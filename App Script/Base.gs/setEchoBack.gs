@@ -1,5 +1,15 @@
 /**
  * 回声机器人，将接收者信息进行原样返回
+ *  * 部署完后替换下面链接botID及部署后的webURL
+ * https://api.telegram.org/bot你的botID/setWebhook?url=你的google webURL
+ *
+ * 浏览器打开链接，返回下方内容皆为成功
+ * {"ok":true,"result":true,"description":"Webhook is set"}
+ * {"ok":true,"result":true,"description":"Webhook is already set"}
+ * 返回google表格即可看到新内容存储
+ *
+ * 返回下面内容则botID失效，通过BotFather重新获取
+ * {"ok":false,"error_code":401,"description":"Unauthorized"}
  */
 function doPost(e) {
   var estringa = JSON.parse(e.postData.contents);
@@ -8,10 +18,7 @@ function doPost(e) {
     method: "post",
     payload: payload,
   };
-  UrlFetchApp.fetch(
-    "https://api.telegram.org/bot你的BotID/",
-    data
-  );
+  UrlFetchApp.fetch("https://api.telegram.org/bot你的BotID/", data);
 }
 function start(estringa) {
   var id = estringa.message.from.id.toString();
