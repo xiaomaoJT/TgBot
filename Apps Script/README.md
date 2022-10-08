@@ -2,6 +2,10 @@
 ***https://github.com/xiaomaoJT/TgBot***
 
 ------------
+
+### 完整脚本 - XiaoMao机器人源码
+### https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs
+
 ------------
 
 ### 目录构成
