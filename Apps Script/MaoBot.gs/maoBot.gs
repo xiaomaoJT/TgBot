@@ -43,8 +43,8 @@ function processData(userMessage) {
   let payload;
   // 定义底部自定义键盘
   let followKeyboard = [
-    [{ text: "小帽集团" }, { text: "Mao`s Bot" }],
-    [{ text: "beta1.0 @Xiao_MaoMao_bot" }],
+    [{ text: "公众号小帽集团" }, { text: "懒人配置" }],
+    [{ text: "免费节点" }, { text: "@Xiao_MaoMao_bot" }],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -82,7 +82,9 @@ function processData(userMessage) {
         : userMessage.message.chat.id.toString();
     let messageReplyID = userMessage.message.message_id.toString();
 
-    let HTML_REPLY = "<b>来自XiaoMaoBot的消息：</b>" + userMessage.message.text;
+    // let HTML_REPLY = "<b>来自XiaoMaoBot的消息：</b>" + userMessage.message.text;
+
+    let HTML_REPLY = processReplyWord(userMessage.message.text);
 
     let payloadPostData = {
       method: "sendMessage",
@@ -94,7 +96,7 @@ function processData(userMessage) {
     };
 
     if (
-      userMessage.message.text == "小帽集团" ||
+      userMessage.message.text == "公众号小帽集团" ||
       userMessage.message.text.indexOf("Mao") != -1
     ) {
       payloadPostData.reply_markup = JSON.stringify(keyboardFollowParams);
@@ -113,9 +115,7 @@ function processData(userMessage) {
       payloadCallback = {
         method: "sendMessage",
         chat_id: callbackChatID,
-        text:
-          "微信公众号：" +
-          "<a href='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI3MjE3NTc4OA==#wechat_redirect'>小帽集团</a>",
+        text: "<a href='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI3MjE3NTc4OA==#wechat_redirect'><b>小帽集团公众号 点击查看</b></a>",
         parse_mode: "HTML",
         reply_markup: JSON.stringify(keyboardFollowParams),
       };
@@ -128,6 +128,76 @@ function processData(userMessage) {
 }
 
 /**
+ * 用于处理用户关键字自动回复
+ * keyword值唯一不可重复，用于匹配用户关键字是否包含，并触发自动回复
+ * @param key 用户消息关键字
+ */
+function processReplyWord(key) {
+  let autoReply = [
+    {
+      keyword: ["懒人", "懒人规则", "配置", "懒人配置"],
+      replyWord:
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XiaoMao_General.conf'>XiaoMao懒人规则通用版</a>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XIAOMAO.conf'>XiaoMao懒人规则自定义版</a>",
+    },
+    {
+      keyword: ["订阅", "节点", "机场", "网易云", "免费节点"],
+      replyWord:
+        "永久节点订阅内置于XiaoMao懒人规则" +
+        "<b>[server_remote]</b>" +
+        "标签中" +
+        "\n" +
+        "回复" +
+        "<b> 懒人规则 </b>" +
+        "以获取节点配置" +
+        "\n" +
+        "回复" +
+        "<b> 订阅转换 </b>" +
+        "以获取转换地址",
+    },
+    {
+      keyword: ["订阅转换", "转换"],
+      replyWord:
+        "1⃣️<a href='https://t.me/QuanXNews/110'>Quantumult X资源解析器</a>" +
+        "\n" +
+        "2⃣️<a href='https://t.me/cool_scripts/200'>Sub-Store本地订阅</a>" +
+        "\n" +
+        "3⃣️在线订阅转换：" +
+        "\n" +
+        "<a href='https://dove.589669.xyz/web'>Clash | Quantumult X | Surge 转换</a>" +
+        "\n" +
+        "<a href='https://sub.pet'>Subscription 转换</a>" +
+        "\n" +
+        "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换</b>",
+    },
+  ];
+  let htmlReply =
+    "<b>来自XiaoMaoBot的消息：</b>" +
+    "\n" +
+    "<b>关键字</b> " +
+    key +
+    "<b> 匹配失败，请联系管理员！</b>";
+
+  let outsideWord = ["公众号小帽集团", "@Xiao_MaoMao_bot"];
+  if (outsideWord.indexOf(key) != -1) {
+    htmlReply =
+      "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "当前时间：" + getNowDate();
+  }
+
+  autoReply.forEach((item) => {
+    item.keyword.forEach((element) => {
+      if (key.indexOf(element) != -1) {
+        htmlReply = "<b>来自XiaoMaoBot的消息：</b>" + "\n" + item.replyWord;
+        return;
+      }
+    });
+  });
+
+  return htmlReply;
+}
+
+/**
  * 将讯息进行Google表格内存储
  * @param {*} MESSAGE
  */
@@ -137,7 +207,7 @@ function setStorage(MESSAGE, TYPE) {
   let userName = MESSAGE.message.chat.username;
   let userAllName =
     MESSAGE.message.chat.first_name + MESSAGE.message.chat.last_name;
-  let messageType = TYPE == 'POSTDATA' ? "POSTDATA" : "CALLBACK";
+  let messageType = TYPE == "POSTDATA" ? "POSTDATA" : "CALLBACK";
   let messageContent = MESSAGE.message.text;
 
   let spreadSheet = SpreadsheetApp.openById(EXECID);
