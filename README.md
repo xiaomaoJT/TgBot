@@ -13,17 +13,12 @@
 ------------
 ------------
 
-### 目录构成
-+ #### [Apps Script](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script) **总目录**
-    * > ##### [配置图解](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/配置图解) **图解配置教程**
-    * > ##### [Base.gs](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/Base.gs) **基础脚本 - 入门必学**
-    * > ##### [MaoBot.gs](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs) **一键脚本 - 完善相关ID Token即可部署使用**
-    * > ##### [Bot.gs](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/Bot.gs) **相关优秀脚本库收藏**
+
 
 ------------
 ------------
 
-## tg机器人 简略配置教程
+## 🌟🌟🌟🌟 tg机器人 简略配置教程
 > - 轻松上手，带你打造属于自己的tg机器人
 > - 有js基础的或想完整学习部署的，可参考[@toikusen](https://ithelp.ithome.com.tw/users/20130283/ironman/3553)教程
 
@@ -35,7 +30,7 @@
 
 ------------
 
-### 🚇 第二步：新建 Google 表格
+### 🚇🚇 第二步：新建 Google 表格
 > - 1、左上角新建，选择Google 表格即可。
 > - 2、浏览器地址栏，记下表格ID 
 ```text
@@ -52,7 +47,7 @@
 
 ------------
 
-### 🚇 第三步：[创建个人tg机器人](https://ithelp.ithome.com.tw/articles/10244411)
+### 🚇🚇🚇 第三步：[创建个人tg机器人](https://ithelp.ithome.com.tw/articles/10244411)
 > -  1、telegram搜索 @BotFather 机器人
 > -  2、点击 @BotFather 菜单 /newbot 或 自行输入
 > -  3、待机器人响应后 按要求输入 自己的机器人名称，注意名称要求小写字母，且以bot结尾，例如maobot或者mao_bot 等等
@@ -70,7 +65,7 @@
 
 ------------
 
-### 🚇 第四步：创建Google Apps Script函数，开启自动回复功能
+### 🚇🚇🚇🚇 第四步：创建Google Apps Script函数，完成机器人部署
 > -  1、打开刚刚创建的Google表格，点击工具栏 扩展程序 > Apps脚本
 > -  2、复制 [maoBot.gs](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs) 代码，并全部覆盖粘贴到脚本内
 > -  3、完善EXECID - 谷歌表格ID
