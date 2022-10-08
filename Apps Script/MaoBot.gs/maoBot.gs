@@ -133,6 +133,7 @@ function processData(userMessage) {
  * @param key 用户消息关键字
  */
 function processReplyWord(key) {
+  //关键字及回复列表
   let autoReply = [
     {
       keyword: ["懒人", "懒人规则", "配置", "懒人配置"],
@@ -172,13 +173,14 @@ function processReplyWord(key) {
         "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换</b>",
     },
   ];
+  //未匹配的关键字回复
   let htmlReply =
     "<b>来自XiaoMaoBot的消息：</b>" +
     "\n" +
     "<b>关键字</b> " +
     key +
     "<b> 匹配失败，请联系管理员！</b>";
-
+  //关键字排除
   let outsideWord = ["公众号小帽集团", "@Xiao_MaoMao_bot"];
   if (outsideWord.indexOf(key) != -1) {
     htmlReply =
