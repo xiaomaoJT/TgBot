@@ -89,3 +89,17 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 {"ok":false,"error_code":401,"description":"Unauthorized"}
 ```
 > -  12、完成，可以通过群聊或者私聊自己的机器人进行消息回复了，并且交互的信息将会自动存于Google表格中，nice～
+
+------------
+------------
+
+## 🌟🌟 更新日志
++ ### 20221001
+    * > MaoBot @Beta1.1
+    * > 增加关键字回复功能，优化自动回复配置
+    * > 增加使用教程
++ ### 20221001
+    * > MaoBot @Beta1.0 第一测试版
+    * > 可实现自定义键盘、消息跟随键盘、自动回复、消息存储等功能
++ ### 20220930
+    * > bot基础代码
