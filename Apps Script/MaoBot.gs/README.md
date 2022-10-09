@@ -80,7 +80,7 @@ var BOTID = "";
 
 #### **autoReply** 参数 自定义关键字匹配
 > - **keyword** 参数为某规则关键字列表，请注意使用数组[]格式，请注意关键字不要重复。
-> - **replyWord** 参数为某关键字所对定的回复语句，html格式或字符串格式，具体规则可参考：https://core.telegram.org/bots/api#formatting-options。
+> - **replyWord** 参数为某关键字所对应的回复语句，html格式或字符串格式，具体规则可参考：https://core.telegram.org/bots/api#formatting-options。
 > - **"\n"**为换行符
 > - **htmlReply** 参数为默认回复语句
 > - **outsideWord** 参数为关键字排除，将优先排除内定的关键字匹配

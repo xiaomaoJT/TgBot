@@ -139,9 +139,9 @@ function processReplyWord(key, chatId) {
     {
       keyword: ["懒人", "懒人规则", "配置", "懒人配置"],
       replyWord:
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XiaoMao_General.conf'>XiaoMao懒人规则通用版</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XiaoMao_General.conf'>1⃣️ XiaoMao懒人规则通用版</a>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XIAOMAO.conf'>XiaoMao懒人规则自定义版</a>",
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XIAOMAO.conf'>2⃣️ XiaoMao懒人规则自定义版</a>",
     },
     {
       keyword: ["订阅", "节点", "机场", "网易云", "免费节点"],
@@ -161,11 +161,11 @@ function processReplyWord(key, chatId) {
     {
       keyword: ["订阅转换", "转换"],
       replyWord:
-        "1⃣️<a href='https://t.me/QuanXNews/110'>Quantumult X资源解析器</a>" +
+        "1⃣️ <a href='https://t.me/QuanXNews/110'>Quantumult X资源解析器</a>" +
         "\n" +
-        "2⃣️<a href='https://t.me/cool_scripts/200'>Sub-Store本地订阅</a>" +
+        "2⃣️ <a href='https://t.me/cool_scripts/200'>Sub-Store本地订阅</a>" +
         "\n" +
-        "3⃣️在线订阅转换：" +
+        "3⃣️ 在线订阅转换：" +
         "\n" +
         "<a href='https://dove.589669.xyz/web'>Clash | Quantumult X | Surge 转换</a>" +
         "\n" +
@@ -204,6 +204,7 @@ function processReplyWord(key, chatId) {
     "<b> 匹配失败，请联系管理员！</b>";
   //关键字排除
   let outsideWord = ["公众号小帽集团", "@Xiao_MaoMao_bot"];
+  // api key
   let commandWord = [
     { api: "/weather", apiId: 0 },
     { api: "/short", apiId: 1 },
