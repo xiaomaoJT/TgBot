@@ -15,6 +15,9 @@
 
 #### [更新日志](#update)
 
+#### [XiaoMao机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
+#### [XiaoMao机器人源码部分参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
+
 ------------
 ------------
 
@@ -94,6 +97,8 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 ------------
 
 ## 🌟🌟 <span id="update">更新日志</span>
+##### [XiaoMao机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
+##### [XiaoMao机器人源码部分参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
 + ### 20221009
     * > MaoBot @Beta2.0
     * > 新增maoBot参数描述
