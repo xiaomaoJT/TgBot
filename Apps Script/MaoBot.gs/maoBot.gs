@@ -43,8 +43,9 @@ function processData(userMessage) {
   let payload;
   // 定义底部自定义键盘
   let followKeyboard = [
-    [{ text: "公众号小帽集团" }, { text: "懒人配置" }],
-    [{ text: "免费节点" }, { text: "@Xiao_MaoMao_bot" }],
+    [{ text: "懒人配置" }, { text: "免费节点" }],
+    [{ text: "api接口查询" }, { text: "订阅转换" }],
+    [{ text: "公众号小帽集团" }, { text: "@Xiao_MaoMao_bot" }],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -54,7 +55,7 @@ function processData(userMessage) {
     ],
     [
       { text: "XiaoMao频道", url: "https://t.me/xiaomaoJT" },
-      { text: "XiaoMao群聊", url: "https://t.me/+hSuMjrQppKE5MWU9" },
+      { text: "XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
     ],
     [{ text: "微信公众号：小帽集团", callback_data: "WXGROUP" }],
   ];
@@ -84,7 +85,7 @@ function processData(userMessage) {
 
     // let HTML_REPLY = "<b>来自XiaoMaoBot的消息：</b>" + userMessage.message.text;
 
-    let HTML_REPLY = processReplyWord(userMessage.message.text);
+    let HTML_REPLY = processReplyWord(userMessage.message.text, messageUserID);
 
     let payloadPostData = {
       method: "sendMessage",
@@ -132,7 +133,7 @@ function processData(userMessage) {
  * keyword值唯一不可重复，用于匹配用户关键字是否包含，并触发自动回复
  * @param key 用户消息关键字
  */
-function processReplyWord(key) {
+function processReplyWord(key, chatId) {
   //关键字及回复列表
   let autoReply = [
     {
@@ -172,6 +173,27 @@ function processReplyWord(key) {
         "\n" +
         "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换</b>",
     },
+    {
+      keyword: ["api接口查询"],
+      replyWord:
+        "1⃣️ 天气状况查询｜示例：/weather 广州" +
+        "\n" +
+        "2⃣️ 短链网址生成｜示例：/short www.baidu.com" +
+        "\n" +
+        "3⃣️ 抖音热搜榜单｜示例：/douyin" +
+        "\n" +
+        "4⃣️ 手机号码查询｜示例：/phone 18888888888" +
+        "\n" +
+        "5⃣️ 网站测速查询｜示例：/ping www.baidu.com" +
+        "\n" +
+        "6⃣️ 酷狗音乐查询｜示例：/music 薛之谦" +
+        "\n" +
+        "7⃣️ 腾讯视频查询｜示例：/video 蜡笔小新" +
+        "\n" +
+        "8⃣️ 中国农历查询｜示例：/nl" +
+        "\n" +
+        "<b>接口数据来源于随身助手API，可能存在拥挤情况，可稍后再试～</b>",
+    },
   ];
   //未匹配的关键字回复
   let htmlReply =
@@ -182,21 +204,326 @@ function processReplyWord(key) {
     "<b> 匹配失败，请联系管理员！</b>";
   //关键字排除
   let outsideWord = ["公众号小帽集团", "@Xiao_MaoMao_bot"];
+  let commandWord = [
+    { api: "/weather", apiId: 0 },
+    { api: "/short", apiId: 1 },
+    { api: "/douyin", apiId: 2 },
+    { api: "/phone", apiId: 3 },
+    { api: "/ping", apiId: 4 },
+    { api: "/music", apiId: 5 },
+    { api: "/video", apiId: 6 },
+    { api: "/nl", apiId: 7 },
+  ];
+
   if (outsideWord.indexOf(key) != -1) {
     htmlReply =
       "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "当前时间：" + getNowDate();
+  } else {
+    if (isApi(commandWord, key).status) {
+      switch (isApi(commandWord, key).id) {
+        case 0:
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            getWeatherApi(getString(key, isApi(commandWord, key).api));
+          break;
+        case 1:
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            getLinkShort(getString(key, isApi(commandWord, key).api));
+          break;
+        case 2:
+          htmlReply = "<b>来自XiaoMaoBot的消息：</b>" + "\n" + getDouYinHost();
+          break;
+        case 3:
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            getPhoneWhere(getString(key, isApi(commandWord, key).api));
+          break;
+        case 4:
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            getWebPing(getString(key, isApi(commandWord, key).api));
+          break;
+        case 5:
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            getKuGouMusic(getString(key, isApi(commandWord, key).api))
+              .returnText;
+
+          if (
+            getKuGouMusic(getString(key, isApi(commandWord, key).api)).status
+          ) {
+            let dataPhoto = {
+              method: "post",
+              payload: {
+                method: "sendPhoto",
+                chat_id: chatId,
+                photo: getKuGouMusic(
+                  getString(key, isApi(commandWord, key).api)
+                ).returnImg,
+              },
+            };
+            //   Google 请求域建立连接
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              dataPhoto
+            );
+          }
+          break;
+        case 6:
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            getTencentVideo(getString(key, isApi(commandWord, key).api))
+              .returnText;
+
+          if (
+            getTencentVideo(getString(key, isApi(commandWord, key).api)).status
+          ) {
+            let dataPhoto = {
+              method: "post",
+              payload: {
+                method: "sendPhoto",
+                chat_id: chatId,
+                photo: getTencentVideo(
+                  getString(key, isApi(commandWord, key).api)
+                ).returnImg,
+              },
+            };
+            //   Google 请求域建立连接
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              dataPhoto
+            );
+          }
+          break;
+        case 7:
+          htmlReply = "<b>来自XiaoMaoBot的消息：</b>" + "\n" + getNongLi();
+          break;
+      }
+    } else {
+      autoReply.forEach((item) => {
+        item.keyword.forEach((element) => {
+          if (key.indexOf(element) != -1) {
+            htmlReply = "<b>来自XiaoMaoBot的消息：</b>" + "\n" + item.replyWord;
+            return;
+          }
+        });
+      });
+    }
   }
 
-  autoReply.forEach((item) => {
-    item.keyword.forEach((element) => {
-      if (key.indexOf(element) != -1) {
-        htmlReply = "<b>来自XiaoMaoBot的消息：</b>" + "\n" + item.replyWord;
-        return;
-      }
-    });
-  });
-
   return htmlReply;
+}
+
+/**
+ * 用于截取api关键字后查询内容
+ * @param key
+ * @param keyApi
+ * @returns
+ */
+function getString(key, keyApi) {
+  const apiString = key.split(keyApi)[1] || "";
+  return apiString.replace(/\s*/g,"");
+}
+/**
+ * 用于api接口参数识别
+ * @param commandList
+ * @param key
+ * @returns
+ */
+function isApi(commandList, key) {
+  let isApiStatus = {
+    status: false,
+    id: null,
+    api: "",
+  };
+  commandList.forEach((command) => {
+    if (key.indexOf(command.api) != -1) {
+      isApiStatus.status = true;
+      isApiStatus.id = command.apiId;
+      isApiStatus.api = command.api;
+    }
+  });
+  return isApiStatus;
+}
+
+/**
+ * 腾讯视频查询
+ * @param video
+ * @returns
+ */
+function getTencentVideo(video) {
+  let responseTencentVideo = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/txss.php?msg=" + video
+  );
+  let returnTextTem = responseTencentVideo.getContentText();
+
+  let returnList = {
+    returnImg: "",
+    returnText: "",
+    status: false,
+  };
+
+  if (
+    returnTextTem.indexOf("±") != -1 &&
+    returnTextTem.lastIndexOf("±") != -1
+  ) {
+    returnList.returnImg = returnTextTem.substring(
+      returnTextTem.indexOf("±") + 5,
+      returnTextTem.lastIndexOf("±")
+    );
+    if (returnList.returnImg.length) {
+      returnList.status = true;
+    }
+  }
+
+  returnList.returnText = returnTextTem
+    .replace(
+      returnTextTem.substring(
+        returnTextTem.indexOf("±"),
+        returnTextTem.lastIndexOf("±") + 1
+      ),
+      ""
+    )
+    .replace("随身助手API", "XiaoMao - ");
+  return returnList;
+}
+/**
+ * 酷狗音乐查询
+ * @param music
+ * @returns
+ */
+function getKuGouMusic(music) {
+  let responseKuGouMusic = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/kugoudx.php?msg=" + music + "&b=1"
+  );
+  let returnTextTem = responseKuGouMusic.getContentText();
+
+  let returnList = {
+    returnImg: "",
+    returnText: "",
+    status: false,
+  };
+
+  if (
+    returnTextTem.indexOf("±") != -1 &&
+    returnTextTem.lastIndexOf("±") != -1
+  ) {
+    returnList.returnImg = returnTextTem.substring(
+      returnTextTem.indexOf("±") + 5,
+      returnTextTem.lastIndexOf("±")
+    );
+    if (returnList.returnImg.length) {
+      returnList.status = true;
+    }
+  }
+
+  returnList.returnText = returnTextTem
+    .replace(
+      returnTextTem.substring(
+        returnTextTem.indexOf("±"),
+        returnTextTem.lastIndexOf("±") + 1
+      ),
+      ""
+    )
+    .replace("随身助手API", "XiaoMao - ");
+  return returnList;
+}
+/**
+ * 网址测速查询
+ * @param web
+ * @returns
+ */
+function getWebPing(web) {
+  let responseWeb = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/ping.php?url=" + web
+  );
+  let returnText = responseWeb
+    .getContentText()
+    .replace("随身助手API", "XiaoMao - ");
+  return returnText;
+}
+
+/**
+ * 查询手机号码归属地
+ * @param phone
+ * @returns
+ */
+function getPhoneWhere(phone) {
+  let responsePhone = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/phone.php?id=" + phone
+  );
+  let returnText = responsePhone
+    .getContentText()
+    .replace("随身助手API", "XiaoMao - ");
+  return returnText;
+}
+/**
+ * 农历查询
+ * @returns
+ */
+function getNongLi() {
+  let responseNongLi = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/nl.php"
+  );
+  let returnText = responseNongLi
+    .getContentText()
+    .replace("随身助手API", "XiaoMao - ");
+  return returnText;
+}
+/**
+ * 查询抖音热搜榜单
+ * @param text
+ * @returns
+ */
+function getDouYinHost() {
+  let responseDouYinHost = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/douyinresou.php"
+  );
+  let returnText = responseDouYinHost
+    .getContentText()
+    .replace("随身助手API", "XiaoMao - ");
+  return returnText;
+}
+/**
+ * 短网址生成
+ * @param link
+ * @returns
+ */
+function getLinkShort(link) {
+  let responseLinkShort = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/dwz.php?url=" + link
+  );
+  let returnText = "";
+  if (JSON.parse(responseLinkShort.getContentText()).code == 1000) {
+    returnText =
+      "<b>网址短链接:</b>" +
+      JSON.parse(responseLinkShort.getContentText()).data.url;
+  } else {
+    returnText = "<b>发生错误，请稍后重试！</b>";
+  }
+
+  return returnText;
+}
+/**
+ * 天气api查询
+ * @param location
+ * @returns
+ */
+function getWeatherApi(location) {
+  let responseWeather = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/tianqi.php?msg=" + location + "&b=1"
+  );
+  let returnText = responseWeather
+    .getContentText()
+    .replace("随身助手API", "XiaoMao - ");
+  return returnText;
 }
 
 /**
