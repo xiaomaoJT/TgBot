@@ -100,6 +100,10 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 ## 🌟🌟 <span id="update">更新日志</span>
 ##### [XiaoMao机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
 ##### [XiaoMao机器人源码部分参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
+
++ ### 20221013
+    * > 更新maoBot.gs回复内容设定及语句换行样式优化。
+    * > 内部测试版本号 MaoBot @Beta2.3
 + ### 20221009
     * > MaoBot @Beta2.0
     * > 新增maoBot参数描述
