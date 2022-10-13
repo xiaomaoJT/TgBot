@@ -139,9 +139,16 @@ function processReplyWord(key, chatId) {
     {
       keyword: ["懒人", "懒人规则", "配置", "懒人配置"],
       replyWord:
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XiaoMao_General.conf'>1⃣️ XiaoMao懒人规则通用版</a>" +
+        "<b>iPhone/iPad设备 - 懒人规则</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XIAOMAO.conf'>2⃣️ XiaoMao懒人规则自定义版</a>",
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XiaoMao_General.conf'>1⃣️ XiaoMao懒人规则通用版·XiaoMao推荐</a>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XIAOMAO.conf'>2⃣️ XiaoMao懒人规则自定义版</a>" +
+        "\n" +
+        "\n" +
+        "<b>Mac M芯片设备 - 懒人规则</b>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QX_Mac/QuantumultX_XIAOMAO_Mac.conf'>1⃣️ XiaoMao懒人规则Mac版</a>",
     },
     {
       keyword: ["订阅", "节点", "机场", "网易云", "免费节点"],
@@ -199,6 +206,7 @@ function processReplyWord(key, chatId) {
   let htmlReply =
     "<b>来自XiaoMaoBot的消息：</b>" +
     "\n" +
+    "\n" +
     "<b>关键字</b> " +
     key +
     "<b> 匹配失败，请联系管理员！</b>";
@@ -218,7 +226,11 @@ function processReplyWord(key, chatId) {
 
   if (outsideWord.indexOf(key) != -1) {
     htmlReply =
-      "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "当前时间：" + getNowDate();
+      "<b>来自XiaoMaoBot的消息：</b>" +
+      "\n" +
+      "\n" +
+      "当前时间：" +
+      getNowDate();
   } else {
     if (isApi(commandWord, key).status) {
       switch (isApi(commandWord, key).id) {
@@ -226,20 +238,24 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>来自XiaoMaoBot的消息：</b>" +
             "\n" +
+            "\n" +
             getWeatherApi(getString(key, isApi(commandWord, key).api));
           break;
         case 1:
           htmlReply =
             "<b>来自XiaoMaoBot的消息：</b>" +
             "\n" +
+            "\n" +
             getLinkShort(getString(key, isApi(commandWord, key).api));
           break;
         case 2:
-          htmlReply = "<b>来自XiaoMaoBot的消息：</b>" + "\n" + getDouYinHost();
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getDouYinHost();
           break;
         case 3:
           htmlReply =
             "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
             "\n" +
             getPhoneWhere(getString(key, isApi(commandWord, key).api));
           break;
@@ -247,11 +263,13 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>来自XiaoMaoBot的消息：</b>" +
             "\n" +
+            "\n" +
             getWebPing(getString(key, isApi(commandWord, key).api));
           break;
         case 5:
           htmlReply =
             "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
             "\n" +
             getKuGouMusic(getString(key, isApi(commandWord, key).api))
               .returnText;
@@ -280,6 +298,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>来自XiaoMaoBot的消息：</b>" +
             "\n" +
+            "\n" +
             getTencentVideo(getString(key, isApi(commandWord, key).api))
               .returnText;
 
@@ -304,14 +323,16 @@ function processReplyWord(key, chatId) {
           }
           break;
         case 7:
-          htmlReply = "<b>来自XiaoMaoBot的消息：</b>" + "\n" + getNongLi();
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getNongLi();
           break;
       }
     } else {
       autoReply.forEach((item) => {
         item.keyword.forEach((element) => {
           if (key.indexOf(element) != -1) {
-            htmlReply = "<b>来自XiaoMaoBot的消息：</b>" + "\n" + item.replyWord;
+            htmlReply =
+              "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + item.replyWord;
             return;
           }
         });
@@ -330,7 +351,7 @@ function processReplyWord(key, chatId) {
  */
 function getString(key, keyApi) {
   const apiString = key.split(keyApi)[1] || "";
-  return apiString.replace(/\s*/g,"");
+  return apiString.replace(/\s*/g, "");
 }
 /**
  * 用于api接口参数识别
