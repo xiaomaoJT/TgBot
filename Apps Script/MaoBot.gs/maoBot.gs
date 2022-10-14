@@ -29,8 +29,29 @@ function doPost(e) {
     method: "post",
     payload: payload,
   };
+
+  // 分析文字消息是否包含关键字 未包含将不做匹配
+  let htmlReplyState = true;
+  if (userMessage.message) {
+    // 判断消息类型 - 进行私聊或群聊回复
+    let messageUserID =
+      userMessage.message.chat.type == "private"
+        ? userMessage.message.from.id.toString()
+        : userMessage.message.chat.id.toString();
+    htmlReplyState = processReplyWord(
+      userMessage.message.text,
+      messageUserID
+    ).state;
+  }
   //   Google 请求域建立连接
-  UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+  // 判断消息，仅对私聊和@消息以及关键字进行回复
+  if (
+    htmlReplyState ||
+    userMessage.message.chat.type == "private" ||
+    userMessage.message.entities[0].type == "mention"
+  ) {
+    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+  }
 }
 
 /**
@@ -85,7 +106,10 @@ function processData(userMessage) {
 
     // let HTML_REPLY = "<b>来自XiaoMaoBot的消息：</b>" + userMessage.message.text;
 
-    let HTML_REPLY = processReplyWord(userMessage.message.text, messageUserID);
+    let HTML_REPLY = processReplyWord(
+      userMessage.message.text,
+      messageUserID
+    ).htmlReply;
 
     let payloadPostData = {
       method: "sendMessage",
@@ -207,9 +231,15 @@ function processReplyWord(key, chatId) {
     "<b>来自XiaoMaoBot的消息：</b>" +
     "\n" +
     "\n" +
-    "<b>关键字</b> " +
+    "<b>呜呜呜，关键字</b> " +
     key +
-    "<b> 匹配失败，请联系管理员！</b>";
+    "<b> 匹配失败，XiaoMao已采集，正在抓紧学习！</b>";
+
+  // 自动回复关键字判断
+  let returnHtmlReply = {
+    htmlReply: "",
+    state: false,
+  };
   //关键字排除
   let outsideWord = ["公众号小帽集团", "@Xiao_MaoMao_bot"];
   // api key
@@ -231,6 +261,7 @@ function processReplyWord(key, chatId) {
       "\n" +
       "当前时间：" +
       getNowDate();
+    returnHtmlReply.state = true;
   } else {
     if (isApi(commandWord, key).status) {
       switch (isApi(commandWord, key).id) {
@@ -240,6 +271,7 @@ function processReplyWord(key, chatId) {
             "\n" +
             "\n" +
             getWeatherApi(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
           break;
         case 1:
           htmlReply =
@@ -247,10 +279,12 @@ function processReplyWord(key, chatId) {
             "\n" +
             "\n" +
             getLinkShort(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
           break;
         case 2:
           htmlReply =
             "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getDouYinHost();
+          returnHtmlReply.state = true;
           break;
         case 3:
           htmlReply =
@@ -258,6 +292,7 @@ function processReplyWord(key, chatId) {
             "\n" +
             "\n" +
             getPhoneWhere(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
           break;
         case 4:
           htmlReply =
@@ -265,6 +300,7 @@ function processReplyWord(key, chatId) {
             "\n" +
             "\n" +
             getWebPing(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
           break;
         case 5:
           htmlReply =
@@ -273,6 +309,7 @@ function processReplyWord(key, chatId) {
             "\n" +
             getKuGouMusic(getString(key, isApi(commandWord, key).api))
               .returnText;
+          returnHtmlReply.state = true;
 
           if (
             getKuGouMusic(getString(key, isApi(commandWord, key).api)).status
@@ -301,6 +338,7 @@ function processReplyWord(key, chatId) {
             "\n" +
             getTencentVideo(getString(key, isApi(commandWord, key).api))
               .returnText;
+          returnHtmlReply.state = true;
 
           if (
             getTencentVideo(getString(key, isApi(commandWord, key).api)).status
@@ -325,6 +363,7 @@ function processReplyWord(key, chatId) {
         case 7:
           htmlReply =
             "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getNongLi();
+          returnHtmlReply.state = true;
           break;
       }
     } else {
@@ -333,6 +372,7 @@ function processReplyWord(key, chatId) {
           if (key.indexOf(element) != -1) {
             htmlReply =
               "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + item.replyWord;
+            returnHtmlReply.state = true;
             return;
           }
         });
@@ -340,7 +380,9 @@ function processReplyWord(key, chatId) {
     }
   }
 
-  return htmlReply;
+  returnHtmlReply.htmlReply = htmlReply;
+
+  return returnHtmlReply;
 }
 
 /**
