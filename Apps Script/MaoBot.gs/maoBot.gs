@@ -571,7 +571,7 @@ function setStorage(MESSAGE, TYPE) {
   Sheet.getRange(lastSheetRow + 1, 4).setValue(userAllName);
   Sheet.getRange(lastSheetRow + 1, 5).setValue(messageType);
   Sheet.getRange(lastSheetRow + 1, 6).setValue(messageContent);
-  Sheet.getRange(lastSheetRow + 1, 7).setValue(MESSAGE);
+  Sheet.getRange(lastSheetRow + 1, 7).setValue(JSON.stringify(MESSAGE));
 }
 
 /**
