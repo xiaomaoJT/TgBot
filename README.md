@@ -8,7 +8,7 @@
 - 作者@XiaoMao
 - 当前版本：@Beta2.0
 - 可实现接口查询、自定义键盘、自动回复、关键字回复等功能
-- 最近更新时间：2022年10月09日
+- 最近更新时间：2022年10月14日
 > 资源来源于网络，仅供学习参考，请于下载后24小时内删除
 
 ------------
@@ -101,6 +101,9 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 ##### [XiaoMao机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
 ##### [XiaoMao机器人源码部分参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
 
++ ### 20221014
+    * > 更新maoBot.gs存储优化，避免id串自动格式化
+    * > 内部测试版本号 MaoBot @Beta2.3
 + ### 20221013
     * > 更新maoBot.gs回复内容设定及语句换行样式优化。
     * > 内部测试版本号 MaoBot @Beta2.3
