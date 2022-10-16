@@ -181,13 +181,17 @@ function processReplyWord(key, chatId) {
         "<b>[server_remote]</b>" +
         "标签中" +
         "\n" +
+        "\n" +
         "回复" +
         "<b> 懒人规则 </b>" +
         "以获取节点配置" +
         "\n" +
         "回复" +
         "<b> 订阅转换 </b>" +
-        "以获取转换地址",
+        "以获取转换地址" +
+        "\n" +
+        "\n" +
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'>XiaoMao-Forever 长按复制订阅地址</a>",
     },
     {
       keyword: ["订阅转换", "转换"],

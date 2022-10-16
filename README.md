@@ -6,9 +6,9 @@
 
 ## Telegram机器人，基于Google Apps Script实现.
 - 作者@XiaoMao
-- 当前版本：@Beta3.1
+- 当前版本：@Beta3.2
 - 可实现接口查询、自定义键盘、私聊与@自动回复、关键字回复等功能
-- 最近更新时间：2022年10月14日
+- 最近更新时间：2022年10月16日
 > 资源来源于网络，仅供学习参考，请于下载后24小时内删除
 
 ------------
@@ -101,6 +101,9 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 ##### [XiaoMao机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
 ##### [XiaoMao机器人源码部分参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
 
++ ### 20221016
+    * > 免费节点订阅地址开放 [XiaoMao-Forever](https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever)。
+    * > 内部测试版本号 MaoBot @Beta3.2
 + ### 20221014
     * > 更新maoBot.gs存储优化，避免id串自动格式化。
     * > 优化自动回复逻辑，仅对 私聊消息、关键字、@消息 三种类型进行回复。
