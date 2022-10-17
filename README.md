@@ -100,8 +100,9 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 ## 🌟🌟 <span id="update">更新日志</span>
 ##### [XiaoMao机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
 ##### [XiaoMao机器人源码部分参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
-- 如何更新？在Google Apps Script脚本中，替换maobot代码，新建部署即可
-- 旧部署将自动归档；请注意保留前三行 EXECID 、 EXECNAME 、 BOTID参数。
+> 如何更新？在Google表格的Apps脚本中，替换maobot代码，保存并部署即可。
+> 如何更新部署？右上角部署 > 管理部署 > 编辑 > 选择新版本，输入版本描述 > 部署即可生效。
+> 旧部署将自动归档；请注意保留前三行 EXECID 、 EXECNAME 、 BOTID参数。
 
 + ### 20221017
     * > 更新maobot源码参数详解。
