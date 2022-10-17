@@ -161,7 +161,7 @@ function processReplyWord(key, chatId) {
   //关键字及回复列表
   let autoReply = [
     {
-      keyword: ["懒人", "懒人规则", "配置", "懒人配置"],
+      keyword: ["懒人", "懒人规则", "懒人配置"],
       replyWord:
         "<b>iPhone/iPad设备 - 懒人规则</b>" +
         "\n" +
@@ -172,10 +172,13 @@ function processReplyWord(key, chatId) {
         "\n" +
         "<b>Mac M芯片设备 - 懒人规则</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QX_Mac/QuantumultX_XIAOMAO_Mac.conf'>1⃣️ XiaoMao懒人规则Mac版</a>",
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QX_Mac/QuantumultX_XIAOMAO_Mac.conf'>1⃣️ XiaoMao懒人规则Mac版</a>" +
+        "\n" +
+        "\n" +
+        "<a href='https://github.com/xiaomaoJT/QX_Script#xiaomao懒人规则--使用教程'>xiaomao懒人规则使用教程</a>",
     },
     {
-      keyword: ["订阅", "节点", "机场", "网易云", "免费节点"],
+      keyword: ["订阅", "节点", "网易云", "免费节点"],
       replyWord:
         "永久节点订阅内置于XiaoMao懒人规则" +
         "<b>[server_remote]</b>" +
