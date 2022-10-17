@@ -101,6 +101,8 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 ##### [XiaoMao机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
 ##### [XiaoMao机器人源码部分参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
 
++ ### 20221017
+    * > 更新maobot源码参数详解。
 + ### 20221016
     * > 免费节点订阅地址开放 [XiaoMao-Forever](https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever)。
     * > 内部测试版本号 MaoBot @Beta3.2
