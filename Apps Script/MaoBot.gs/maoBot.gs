@@ -218,7 +218,7 @@ function processReplyWord(key, chatId) {
         "\n" +
         "2⃣️ 短链网址生成｜示例：/short www.baidu.com" +
         "\n" +
-        "3⃣️ 抖音热搜榜单｜示例：/douyin" +
+        "3⃣️ 抖音热搜榜单｜示例：/dy" +
         "\n" +
         "4⃣️ 手机号码查询｜示例：/phone 18888888888" +
         "\n" +
@@ -229,6 +229,10 @@ function processReplyWord(key, chatId) {
         "7⃣️ 腾讯视频查询｜示例：/video 蜡笔小新" +
         "\n" +
         "8⃣️ 中国农历查询｜示例：/nl" +
+        "\n" +
+        "9⃣️ 聊天机器人｜示例：/hi 小帽" +
+        "\n" +
+        "🔟 国内疫情查询｜示例：/yq 广州" +
         "\n" +
         "<b>接口数据来源于随身助手API，可能存在拥挤情况，可稍后再试～</b>",
     },
@@ -253,12 +257,14 @@ function processReplyWord(key, chatId) {
   let commandWord = [
     { api: "/weather", apiId: 0 },
     { api: "/short", apiId: 1 },
-    { api: "/douyin", apiId: 2 },
+    { api: "/dy", apiId: 2 },
     { api: "/phone", apiId: 3 },
     { api: "/ping", apiId: 4 },
     { api: "/music", apiId: 5 },
     { api: "/video", apiId: 6 },
     { api: "/nl", apiId: 7 },
+    { api: "/hi", apiId: 8 },
+    { api: "/yq", apiId: 9 },
   ];
 
   if (outsideWord.indexOf(key) != -1) {
@@ -372,6 +378,22 @@ function processReplyWord(key, chatId) {
             "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getNongLi();
           returnHtmlReply.state = true;
           break;
+        case 8:
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "\n" +
+            getHelloBot(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
+          break;
+        case 9:
+          htmlReply =
+            "<b>来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "\n" +
+            getCOVID19(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
+          break;
       }
     } else {
       autoReply.forEach((item) => {
@@ -422,6 +444,33 @@ function isApi(commandList, key) {
     }
   });
   return isApiStatus;
+}
+
+/**
+ * 地区疫情查询
+ * @param address
+ * @returns
+ */
+function getCOVID19(address) {
+  let responseCOVID19 = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/yq.php?msg=" + address
+  );
+  let returnText = responseCOVID19
+    .getContentText()
+    .replace("随身助手API", "XiaoMao - ");
+  return returnText;
+}
+/**
+ * 聊天api
+ * @param word
+ * @returns
+ */
+function getHelloBot(word) {
+  let responseHelloBot = UrlFetchApp.fetch(
+    "http://api.wuxixindong.cn/api/liaotian.php?msg=" + word
+  );
+  let returnText = responseHelloBot.getContentText();
+  return returnText;
 }
 
 /**
