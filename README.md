@@ -107,7 +107,12 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 > 旧部署将自动归档；请注意保留前三行 EXECID 、 EXECNAME 、 BOTID参数。
 
 + ### 20221021
-    * > 更新maobot，内部测试版本号@Beta3.3。
+    * > 更新maobot，内部测试版本号@Beta3.76。
+    * > 优化讯息存储结构，增加回复语句存储（数据存储更改，需同步修改Google表格结构），[配置图解 点击查看](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/配置图解)。
+    ```text
+    发起时间	用户ID	用户名称	用户昵称	消息类型	消息来源	来源ID	消息内容	消息JSON
+    ```
+    * > 修复消息回调键盘失效的问题。
     * > 新增接口聊天机器人 ，通过指令 /hi 激活 ，例如/hi 早上好
     * > 新增国内疫情查询 ， 通过指令 /yq 激活 ， 例如/yq 广东
 + ### 20221017
