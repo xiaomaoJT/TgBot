@@ -48,9 +48,11 @@ function doPost(e) {
   if (
     htmlReplyState ||
     userMessage.message.chat.type == "private" ||
-    userMessage.message.entities[0].type == "mention"
+    userMessage.message.entities[0].type == "mention" ||
+    userMessage.message.entities[0].type == "bold"
   ) {
     UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+    setStorage(data, "MESSAGEBACK");
   }
 }
 
@@ -652,24 +654,87 @@ function getWeatherApi(location) {
  */
 function setStorage(MESSAGE, TYPE) {
   let time = getNowDate();
-  let userID = MESSAGE.message.from.id.toString();
-  let userName = MESSAGE.message.chat.username;
-  let userAllName =
-    MESSAGE.message.chat.first_name + MESSAGE.message.chat.last_name;
-  let messageType = TYPE == "POSTDATA" ? "POSTDATA" : "CALLBACK";
-  let messageContent = MESSAGE.message.text;
+  let userID,
+    userName,
+    userAllName,
+    messageSource,
+    messageSourceID,
+    messageType,
+    messageContent = "";
+  if (TYPE != "MESSAGEBACK") {
+    userID = MESSAGE.message.from.id.toString();
+
+    userName = "@" + MESSAGE.message.from.username;
+
+    userAllName =
+      (MESSAGE.message.from.first_name != undefined
+        ? MESSAGE.message.from.first_name
+        : "") +
+      (MESSAGE.message.from.last_name != undefined
+        ? MESSAGE.message.from.last_name
+        : "");
+
+    if (userAllName == "") {
+      userAllName = "该用户未设置昵称";
+    }
+    messageContent = MESSAGE.message.text;
+
+    messageSource =
+      (MESSAGE.message.chat.type == "supergroup"
+        ? MESSAGE.message.chat.title
+        : "") +
+      "(" +
+      (MESSAGE.message.chat.type == "supergroup"
+        ? "群聊消息"
+        : MESSAGE.message.chat.type == "private"
+        ? "私聊消息"
+        : "未知渠道") +
+      ")";
+
+    messageSourceID = MESSAGE.message.chat.id.toString();
+  }
+
+  messageType =
+    TYPE == "POSTDATA"
+      ? "主动发起"
+      : TYPE == "CALLBACK"
+      ? "键盘回调"
+      : "--自动回复";
 
   let spreadSheet = SpreadsheetApp.openById(EXECID);
   let Sheet = spreadSheet.getSheetByName(EXECNAME);
   let lastSheetRow = spreadSheet.getLastRow();
 
+  //发起时间
   Sheet.getRange(lastSheetRow + 1, 1).setValue(time);
-  Sheet.getRange(lastSheetRow + 1, 2).setValue(userID);
-  Sheet.getRange(lastSheetRow + 1, 3).setValue(userName);
-  Sheet.getRange(lastSheetRow + 1, 4).setValue(userAllName);
+  //用户ID
+  TYPE != "MESSAGEBACK"
+    ? Sheet.getRange(lastSheetRow + 1, 2).setValue(userID)
+    : "";
+  //用户名称
+  TYPE != "MESSAGEBACK"
+    ? Sheet.getRange(lastSheetRow + 1, 3).setValue(userName)
+    : "";
+  // 用户昵称
+  TYPE != "MESSAGEBACK"
+    ? Sheet.getRange(lastSheetRow + 1, 4).setValue(userAllName)
+    : "";
+  // 消息类型
   Sheet.getRange(lastSheetRow + 1, 5).setValue(messageType);
-  Sheet.getRange(lastSheetRow + 1, 6).setValue(messageContent);
-  Sheet.getRange(lastSheetRow + 1, 7).setValue(JSON.stringify(MESSAGE));
+  // 消息来源
+  TYPE != "MESSAGEBACK"
+    ? Sheet.getRange(lastSheetRow + 1, 6).setValue(messageSource)
+    : "";
+  // 消息来源ID
+  TYPE != "MESSAGEBACK"
+    ? Sheet.getRange(lastSheetRow + 1, 7).setValue(messageSourceID)
+    : "";
+  // 消息内容
+  TYPE != "MESSAGEBACK"
+    ? Sheet.getRange(lastSheetRow + 1, 8).setValue(messageContent)
+    : "";
+  // 消息JSON
+  Sheet.getRange(lastSheetRow + 1, 9).setValue(JSON.stringify(MESSAGE));
 }
 
 /**
