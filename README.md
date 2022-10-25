@@ -140,3 +140,15 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
     * > 可实现自定义键盘、消息跟随键盘、自动回复、消息存储等功能
 + ### 20220930
     * > bot基础代码
+
+------------
+------------
+
+![Visitor Count](https://profile-counter.glitch.me/xiaomaoJT/count.svg)
+
+[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=xiaomaoJT&layout=compact)](https://github.com/xiaomaoJT/github-readme-stats)
+
+![xiaomaoJT's GitHub stats](https://github-readme-stats.vercel.app/api?username=xiaomaoJT&show_icons=true&theme=tokyonight)
+
+------------
+------------
