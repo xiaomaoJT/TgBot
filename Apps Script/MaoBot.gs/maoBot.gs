@@ -106,7 +106,7 @@ function processData(userMessage) {
         : userMessage.message.chat.id.toString();
     let messageReplyID = userMessage.message.message_id.toString();
 
-    // let HTML_REPLY = "<b>来自XiaoMaoBot的消息：</b>" + userMessage.message.text;
+    // let HTML_REPLY = "<b>🕹 来自XiaoMaoBot的消息：</b>" + userMessage.message.text;
 
     let HTML_REPLY = processReplyWord(
       userMessage.message.text,
@@ -142,7 +142,7 @@ function processData(userMessage) {
       payloadCallback = {
         method: "sendMessage",
         chat_id: callbackChatID,
-        text: "<a href='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI3MjE3NTc4OA==#wechat_redirect'><b>小帽集团公众号 点击查看</b></a>",
+        text: "<a href='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI3MjE3NTc4OA==#wechat_redirect'><b>🕹 小帽集团公众号 点击查看</b></a>",
         parse_mode: "HTML",
         reply_markup: JSON.stringify(keyboardFollowParams),
       };
@@ -177,12 +177,12 @@ function processReplyWord(key, chatId) {
         "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QX_Mac/QuantumultX_XIAOMAO_Mac.conf'>1⃣️ XiaoMao懒人规则Mac版</a>" +
         "\n" +
         "\n" +
-        "<a href='https://github.com/xiaomaoJT/QX_Script#xiaomao懒人规则--使用教程'>xiaomao懒人规则使用教程</a>",
+        "<a href='https://github.com/xiaomaoJT/QX_Script#快速导航'>💊 xiaomao懒人规则使用教程</a>",
     },
     {
       keyword: ["订阅", "节点", "网易云", "免费节点"],
       replyWord:
-        "永久节点订阅内置于XiaoMao懒人规则" +
+        "永久节点订阅已内置于XiaoMao懒人规则" +
         "<b>[server_remote]</b>" +
         "标签中" +
         "\n" +
@@ -196,7 +196,7 @@ function processReplyWord(key, chatId) {
         "以获取转换地址" +
         "\n" +
         "\n" +
-        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'>XiaoMao-Forever 长按复制订阅地址</a>",
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'>💊 XiaoMao-Forever 长按复制订阅地址</a>",
     },
     {
       keyword: ["订阅转换", "转换"],
@@ -210,6 +210,7 @@ function processReplyWord(key, chatId) {
         "<a href='https://dove.589669.xyz/web'>Clash | Quantumult X | Surge 转换</a>" +
         "\n" +
         "<a href='https://sub.pet'>Subscription 转换</a>" +
+        "\n" +
         "\n" +
         "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换</b>",
     },
@@ -236,12 +237,13 @@ function processReplyWord(key, chatId) {
         "\n" +
         "🔟 国内疫情查询｜示例：/yq 广州" +
         "\n" +
+        "\n" +
         "<b>接口数据来源于随身助手API，可能存在拥挤情况，可稍后再试～</b>",
     },
   ];
   //未匹配的关键字回复
   let htmlReply =
-    "<b>来自XiaoMaoBot的消息：</b>" +
+    "<b>🕹 来自XiaoMaoBot的消息：</b>" +
     "\n" +
     "\n" +
     "<b>呜呜呜，关键字</b> " +
@@ -271,7 +273,7 @@ function processReplyWord(key, chatId) {
 
   if (outsideWord.indexOf(key) != -1) {
     htmlReply =
-      "<b>来自XiaoMaoBot的消息：</b>" +
+      "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
       "\n" +
       "当前时间：" +
@@ -282,7 +284,7 @@ function processReplyWord(key, chatId) {
       switch (isApi(commandWord, key).id) {
         case 0:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" +
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
             getWeatherApi(getString(key, isApi(commandWord, key).api));
@@ -290,7 +292,7 @@ function processReplyWord(key, chatId) {
           break;
         case 1:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" +
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
             getLinkShort(getString(key, isApi(commandWord, key).api));
@@ -298,12 +300,12 @@ function processReplyWord(key, chatId) {
           break;
         case 2:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getDouYinHost();
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getDouYinHost();
           returnHtmlReply.state = true;
           break;
         case 3:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" +
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
             getPhoneWhere(getString(key, isApi(commandWord, key).api));
@@ -311,7 +313,7 @@ function processReplyWord(key, chatId) {
           break;
         case 4:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" +
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
             getWebPing(getString(key, isApi(commandWord, key).api));
@@ -319,7 +321,7 @@ function processReplyWord(key, chatId) {
           break;
         case 5:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" +
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
             getKuGouMusic(getString(key, isApi(commandWord, key).api))
@@ -348,7 +350,7 @@ function processReplyWord(key, chatId) {
           break;
         case 6:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" +
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
             getTencentVideo(getString(key, isApi(commandWord, key).api))
@@ -377,12 +379,12 @@ function processReplyWord(key, chatId) {
           break;
         case 7:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getNongLi();
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getNongLi();
           returnHtmlReply.state = true;
           break;
         case 8:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" +
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
             getHelloBot(getString(key, isApi(commandWord, key).api));
@@ -390,7 +392,7 @@ function processReplyWord(key, chatId) {
           break;
         case 9:
           htmlReply =
-            "<b>来自XiaoMaoBot的消息：</b>" +
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
             getCOVID19(getString(key, isApi(commandWord, key).api));
@@ -402,7 +404,7 @@ function processReplyWord(key, chatId) {
         item.keyword.forEach((element) => {
           if (key.indexOf(element) != -1) {
             htmlReply =
-              "<b>来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + item.replyWord;
+              "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + item.replyWord;
             returnHtmlReply.state = true;
             return;
           }
@@ -664,7 +666,10 @@ function setStorage(MESSAGE, TYPE) {
   if (TYPE != "MESSAGEBACK") {
     userID = MESSAGE.message.from.id.toString();
 
-    userName = "@" + MESSAGE.message.from.username;
+    userName =
+      MESSAGE.message.from.username != undefined
+        ? "@" + MESSAGE.message.from.username
+        : "🈚️用户名";
 
     userAllName =
       (MESSAGE.message.from.first_name != undefined
