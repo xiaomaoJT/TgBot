@@ -269,6 +269,7 @@ function processReplyWord(key, chatId) {
     { api: "/nl", apiId: 7 },
     { api: "/hi", apiId: 8 },
     { api: "/yq", apiId: 9 },
+    { api: "/start", apiId: 10 },
   ];
 
   if (outsideWord.indexOf(key) != -1) {
@@ -398,6 +399,14 @@ function processReplyWord(key, chatId) {
             getCOVID19(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
+          case 10:
+            htmlReply =
+              "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+              "\n" +
+              "\n" +
+              "Hello,我是 XiaoMao机器人,很高兴认识您！";
+            returnHtmlReply.state = true;
+            break;
       }
     } else {
       autoReply.forEach((item) => {
