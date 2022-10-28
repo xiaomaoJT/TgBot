@@ -219,7 +219,7 @@ function processReplyWord(key, chatId) {
       replyWord:
         "1⃣️ 天气状况查询｜示例：/weather 广州" +
         "\n" +
-        "2⃣️ 短链网址生成｜示例：/short www.baidu.com" +
+        "2⃣️ 短链网址生成｜示例：/suo www.baidu.com" +
         "\n" +
         "3⃣️ 抖音热搜榜单｜示例：/dy" +
         "\n" +
@@ -260,7 +260,7 @@ function processReplyWord(key, chatId) {
   // api key
   let commandWord = [
     { api: "/weather", apiId: 0 },
-    { api: "/short", apiId: 1 },
+    { api: "/suo", apiId: 1 },
     { api: "/dy", apiId: 2 },
     { api: "/phone", apiId: 3 },
     { api: "/ping", apiId: 4 },
