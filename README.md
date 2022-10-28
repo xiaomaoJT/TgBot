@@ -107,8 +107,9 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 > 旧部署将自动归档；请注意保留前三行 EXECID 、 EXECNAME 、 BOTID参数。
 
 + ### 20221028
-    * > 更新maobot，内部测试版本号@Beta3.79。
+    * > 更新maobot，内部测试版本号@Beta3.80。
     * > 优化masBot部分api指令，防止误判。
+    * > 新增启用机器人时start指令的识别。
 + ### 20221026
     * > 更新maobot，内部测试版本号@Beta3.78。
     * > 优化部分资源失效问题。
