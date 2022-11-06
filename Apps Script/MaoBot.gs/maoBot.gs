@@ -177,7 +177,7 @@ function processReplyWord(key, chatId) {
         "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QX_Mac/QuantumultX_XIAOMAO_Mac.conf'>1⃣️ XiaoMao懒人规则Mac版</a>" +
         "\n" +
         "\n" +
-        "<a href='https://github.com/xiaomaoJT/QX_Script#快速导航'>💊 xiaomao懒人规则使用教程</a>",
+        "<a href='https://github.com/xiaomaoJT/QX_Script'>💊 xiaomao懒人规则使用教程</a>",
     },
     {
       keyword: ["订阅", "节点", "网易云", "免费节点"],
