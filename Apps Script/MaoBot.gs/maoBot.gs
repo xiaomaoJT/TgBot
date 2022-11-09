@@ -66,9 +66,9 @@ function processData(userMessage) {
   let payload;
   // 定义底部自定义键盘
   let followKeyboard = [
-    [{ text: "懒人配置" }, { text: "免费节点" }],
-    [{ text: "api接口查询" }, { text: "订阅转换" }],
-    [{ text: "公众号小帽集团" }, { text: "@Xiao_MaoMao_bot" }],
+    [{ text: "懒人配置" }, { text: "免费节点" }, { text: "QX去广告" }],
+    [{ text: "接口查询" }, { text: "订阅转换" }],
+    [{ text: "公众号小帽集团" }],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -120,6 +120,7 @@ function processData(userMessage) {
       reply_to_message_id: messageReplyID,
       parse_mode: "HTML",
       reply_markup: JSON.stringify(keyboardParams),
+      disable_web_page_preview: true,
     };
 
     if (
@@ -145,6 +146,7 @@ function processData(userMessage) {
         text: "<a href='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI3MjE3NTc4OA==#wechat_redirect'><b>🕹 小帽集团公众号 点击查看</b></a>",
         parse_mode: "HTML",
         reply_markup: JSON.stringify(keyboardFollowParams),
+        disable_web_page_preview: true,
       };
     }
     payload = payloadCallback;
@@ -215,7 +217,20 @@ function processReplyWord(key, chatId) {
         "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换</b>",
     },
     {
-      keyword: ["api接口查询"],
+      keyword: ["去广告", "强力去广告"],
+      replyWord:
+        "💊  <a href='https://github.com/xiaomaoJT/QX_Script/tree/main/rewrite/xiaomao/NOAD'>去广告模块教程</a>" +
+        "\n" +
+        "\n" +
+        "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/rewrite/xiaomao/NOAD/noad_filter.list'>分流及规则修正</a>" +
+        "\n" +
+        "2⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/rewrite/xiaomao/NOAD/noad_rewrite.conf'>重写拒绝</a>" +
+        "\n" +
+        "\n" +
+        "<b>去广告模块日更补充，可能存在误杀，请反馈修正！</b>",
+    },
+    {
+      keyword: ["接口查询"],
       replyWord:
         "1⃣️ 天气状况查询｜示例：/weather 广州" +
         "\n" +
@@ -399,14 +414,14 @@ function processReplyWord(key, chatId) {
             getCOVID19(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
-          case 10:
-            htmlReply =
-              "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-              "\n" +
-              "\n" +
-              "Hello,我是 XiaoMao机器人,很高兴认识您！";
-            returnHtmlReply.state = true;
-            break;
+        case 10:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "\n" +
+            "Hello,我是 XiaoMao机器人,很高兴认识您！";
+          returnHtmlReply.state = true;
+          break;
       }
     } else {
       autoReply.forEach((item) => {
@@ -465,12 +480,19 @@ function isApi(commandList, key) {
  * @returns
  */
 function getCOVID19(address) {
-  let responseCOVID19 = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/yq.php?msg=" + address
-  );
-  let returnText = responseCOVID19
-    .getContentText()
-    .replace("随身助手API", "XiaoMao - ");
+  let responseCOVID19 = null;
+  let returnText = "";
+  try {
+    responseCOVID19 = UrlFetchApp.fetch(
+      "http://api.wuxixindong.cn/api/yq.php?msg=" + address
+    );
+    returnText = responseCOVID19
+      .getContentText()
+      .replace("随身助手API", "XiaoMao - ");
+  } catch (e) {
+    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
+
   return returnText;
 }
 /**
@@ -479,10 +501,17 @@ function getCOVID19(address) {
  * @returns
  */
 function getHelloBot(word) {
-  let responseHelloBot = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/liaotian.php?msg=" + word
-  );
-  let returnText = responseHelloBot.getContentText();
+  let responseHelloBot = null;
+  let returnText = "";
+
+  try {
+    responseHelloBot = UrlFetchApp.fetch(
+      "http://api.wuxixindong.cn/api/liaotian.php?msg=" + word
+    );
+    returnText = responseHelloBot.getContentText();
+  } catch (e) {
+    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
   return returnText;
 }
 
@@ -492,10 +521,8 @@ function getHelloBot(word) {
  * @returns
  */
 function getTencentVideo(video) {
-  let responseTencentVideo = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/txss.php?msg=" + video
-  );
-  let returnTextTem = responseTencentVideo.getContentText();
+  let responseTencentVideo = null;
+  let returnTextTem = "";
 
   let returnList = {
     returnImg: "",
@@ -503,28 +530,38 @@ function getTencentVideo(video) {
     status: false,
   };
 
-  if (
-    returnTextTem.indexOf("±") != -1 &&
-    returnTextTem.lastIndexOf("±") != -1
-  ) {
-    returnList.returnImg = returnTextTem.substring(
-      returnTextTem.indexOf("±") + 5,
-      returnTextTem.lastIndexOf("±")
+  try {
+    responseTencentVideo = UrlFetchApp.fetch(
+      "http://api.wuxixindong.cn/api/txss.php?msg=" + video
     );
-    if (returnList.returnImg.length) {
-      returnList.status = true;
+    returnTextTem = responseTencentVideo.getContentText();
+
+    if (
+      returnTextTem.indexOf("±") != -1 &&
+      returnTextTem.lastIndexOf("±") != -1
+    ) {
+      returnList.returnImg = returnTextTem.substring(
+        returnTextTem.indexOf("±") + 5,
+        returnTextTem.lastIndexOf("±")
+      );
+      if (returnList.returnImg.length) {
+        returnList.status = true;
+      }
     }
+    returnList.returnText = returnTextTem
+      .replace(
+        returnTextTem.substring(
+          returnTextTem.indexOf("±"),
+          returnTextTem.lastIndexOf("±") + 1
+        ),
+        ""
+      )
+      .replace("随身助手API", "XiaoMao - ");
+  } catch (e) {
+    returnList.returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
-  returnList.returnText = returnTextTem
-    .replace(
-      returnTextTem.substring(
-        returnTextTem.indexOf("±"),
-        returnTextTem.lastIndexOf("±") + 1
-      ),
-      ""
-    )
-    .replace("随身助手API", "XiaoMao - ");
   return returnList;
 }
 /**
@@ -533,10 +570,8 @@ function getTencentVideo(video) {
  * @returns
  */
 function getKuGouMusic(music) {
-  let responseKuGouMusic = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/kugoudx.php?msg=" + music + "&b=1"
-  );
-  let returnTextTem = responseKuGouMusic.getContentText();
+  let responseKuGouMusic = null;
+  let returnTextTem = "";
 
   let returnList = {
     returnImg: "",
@@ -544,28 +579,38 @@ function getKuGouMusic(music) {
     status: false,
   };
 
-  if (
-    returnTextTem.indexOf("±") != -1 &&
-    returnTextTem.lastIndexOf("±") != -1
-  ) {
-    returnList.returnImg = returnTextTem.substring(
-      returnTextTem.indexOf("±") + 5,
-      returnTextTem.lastIndexOf("±")
+  try {
+    responseKuGouMusic = UrlFetchApp.fetch(
+      "http://api.wuxixindong.cn/api/kugoudx.php?msg=" + music + "&b=1"
     );
-    if (returnList.returnImg.length) {
-      returnList.status = true;
+    returnTextTem = responseKuGouMusic.getContentText();
+
+    if (
+      returnTextTem.indexOf("±") != -1 &&
+      returnTextTem.lastIndexOf("±") != -1
+    ) {
+      returnList.returnImg = returnTextTem.substring(
+        returnTextTem.indexOf("±") + 5,
+        returnTextTem.lastIndexOf("±")
+      );
+      if (returnList.returnImg.length) {
+        returnList.status = true;
+      }
     }
+    returnList.returnText = returnTextTem
+      .replace(
+        returnTextTem.substring(
+          returnTextTem.indexOf("±"),
+          returnTextTem.lastIndexOf("±") + 1
+        ),
+        ""
+      )
+      .replace("随身助手API", "XiaoMao - ");
+  } catch (e) {
+    returnList.returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
-  returnList.returnText = returnTextTem
-    .replace(
-      returnTextTem.substring(
-        returnTextTem.indexOf("±"),
-        returnTextTem.lastIndexOf("±") + 1
-      ),
-      ""
-    )
-    .replace("随身助手API", "XiaoMao - ");
   return returnList;
 }
 /**
@@ -574,12 +619,20 @@ function getKuGouMusic(music) {
  * @returns
  */
 function getWebPing(web) {
-  let responseWeb = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/ping.php?url=" + web
-  );
-  let returnText = responseWeb
-    .getContentText()
-    .replace("随身助手API", "XiaoMao - ");
+  let responseWeb = null;
+  let returnText = "";
+
+  try {
+    responseWeb = UrlFetchApp.fetch(
+      "http://api.wuxixindong.cn/api/ping.php?url=" + web
+    );
+    returnText = responseWeb
+      .getContentText()
+      .replace("随身助手API", "XiaoMao - ");
+  } catch (e) {
+    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
+
   return returnText;
 }
 
@@ -589,12 +642,20 @@ function getWebPing(web) {
  * @returns
  */
 function getPhoneWhere(phone) {
-  let responsePhone = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/phone.php?id=" + phone
-  );
-  let returnText = responsePhone
-    .getContentText()
-    .replace("随身助手API", "XiaoMao - ");
+  let responsePhone = null;
+  let returnText = "";
+
+  try {
+    responsePhone = UrlFetchApp.fetch(
+      "http://api.wuxixindong.cn/api/phone.php?id=" + phone
+    );
+    returnText = responsePhone
+      .getContentText()
+      .replace("随身助手API", "XiaoMao - ");
+  } catch (e) {
+    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
+
   return returnText;
 }
 /**
@@ -602,12 +663,18 @@ function getPhoneWhere(phone) {
  * @returns
  */
 function getNongLi() {
-  let responseNongLi = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/nl.php"
-  );
-  let returnText = responseNongLi
-    .getContentText()
-    .replace("随身助手API", "XiaoMao - ");
+  let responseNongLi = null;
+  let returnText = "";
+
+  try {
+    responseNongLi = UrlFetchApp.fetch("http://api.wuxixindong.cn/api/nl.php");
+    returnText = responseNongLi
+      .getContentText()
+      .replace("随身助手API", "XiaoMao - ");
+  } catch (e) {
+    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
+
   return returnText;
 }
 /**
@@ -616,12 +683,20 @@ function getNongLi() {
  * @returns
  */
 function getDouYinHost() {
-  let responseDouYinHost = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/douyinresou.php"
-  );
-  let returnText = responseDouYinHost
-    .getContentText()
-    .replace("随身助手API", "XiaoMao - ");
+  let responseDouYinHost = null;
+  let returnText = "";
+
+  try {
+    responseDouYinHost = UrlFetchApp.fetch(
+      "http://api.wuxixindong.cn/api/douyinresou.php"
+    );
+    returnText = responseDouYinHost
+      .getContentText()
+      .replace("随身助手API", "XiaoMao - ");
+  } catch (e) {
+    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
+
   return returnText;
 }
 /**
@@ -630,16 +705,22 @@ function getDouYinHost() {
  * @returns
  */
 function getLinkShort(link) {
-  let responseLinkShort = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/dwz.php?url=" + link
-  );
+  let responseLinkShort = null;
   let returnText = "";
-  if (JSON.parse(responseLinkShort.getContentText()).code == 1000) {
-    returnText =
-      "<b>网址短链接:</b>" +
-      JSON.parse(responseLinkShort.getContentText()).data.url;
-  } else {
-    returnText = "<b>发生错误，请稍后重试！</b>";
+
+  try {
+    responseLinkShort = UrlFetchApp.fetch(
+      "http://api.wuxixindong.cn/api/dwz.php?url=" + link
+    );
+    if (JSON.parse(responseLinkShort.getContentText()).code == 1000) {
+      returnText =
+        "<b>网址短链接:</b>" +
+        JSON.parse(responseLinkShort.getContentText()).data.url;
+    } else {
+      returnText = "<b>发生错误，请稍后重试！</b>";
+    }
+  } catch (e) {
+    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
   return returnText;
@@ -650,12 +731,20 @@ function getLinkShort(link) {
  * @returns
  */
 function getWeatherApi(location) {
-  let responseWeather = UrlFetchApp.fetch(
-    "http://api.wuxixindong.cn/api/tianqi.php?msg=" + location + "&b=1"
-  );
-  let returnText = responseWeather
-    .getContentText()
-    .replace("随身助手API", "XiaoMao - ");
+  let responseWeather = null;
+  let returnText = "";
+
+  try {
+    responseWeather = UrlFetchApp.fetch(
+      "http://api.wuxixindong.cn/api/tianqi.php?msg=" + location + "&b=1"
+    );
+    returnText = responseWeather
+      .getContentText()
+      .replace("随身助手API", "XiaoMao - ");
+  } catch (e) {
+    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
+
   return returnText;
 }
 
