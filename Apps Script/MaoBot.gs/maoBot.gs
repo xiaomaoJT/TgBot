@@ -48,7 +48,7 @@ function doPost(e) {
   if (
     htmlReplyState ||
     userMessage.message.chat.type == "private" ||
-    userMessage.message.entities[0].type == "mention" ||
+    (userMessage.message.entities[0].type == "mention" && htmlReplyState) ||
     userMessage.message.entities[0].type == "bold"
   ) {
     UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
@@ -107,21 +107,55 @@ function processData(userMessage) {
     let messageReplyID = userMessage.message.message_id.toString();
 
     // let HTML_REPLY = "<b>🕹 来自XiaoMaoBot的消息：</b>" + userMessage.message.text;
+    let payloadPostData = {};
+    if (processReplyWord(userMessage.message.text, messageUserID).htmlReply) {
+      let HTML_REPLY = processReplyWord(
+        userMessage.message.text,
+        messageUserID
+      ).htmlReply;
 
-    let HTML_REPLY = processReplyWord(
-      userMessage.message.text,
-      messageUserID
-    ).htmlReply;
+      payloadPostData = {
+        method: "sendMessage",
+        chat_id: messageUserID,
+        text: HTML_REPLY,
+        reply_to_message_id: messageReplyID,
+        parse_mode: "HTML",
+        reply_markup: JSON.stringify(keyboardParams),
+        disable_web_page_preview: true,
+      };
+    } else {
+      payloadPostData = {
+        method: "deleteMessage",
+        chat_id: userMessage.message.chat.id.toString(),
+        message_id: userMessage.message.message_id.toString(),
+      };
+      let htmlReply =
+        "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+        "\n" +
+        "\n" +
+        "<b>拦截到</b> " +
+        " @" +
+        userMessage.message.from.username +
+        " 消息中含" +
+        processReplyWord(userMessage.message.text, messageUserID).dfa
+          .wordLength +
+        "<b>处敏感词，XiaoMao已自动删除消息，请文明聊天喔！</b>";
+      let payload = {
+        method: "sendMessage",
+        chat_id: messageUserID,
+        text: htmlReply,
+        reply_to_message_id: messageReplyID,
+        parse_mode: "HTML",
+        reply_markup: JSON.stringify(keyboardParams),
+        disable_web_page_preview: true,
+      };
 
-    let payloadPostData = {
-      method: "sendMessage",
-      chat_id: messageUserID,
-      text: HTML_REPLY,
-      reply_to_message_id: messageReplyID,
-      parse_mode: "HTML",
-      reply_markup: JSON.stringify(keyboardParams),
-      disable_web_page_preview: true,
-    };
+      let data = {
+        method: "post",
+        payload: payload,
+      };
+      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+    }
 
     if (
       userMessage.message.text == "公众号小帽集团" ||
@@ -269,6 +303,7 @@ function processReplyWord(key, chatId) {
   let returnHtmlReply = {
     htmlReply: "",
     state: false,
+    dfa: {},
   };
   //关键字排除
   let outsideWord = ["公众号小帽集团", "@Xiao_MaoMao_bot"];
@@ -296,6 +331,14 @@ function processReplyWord(key, chatId) {
       getNowDate();
     returnHtmlReply.state = true;
   } else {
+    let dfa = checkSensitiveDFA(key);
+    if (dfa.wordLength > 0) {
+      returnHtmlReply.dfa = dfa;
+      returnHtmlReply.htmlReply = null;
+      returnHtmlReply.state = true;
+      return returnHtmlReply;
+    }
+
     if (isApi(commandWord, key).status) {
       switch (isApi(commandWord, key).id) {
         case 0:
@@ -443,6 +486,227 @@ function processReplyWord(key, chatId) {
 }
 
 /**
+ *
+ * 敏感词过滤算法
+ * 因gas性能有限，暂只收录122条常用敏感词
+ */
+function checkSensitiveDFA(content) {
+  // 敏感词库
+  // 内容已作加密处理base64
+  let sensitiveEncodeList = [
+    "5Yqg5b6u",
+    "5YqgVg==",
+    "5Yqgdg==",
+    "5Lq65YW9",
+    "5Lmx5Lym",
+    "5Lmz5rKf",
+    "5YW95Lqk",
+    "5Y2W5q+U",
+    "5Y2W6YC8",
+    "5Y+X5a2V",
+    "5bCE57K+",
+    "5aW45rer",
+    "5aaI6YC8",
+    "5aaT5aWz",
+    "5aiH5ZaY",
+    "5amK5a2Q",
+    "5aqa5aaZ",
+    "5byA6Iue",
+    "5oCn5Lqk",
+    "5oCn5aW0",
+    "5oCn5qyy",
+    "5oCn54ix",
+    "5oCn6JmQ5b6F",
+    "5oOF6Imy",
+    "5aupYg==",
+    "5aupQg==",
+    "5rer5Lmx",
+    "5rer5aaH",
+    "6I2h5aaH",
+    "6IKb5Lqk",
+    "57K+5ray",
+    "54OC5q+U",
+    "54OC6YC8",
+    "6IKJ5qOS",
+    "6IKJ57yd",
+    "6IKP",
+    "5aSn6bih5be0",
+    "5aSn6Zue5be0",
+    "57qm54Ku",
+    "5pON5q+U",
+    "5pON6YC8",
+    "6Zi06IyO",
+    "6Zi06JKC",
+    "6Zi06YGT",
+    "5Lic5Lqs54Ot",
+    "5p2x5Lqs54ax",
+    "5q+b5rO95Lic",
+    "55aG542o",
+    "5Lmg6L+R5bmz",
+    "6YKT5bCP5bmz",
+    "5rGf5rO95rCR",
+    "6IOh6ZSm5rab",
+    "5Lmg6L+b5bmz",
+    "5b2t5Li95aqb",
+    "6YSn5bCP5bmz",
+    "5YWa5ZCO6JCO",
+    "5aSp5a6J6Zeo5bGg5p2A",
+    "6KKr5Lit5YWx",
+    "5YWx54uX",
+    "5Lic5YyX54us56uL",
+    "5YWx5Lqn5YWa",
+    "5YWa5Lit5aSu",
+    "6JeP54us",
+    "5Lmx5aW4",
+    "5Lmx5Lym57G7",
+    "5Lmx5Lym5bCP",
+    "5LqC5YCr",
+    "5o+S5bGB5bGB",
+    "5aeQ5YyF5aSc",
+    "6bih5be0",
+    "5YW86IGM5LiK6Zeo",
+    "6aqa5aaH",
+    "6aqa56m0",
+    "6K+x5aW4",
+    "5o2i5aa7",
+    "5rex5ZaJ",
+    "5ZC56JCn",
+    "6L2u5aW4",
+    "5bCP56m0",
+    "6bKN6bG8",
+    "5aSr5aa75Lqk5o2i",
+    "6Zmw5ZSH",
+    "6Zmw6YGT",
+    "5ZCD57K+",
+    "5ZCe57K+",
+    "5YaF5bCE",
+    "54ix5ray",
+    "5rC15Y67",
+    "5rC15Y676L2m5LuR5bel5Yqb",
+    "5rOVKuWKnw==",
+    "5rOVbHVu5Yqf",
+    "5pON5LuW",
+    "5pON5L2g",
+    "5pON5L2g5aaI",
+    "5pON6JuL",
+    "5pel5L2g5aaI",
+    "5pel5q275L2g",
+    "5Y675L2g5aaI55qE",
+    "5YK76YC8",
+    "6Im5",
+    "6I2J5rOl6ams",
+    "5L2g5aaI55qE",
+    "5bmy5L2g5aiY",
+    "5oiR5pON5L2g",
+    "6Z2g5L2g5aaI",
+    "5p2C56eN",
+    "5pel6LWa",
+    "5Yqe6K+B",
+    "5b2p56Wo",
+    "5YKs55yg5rC0",
+    "5YKs5oOF57KJ",
+    "5YKs5oOF6I2v",
+    "5YKs5oOF6Jel",
+    "5Y+R56Wo5Ye6",
+    "5Y+R56Wo5Luj",
+    "5Y+R56Wo6ZSA",
+    "55m856Wo",
+    "6L+35aW46I2v",
+    "6L+35oOF5rC0",
+    "6L+35oOF6I2v",
+    "6L+36Jel",
+    "5Luj5Yqe",
+  ];
+
+  // 特殊符号过滤逻辑
+  let ignoreChars =
+    " \t\r\n~!@#$%^&*()_+-=【】、{}|;':\"，。、《》？αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ。，、；：？！…—·ˉ¨‘’“”々～‖∶＂＇｀｜〃〔〕〈〉《》「」『』．〖〗【】（）［］｛｝ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅫ⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑⒒⒓⒔⒕⒖⒗⒘⒙⒚⒛㈠㈡㈢㈣㈤㈥㈦㈧㈨㈩①②③④⑤⑥⑦⑧⑨⑩⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽⑾⑿⒀⒁⒂⒃⒄⒅⒆⒇≈≡≠＝≤≥＜＞≮≯∷±＋－×÷／∫∮∝∞∧∨∑∏∪∩∈∵∴⊥∥∠⌒⊙≌∽√§№☆★○●◎◇◆□℃‰€■△▲※→←↑↓〓¤°＃＆＠＼︿＿￣―♂♀┌┍┎┐┑┒┓─┄┈├┝┞┟┠┡┢┣│┆┊┬┭┮┯┰┱┲┳┼┽┾┿╀╁╂╃└┕┖┗┘┙┚┛━┅┉┤┥┦┧┨┩┪┫┃┇┋┴┵┶┷┸┹┺┻╋╊╉╈╇╆╅╄";
+  let ignoreObj = {};
+  for (let i = 0, j = ignoreChars.length; i < j; i++) {
+    ignoreObj[ignoreChars.charCodeAt(i)] = true;
+  }
+
+  //有限机构建方法
+  function buildMap(wordList) {
+    const result = {};
+    for (let i = 0, len = wordList.length; i < len; ++i) {
+      let map = result;
+      const word = wordList[i];
+      for (let j = 0; j < word.length; ++j) {
+        const ch = word.charAt(j).toLowerCase();
+        if (map[ch]) {
+          map = map[ch];
+          if (map.empty) {
+            break;
+          }
+        } else {
+          if (map.empty) {
+            delete map.empty;
+          }
+          map[ch] = {
+            empty: true,
+          };
+          map = map[ch];
+        }
+      }
+    }
+    return result;
+  }
+
+  //获取敏感词并解密
+  function getSensitiveWords() {
+    // GAS 解密方法
+    let words =
+      sensitiveEncodeList.map((word) =>
+        Utilities.newBlob(Utilities.base64Decode(word)).getDataAsString()
+      ) || [];
+
+    return words;
+  }
+
+  const sensitiveWords = getSensitiveWords() || [];
+  let map = buildMap(sensitiveWords) || {};
+
+  //检测机制
+  function check(content) {
+    const result = [];
+    let stack = [];
+    let point = map;
+    for (let i = 0, len = content.length; i < len; ++i) {
+      const code = content.charCodeAt(i); //转Unicode
+      if (ignoreObj[code]) {
+        continue;
+      }
+      const ch = content.charAt(i);
+      const item = point[ch.toLowerCase()]; //转小写
+      if (!item) {
+        i = i - stack.length;
+        stack = [];
+        point = map;
+      } else if (item.empty) {
+        stack.push(ch);
+        result.push(stack.join(""));
+        stack = [];
+        point = map;
+      } else {
+        stack.push(ch);
+        point = item;
+      }
+    }
+    return result;
+  }
+
+  let sensitiveCheckWords = {
+    words: [],
+    wordLength: 0,
+  };
+  sensitiveCheckWords.words = check(content);
+  sensitiveCheckWords.wordLength = sensitiveCheckWords.words.length;
+
+  return sensitiveCheckWords;
+}
+
+/**
  * 用于截取api关键字后查询内容
  * @param key
  * @param keyApi
@@ -490,7 +754,8 @@ function getCOVID19(address) {
       .getContentText()
       .replace("随身助手API", "XiaoMao - ");
   } catch (e) {
-    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
   return returnText;
@@ -510,7 +775,8 @@ function getHelloBot(word) {
     );
     returnText = responseHelloBot.getContentText();
   } catch (e) {
-    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
   return returnText;
 }
@@ -630,7 +896,8 @@ function getWebPing(web) {
       .getContentText()
       .replace("随身助手API", "XiaoMao - ");
   } catch (e) {
-    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
   return returnText;
@@ -653,7 +920,8 @@ function getPhoneWhere(phone) {
       .getContentText()
       .replace("随身助手API", "XiaoMao - ");
   } catch (e) {
-    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
   return returnText;
@@ -672,7 +940,8 @@ function getNongLi() {
       .getContentText()
       .replace("随身助手API", "XiaoMao - ");
   } catch (e) {
-    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
   return returnText;
@@ -694,7 +963,8 @@ function getDouYinHost() {
       .getContentText()
       .replace("随身助手API", "XiaoMao - ");
   } catch (e) {
-    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
   return returnText;
@@ -720,7 +990,8 @@ function getLinkShort(link) {
       returnText = "<b>发生错误，请稍后重试！</b>";
     }
   } catch (e) {
-    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
   return returnText;
@@ -742,7 +1013,8 @@ function getWeatherApi(location) {
       .getContentText()
       .replace("随身助手API", "XiaoMao - ");
   } catch (e) {
-    returnText = "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
   }
 
   return returnText;
