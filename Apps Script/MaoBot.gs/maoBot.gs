@@ -67,7 +67,7 @@ function processData(userMessage) {
   // 定义底部自定义键盘
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "QX去广告" }],
-    [{ text: "接口查询" }, { text: "订阅转换" }],
+    [{ text: "接口查询" }, { text: "订阅转换" }, { text: "TG解限制" }],
     [{ text: "公众号小帽集团" }],
   ];
   // 定义在线内联键盘
@@ -251,7 +251,7 @@ function processReplyWord(key, chatId) {
         "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换</b>",
     },
     {
-      keyword: ["去广告", "强力去广告"],
+      keyword: ["去广告", "QX去广告"],
       replyWord:
         "💊  <a href='https://github.com/xiaomaoJT/QX_Script/tree/main/rewrite/xiaomao/NOAD'>去广告模块教程</a>" +
         "\n" +
@@ -262,6 +262,21 @@ function processReplyWord(key, chatId) {
         "\n" +
         "\n" +
         "<b>去广告模块日更补充，可能存在误杀，请反馈修正！</b>",
+    },
+    {
+      keyword: ["TG解限制", "汉化", "群组限制"],
+      replyWord:
+        "<b>💊  <a href='https://mp.weixin.qq.com/s/YzYsF9QyHZVJK9P7bsrURQ'>外区Apple ID免费注册教程</a></b>" +
+        "\n" +
+        "💊  <a href='https://t.me/xiaomaoJT/5'>解除 +86 私聊限制教程</a>" +
+        "\n" +
+        "💊  <a href='https://t.me/xiaomaoJT/6'>Telegram设置中文教程</a>" +
+        "\n" +
+        "💊  <a href='https://t.me/xiaomaoJT/15'>Telegram解除敏感群组限制教程</a>" +
+        "\n" +
+        "💊  <a href='https://t.me/xiaomaoJT/171'>Telegram多彩主题</a>" +
+        "\n" +
+        "💊  <a href='https://t.me/translation_zhcncc/92439'>更多Telegram教程</a>",
     },
     {
       keyword: ["接口查询"],
