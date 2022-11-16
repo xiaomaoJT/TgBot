@@ -1,6 +1,6 @@
 **[TgBot](https://github.com/xiaomaoJT/TgBot)**   ***https://github.com/xiaomaoJT/TgBot***  **@XiaoMao**
 
-**[<< 回到首页](https://github.com/xiaomaoJT/QX_Script)** 
+**[<< 回到首页](https://github.com/xiaomaoJT/TgBot)** 
 
 
 
@@ -100,4 +100,3 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 {"ok":false,"error_code":401,"description":"Unauthorized"}
 ```
 
-##### 
