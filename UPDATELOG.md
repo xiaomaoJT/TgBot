@@ -1,6 +1,6 @@
 **[TgBot](https://github.com/xiaomaoJT/TgBot)**   ***https://github.com/xiaomaoJT/TgBot***  **@XiaoMao**
 
-**[<< 回到首页](https://github.com/xiaomaoJT/QX_Script)** 
+**[<< 回到首页](https://github.com/xiaomaoJT/TgBot)** 
 
 
 
