@@ -281,28 +281,57 @@ function processReplyWord(key, chatId) {
     {
       keyword: ["接口查询"],
       replyWord:
-        "1⃣️ 天气状况查询｜示例：/weather 广州" +
+        "1⃣️ 天气状况查询" +
         "\n" +
-        "2⃣️ 短链网址生成｜示例：/suo www.baidu.com" +
-        "\n" +
-        "3⃣️ 抖音热搜榜单｜示例：/dy" +
-        "\n" +
-        "4⃣️ 手机号码查询｜示例：/phone 18888888888" +
-        "\n" +
-        "5⃣️ 网站测速查询｜示例：/ping www.baidu.com" +
-        "\n" +
-        "6⃣️ 酷狗音乐查询｜示例：/music 薛之谦" +
-        "\n" +
-        "7⃣️ 腾讯视频查询｜示例：/video 蜡笔小新" +
-        "\n" +
-        "8⃣️ 中国农历查询｜示例：/nl" +
-        "\n" +
-        "9⃣️ 聊天机器人｜示例：/hi 小帽" +
-        "\n" +
-        "🔟 国内疫情查询｜示例：/yq 广州" +
+        "✅  示例：/weather 广州 " +
         "\n" +
         "\n" +
-        "<b>接口数据来源于随身助手API，可能存在拥挤情况，可稍后再试～</b>",
+        "2⃣️ 短链网址生成" +
+        "\n" +
+        "✅ 示例：/suo https://www.baidu.com " +
+        "\n" +
+        "\n" +
+        "3⃣️ 抖音热搜榜单" +
+        "\n" +
+        "⚠️维护中 | 示例：/dy " +
+        "\n" +
+        "\n" +
+        "4⃣️ 手机号码查询" +
+        "\n" +
+        "✅ 示例：/phone 18888888888 " +
+        "\n" +
+        "\n" +
+        "5⃣️ 网站测速查询" +
+        "\n" +
+        "⚠️维护中 | 示例：/ping www.baidu.com " +
+        "\n" +
+        "\n" +
+        "6⃣️ 酷狗音乐查询" +
+        "\n" +
+        "⚠️维护中 | 示例：/music 薛之谦 " +
+        "\n" +
+        "\n" +
+        "7⃣️ 腾讯视频查询" +
+        "\n" +
+        "⚠️维护中 | 示例：/video 蜡笔小新 " +
+        "\n" +
+        "\n" +
+        "8⃣️ 中国农历查询" +
+        "\n" +
+        "⚠️维护中 | 示例：/nl " +
+        "\n" +
+        "\n" +
+        "9⃣️ 智慧聊天机器" +
+        "\n" +
+        "⚠️维护中 | 示例：/hi 小帽 " +
+        "\n" +
+        "\n" +
+        "🔟 全国疫情查询" +
+        "\n" +
+        "✅ 示例：/yq " +
+        "\n" +
+        "\n" +
+        "<b>接口数据来源于网络，可能存在查询拥挤情况，可稍后再试～</b>",
     },
   ];
   //未匹配的关键字回复
@@ -754,7 +783,7 @@ function isApi(commandList, key) {
 }
 
 /**
- * 地区疫情查询
+ * 全国疫情查询
  * @param address
  * @returns
  */
@@ -763,11 +792,55 @@ function getCOVID19(address) {
   let returnText = "";
   try {
     responseCOVID19 = UrlFetchApp.fetch(
-      "http://api.wuxixindong.cn/api/yq.php?msg=" + address
+      "https://news.sina.com.cn/project/fymap/ncp2020_full_data.json?callback=jsoncallback"
     );
-    returnText = responseCOVID19
-      .getContentText()
-      .replace("随身助手API", "XiaoMao - ");
+    let jsonData = JSON.parse(
+      responseCOVID19
+        .getContentText()
+        .slice(13, responseCOVID19.getContentText().length - 2)
+    );
+    returnText =
+      "<b>以下数据来自新浪，由XiaoMao加工：全国（含港澳台）" +
+      jsonData.data.times +
+      "</b>" +
+      "\n" +
+      "\n" +
+      "新增本土确诊：" +
+      jsonData.data.addAsymNum +
+      "\n" +
+      "新增确诊：" +
+      jsonData.data.add_daily.addcon +
+      "\n" +
+      "新增境外：" +
+      jsonData.data.add_daily.addjwsr_new +
+      "\n" +
+      "新增无症状：" +
+      jsonData.data.addAsymNum +
+      "\n" +
+      "现存本土确诊：" +
+      jsonData.data.localExistingNum +
+      "\n" +
+      "现存确诊：" +
+      jsonData.data.econNum +
+      "\n" +
+      "现存无症状：" +
+      jsonData.data.asymptomNum +
+      "\n" +
+      "现存重症：" +
+      jsonData.data.heconNum +
+      "\n" +
+      "累计确诊：" +
+      jsonData.data.gntotal +
+      "\n" +
+      "累计死亡：" +
+      jsonData.data.deathtotal +
+      "\n" +
+      "累计治愈：" +
+      jsonData.data.curetotal +
+      "\n" +
+      "境外累计输入病例：" +
+      jsonData.data.jwsrNum +
+      "\n";
   } catch (e) {
     returnText =
       "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
@@ -929,11 +1002,25 @@ function getPhoneWhere(phone) {
 
   try {
     responsePhone = UrlFetchApp.fetch(
-      "http://api.wuxixindong.cn/api/phone.php?id=" + phone
+      "https://www.mxnzp.com/api/mobile_location/aim_mobile?mobile=" +
+        phone +
+        "&app_id=rgihdrm0kslojqvm&app_secret=WnhrK251TWlUUThqaVFWbG5OeGQwdz09"
     );
-    returnText = responsePhone
-      .getContentText()
-      .replace("随身助手API", "XiaoMao - ");
+
+    let jsonData = JSON.parse(responsePhone.getContentText());
+
+    returnText =
+      "<b>以下数据来自Roll，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      "手机号码：" +
+      jsonData.data.mobile +
+      "\n" +
+      "归属地：" +
+      jsonData.data.province +
+      "\n" +
+      "运营商：" +
+      jsonData.data.carrier;
   } catch (e) {
     returnText =
       "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
@@ -994,15 +1081,30 @@ function getLinkShort(link) {
   let returnText = "";
 
   try {
+    let data = {
+      url: link,
+      token: "18a709553844b10c078c91bde2ec624f",
+      mark: "来自pc网页",
+      env_code: "self",
+    };
+    let option = {
+      method: "post",
+      payload: JSON.stringify(data),
+    };
     responseLinkShort = UrlFetchApp.fetch(
-      "http://api.wuxixindong.cn/api/dwz.php?url=" + link
+      "http://s.nfangbian.com/shortlink/create",
+      option
     );
-    if (JSON.parse(responseLinkShort.getContentText()).code == 1000) {
+    if (JSON.parse(responseLinkShort.getContentText()).code == 0) {
       returnText =
-        "<b>网址短链接:</b>" +
-        JSON.parse(responseLinkShort.getContentText()).data.url;
+        "<b>以下数据来自短链，由XiaoMao加工：</b>" +
+        "\n" +
+        "\n" +
+        "<b>生成的短链接:</b>" +
+        JSON.parse(responseLinkShort.getContentText()).data.short_url;
     } else {
-      returnText = "<b>发生错误，请稍后重试！</b>";
+      returnText =
+        "<b>" + JSON.parse(responseLinkShort.getContentText()).msg + "</b>";
     }
   } catch (e) {
     returnText =
@@ -1022,11 +1124,38 @@ function getWeatherApi(location) {
 
   try {
     responseWeather = UrlFetchApp.fetch(
-      "http://api.wuxixindong.cn/api/tianqi.php?msg=" + location + "&b=1"
+      "https://query.asilu.com/weather/baidu/?city=" + location
     );
-    returnText = responseWeather
-      .getContentText()
-      .replace("随身助手API", "XiaoMao - ");
+    let jsonData = JSON.parse(responseWeather.getContentText());
+    if (jsonData.weather.length) {
+      returnText =
+        "<b>以下数据来自爱思路，由XiaoMao加工：" +
+        jsonData.city +
+        "天气（数据更新时间:" +
+        jsonData.date +
+        jsonData.update_time +
+        "）</b>" +
+        "\n";
+
+      jsonData.weather.forEach((el) => {
+        returnText =
+          returnText +
+          "\n" +
+          "\n" +
+          el.date +
+          "\n" +
+          "☁️天气状况：" +
+          el.weather +
+          "\n" +
+          "☁️温度：" +
+          el.temp +
+          "\n" +
+          "☁️风向：" +
+          el.wind;
+      });
+    } else {
+      returnText = "<b>Oh! 出错了！</b>";
+    }
   } catch (e) {
     returnText =
       "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
