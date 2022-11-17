@@ -283,52 +283,52 @@ function processReplyWord(key, chatId) {
       replyWord:
         "1⃣️ 天气状况查询" +
         "\n" +
-        "✅  示例：/weather 广州 " +
+        "☁️ 示例：/tq 广州 " +
         "\n" +
         "\n" +
         "2⃣️ 短链网址生成" +
         "\n" +
-        "✅ 示例：/suo https://www.baidu.com " +
+        "💻 示例：/suo https://www.baidu.com " +
         "\n" +
         "\n" +
-        "3⃣️ 抖音热搜榜单" +
+        "3⃣️ 随机音乐推送" +
         "\n" +
-        "⚠️维护中 | 示例：/dy " +
+        "🎵 示例：/music " +
         "\n" +
         "\n" +
         "4⃣️ 手机号码查询" +
         "\n" +
-        "✅ 示例：/phone 18888888888 " +
+        "📱 示例：/phone 18888888888 " +
         "\n" +
         "\n" +
-        "5⃣️ 网站测速查询" +
+        "5⃣️ 舔狗日记生成" +
         "\n" +
-        "⚠️维护中 | 示例：/ping www.baidu.com " +
-        "\n" +
-        "\n" +
-        "6⃣️ 酷狗音乐查询" +
-        "\n" +
-        "⚠️维护中 | 示例：/music 薛之谦 " +
+        "❤️ 示例：/tg " +
         "\n" +
         "\n" +
-        "7⃣️ 腾讯视频查询" +
+        "6⃣️ 毒鸡汤查询" +
         "\n" +
-        "⚠️维护中 | 示例：/video 蜡笔小新 " +
+        "🐔 示例：/djt " +
         "\n" +
         "\n" +
-        "8⃣️ 中国农历查询" +
+        "7⃣️ 随机小姐姐视频查询" +
         "\n" +
-        "⚠️维护中 | 示例：/nl " +
+        "👩 示例：/video " +
+        "\n" +
+        "\n" +
+        "8⃣️ 每日一言查询" +
+        "\n" +
+        "📖 示例：/yy " +
         "\n" +
         "\n" +
         "9⃣️ 智慧聊天机器" +
         "\n" +
-        "⚠️维护中 | 示例：/hi 小帽 " +
+        "🤖️ 示例：/hi 小帽 " +
         "\n" +
         "\n" +
         "🔟 全国疫情查询" +
         "\n" +
-        "✅ 示例：/yq " +
+        "🦠 示例：/yq " +
         "\n" +
         "\n" +
         "<b>接口数据来源于网络，可能存在查询拥挤情况，可稍后再试～</b>",
@@ -353,14 +353,14 @@ function processReplyWord(key, chatId) {
   let outsideWord = ["公众号小帽集团", "@Xiao_MaoMao_bot"];
   // api key
   let commandWord = [
-    { api: "/weather", apiId: 0 },
+    { api: "/tq", apiId: 0 },
     { api: "/suo", apiId: 1 },
-    { api: "/dy", apiId: 2 },
+    { api: "/music", apiId: 2 },
     { api: "/phone", apiId: 3 },
-    { api: "/ping", apiId: 4 },
-    { api: "/music", apiId: 5 },
+    { api: "/tg", apiId: 4 },
+    { api: "/djt", apiId: 5 },
     { api: "/video", apiId: 6 },
-    { api: "/nl", apiId: 7 },
+    { api: "/yy", apiId: 7 },
     { api: "/hi", apiId: 8 },
     { api: "/yq", apiId: 9 },
     { api: "/start", apiId: 10 },
@@ -403,7 +403,7 @@ function processReplyWord(key, chatId) {
           break;
         case 2:
           htmlReply =
-            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getDouYinHost();
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getMusic();
           returnHtmlReply.state = true;
           break;
         case 3:
@@ -419,7 +419,7 @@ function processReplyWord(key, chatId) {
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
-            getWebPing(getString(key, isApi(commandWord, key).api));
+            getTianGou(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
         case 5:
@@ -427,62 +427,21 @@ function processReplyWord(key, chatId) {
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
-            getKuGouMusic(getString(key, isApi(commandWord, key).api))
-              .returnText;
+            getDuJiTang(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
-
-          if (
-            getKuGouMusic(getString(key, isApi(commandWord, key).api)).status
-          ) {
-            let dataPhoto = {
-              method: "post",
-              payload: {
-                method: "sendPhoto",
-                chat_id: chatId,
-                photo: getKuGouMusic(
-                  getString(key, isApi(commandWord, key).api)
-                ).returnImg,
-              },
-            };
-            //   Google 请求域建立连接
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              dataPhoto
-            );
-          }
           break;
         case 6:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
-            getTencentVideo(getString(key, isApi(commandWord, key).api))
-              .returnText;
+            getVideo(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
 
-          if (
-            getTencentVideo(getString(key, isApi(commandWord, key).api)).status
-          ) {
-            let dataPhoto = {
-              method: "post",
-              payload: {
-                method: "sendPhoto",
-                chat_id: chatId,
-                photo: getTencentVideo(
-                  getString(key, isApi(commandWord, key).api)
-                ).returnImg,
-              },
-            };
-            //   Google 请求域建立连接
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              dataPhoto
-            );
-          }
           break;
         case 7:
           htmlReply =
-            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getNongLi();
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getYiYan();
           returnHtmlReply.state = true;
           break;
         case 8:
@@ -783,7 +742,7 @@ function isApi(commandList, key) {
 }
 
 /**
- * 全国疫情查询
+ * 全国疫情查询✅
  * @param address
  * @returns
  */
@@ -807,39 +766,51 @@ function getCOVID19(address) {
       "\n" +
       "新增本土确诊：" +
       jsonData.data.addAsymNum +
+      "例" +
       "\n" +
       "新增确诊：" +
       jsonData.data.add_daily.addcon +
+      "例" +
       "\n" +
       "新增境外：" +
       jsonData.data.add_daily.addjwsr_new +
+      "例" +
       "\n" +
       "新增无症状：" +
       jsonData.data.addAsymNum +
+      "例" +
       "\n" +
       "现存本土确诊：" +
       jsonData.data.localExistingNum +
+      "例" +
       "\n" +
       "现存确诊：" +
       jsonData.data.econNum +
+      "例" +
       "\n" +
       "现存无症状：" +
       jsonData.data.asymptomNum +
+      "例" +
       "\n" +
       "现存重症：" +
       jsonData.data.heconNum +
+      "例" +
       "\n" +
       "累计确诊：" +
       jsonData.data.gntotal +
+      "例" +
       "\n" +
       "累计死亡：" +
       jsonData.data.deathtotal +
+      "例" +
       "\n" +
       "累计治愈：" +
       jsonData.data.curetotal +
+      "例" +
       "\n" +
       "境外累计输入病例：" +
       jsonData.data.jwsrNum +
+      "例" +
       "\n";
   } catch (e) {
     returnText =
@@ -849,7 +820,7 @@ function getCOVID19(address) {
   return returnText;
 }
 /**
- * 聊天api
+ * 聊天api✅
  * @param word
  * @returns
  */
@@ -859,9 +830,14 @@ function getHelloBot(word) {
 
   try {
     responseHelloBot = UrlFetchApp.fetch(
-      "http://api.wuxixindong.cn/api/liaotian.php?msg=" + word
+      "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + word
     );
-    returnText = responseHelloBot.getContentText();
+    let jsonData = JSON.parse(responseHelloBot.getContentText());
+    returnText =
+      "<b>以下数据来自菲菲，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      jsonData.content;
   } catch (e) {
     returnText =
       "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
@@ -874,115 +850,69 @@ function getHelloBot(word) {
  * @param video
  * @returns
  */
-function getTencentVideo(video) {
-  let responseTencentVideo = null;
-  let returnTextTem = "";
-
-  let returnList = {
-    returnImg: "",
-    returnText: "",
-    status: false,
-  };
-
-  try {
-    responseTencentVideo = UrlFetchApp.fetch(
-      "http://api.wuxixindong.cn/api/txss.php?msg=" + video
-    );
-    returnTextTem = responseTencentVideo.getContentText();
-
-    if (
-      returnTextTem.indexOf("±") != -1 &&
-      returnTextTem.lastIndexOf("±") != -1
-    ) {
-      returnList.returnImg = returnTextTem.substring(
-        returnTextTem.indexOf("±") + 5,
-        returnTextTem.lastIndexOf("±")
-      );
-      if (returnList.returnImg.length) {
-        returnList.status = true;
-      }
-    }
-    returnList.returnText = returnTextTem
-      .replace(
-        returnTextTem.substring(
-          returnTextTem.indexOf("±"),
-          returnTextTem.lastIndexOf("±") + 1
-        ),
-        ""
-      )
-      .replace("随身助手API", "XiaoMao - ");
-  } catch (e) {
-    returnList.returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
-
-  return returnList;
-}
-/**
- * 酷狗音乐查询
- * @param music
- * @returns
- */
-function getKuGouMusic(music) {
-  let responseKuGouMusic = null;
-  let returnTextTem = "";
-
-  let returnList = {
-    returnImg: "",
-    returnText: "",
-    status: false,
-  };
-
-  try {
-    responseKuGouMusic = UrlFetchApp.fetch(
-      "http://api.wuxixindong.cn/api/kugoudx.php?msg=" + music + "&b=1"
-    );
-    returnTextTem = responseKuGouMusic.getContentText();
-
-    if (
-      returnTextTem.indexOf("±") != -1 &&
-      returnTextTem.lastIndexOf("±") != -1
-    ) {
-      returnList.returnImg = returnTextTem.substring(
-        returnTextTem.indexOf("±") + 5,
-        returnTextTem.lastIndexOf("±")
-      );
-      if (returnList.returnImg.length) {
-        returnList.status = true;
-      }
-    }
-    returnList.returnText = returnTextTem
-      .replace(
-        returnTextTem.substring(
-          returnTextTem.indexOf("±"),
-          returnTextTem.lastIndexOf("±") + 1
-        ),
-        ""
-      )
-      .replace("随身助手API", "XiaoMao - ");
-  } catch (e) {
-    returnList.returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
-
-  return returnList;
-}
-/**
- * 网址测速查询
- * @param web
- * @returns
- */
-function getWebPing(web) {
-  let responseWeb = null;
+function getVideo() {
+  let responseVideo = null;
   let returnText = "";
 
   try {
-    responseWeb = UrlFetchApp.fetch(
-      "http://api.wuxixindong.cn/api/ping.php?url=" + web
+    responseVideo = UrlFetchApp.fetch(
+      "https://v.api.aa1.cn/api/api-dy-girl/index.php?aa1=json"
     );
-    returnText = responseWeb
-      .getContentText()
-      .replace("随身助手API", "XiaoMao - ");
+    let jsonData = JSON.parse(responseVideo.getContentText());
+    returnText =
+      "<b>以下数据来自aa1，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      "<a href='https://" +
+      jsonData.mp4.slice(4,jsonData.mp4.length) +
+      "'>点击播放</a>" +
+      "\n";
+  } catch (e) {
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
+
+  return returnText;
+}
+/**
+ * 毒鸡汤查询
+ * @param music
+ * @returns
+ */
+function getDuJiTang() {
+  let responseDuJiTang = null;
+  let returnText = "";
+
+  try {
+    responseDuJiTang = UrlFetchApp.fetch("http://api.lkblog.net/ws/api.php");
+    let jsonData = JSON.parse(responseDuJiTang.getContentText());
+    returnText =
+      "<b>以下数据来自LK，由XiaoMao加工：</b>" + "\n" + "\n" + jsonData.data;
+  } catch (e) {
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
+
+  return returnText;
+}
+/**
+ * 舔狗日记生成 ✅
+ * @param id
+ * @returns
+ */
+function getTianGou() {
+  let responseTianGou = null;
+  let returnText = "";
+
+  try {
+    responseTianGou = UrlFetchApp.fetch(
+      "https://api.ixiaowai.cn/tgrj/index.php"
+    );
+    returnText =
+      "<b>以下数据来自小歪，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      responseTianGou.getContentText();
   } catch (e) {
     returnText =
       "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
@@ -992,13 +922,18 @@ function getWebPing(web) {
 }
 
 /**
- * 查询手机号码归属地
+ * 查询手机号码归属地✅
  * @param phone
  * @returns
  */
 function getPhoneWhere(phone) {
   let responsePhone = null;
   let returnText = "";
+
+  if (phone == "") {
+    returnText = "查询的手机号为空，请在关键字后面加上手机号码再试～";
+    return returnText;
+  }
 
   try {
     responsePhone = UrlFetchApp.fetch(
@@ -1029,18 +964,20 @@ function getPhoneWhere(phone) {
   return returnText;
 }
 /**
- * 农历查询
+ * 一言查询 ✅
  * @returns
  */
-function getNongLi() {
-  let responseNongLi = null;
+function getYiYan() {
+  let responseYiYan = null;
   let returnText = "";
 
   try {
-    responseNongLi = UrlFetchApp.fetch("http://api.wuxixindong.cn/api/nl.php");
-    returnText = responseNongLi
-      .getContentText()
-      .replace("随身助手API", "XiaoMao - ");
+    responseYiYan = UrlFetchApp.fetch("https://api.ixiaowai.cn/api/ylapi.php");
+    returnText =
+      "<b>以下数据来自小歪，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      responseYiYan.getContentText();
   } catch (e) {
     returnText =
       "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
@@ -1049,21 +986,39 @@ function getNongLi() {
   return returnText;
 }
 /**
- * 查询抖音热搜榜单
+ * 随机歌曲 ✅
  * @param text
  * @returns
  */
-function getDouYinHost() {
-  let responseDouYinHost = null;
+function getMusic() {
+  let responseMusic = null;
   let returnText = "";
 
   try {
-    responseDouYinHost = UrlFetchApp.fetch(
-      "http://api.wuxixindong.cn/api/douyinresou.php"
+    responseMusic = UrlFetchApp.fetch(
+      "https://anime-music.jijidown.com/api/v2/music"
     );
-    returnText = responseDouYinHost
-      .getContentText()
-      .replace("随身助手API", "XiaoMao - ");
+    let jsonData = JSON.parse(responseMusic.getContentText());
+    returnText =
+      "<b>以下数据来自Anime，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      "歌名：" +
+      jsonData.res.anime_info.title +
+      "\n" +
+      "\n" +
+      "歌手：" +
+      jsonData.res.author +
+      "\n" +
+      "\n" +
+      "简介：" +
+      jsonData.res.anime_info.desc +
+      "\n" +
+      "\n" +
+      "<a href='" +
+      jsonData.res.play_url +
+      "'>点击播放</a>" +
+      "\n";
   } catch (e) {
     returnText =
       "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
@@ -1072,7 +1027,7 @@ function getDouYinHost() {
   return returnText;
 }
 /**
- * 短网址生成
+ * 短网址生成✅
  * @param link
  * @returns
  */
@@ -1114,7 +1069,7 @@ function getLinkShort(link) {
   return returnText;
 }
 /**
- * 天气api查询
+ * 天气api查询✅
  * @param location
  * @returns
  */
