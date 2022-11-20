@@ -1,16 +1,18 @@
 ### 🎟 XiaoMao机器人脚本源码解析
 >  **作者@XiaoMao**
+>
+>  **[XiaoMao机器人](https://t.me/Xiao_MaoMao_bot)**
 
 
 
 ------------
 
 #### 🎟 **源码部分解析**
-> 可能需要部分javascript基础
+> 可能需要javascript基础。
 
 > 本程序代码基于Google Apps Script环境实现，脱离环境将无法运行。
 
-> 【Address unavailable 问题】导致您问题的原因可能是被阻止的IP地址。Google使用不同的IP与服务器通信。有时，服务器会阻止一个或多个Google拥有的IP地址，从而导致地址不可用错误。每个请求使用不同的IP进行通信，因此当我们处理大量urls时，有可能会遇到阻塞的IP地址，从而导致地址不可用(大数定律)。
+> 【Address unavailable 问题】导致您问题的原因可能是被阻止的IP地址。Google使用不同的IP与服务器通信。有时，服务器会阻止一个或多个Google拥有的IP地址，从而导致地址不可用错误。每个请求使用不同的IP进行通信，因此当我们处理大量urls时，有可能会遇到阻塞的IP地址，从而导致地址不可用(大数定律)。该问题Google暂无解决方案，请更换接口，避免使用公开接口。
 
 
 
@@ -88,9 +90,9 @@ var BOTID = "";
 ```javascript
 // 官方目前仅兼容以下标签
 <b>bold</b>, <strong>bold</strong>
-  <i>italic</i>, <em>italic</em>
-    <u>underline</u>, <ins>underline</ins>
-      <s>strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>
+<i>italic</i>, <em>italic</em>
+<u>underline</u>, <ins>underline</ins>
+<s>strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>
 <span class="tg-spoiler">spoiler</span>, <tg-spoiler>spoiler</tg-spoiler>
   <b>bold <i>italic bold <s>italic bold strikethrough <span class="tg-spoiler">italic bold strikethrough spoiler</span></s> <u>underline italic bold</u></i> bold</b>
 <a href="http://www.example.com/">inline URL</a>
@@ -150,19 +152,17 @@ __underline__
 
 ------------
 
-##### 🎨 **getTencentVideo** 、 **getKuGouMusic**、 **getWebPing**、 **getPhoneWhere**、 **getNongLi**、 **getDouYinHost**、 **getLinkShort**、 **getWeatherApi**方法
-> api查询方法
->
-> - getTencentVideo 腾讯视频查询
-> - getKuGouMusic 酷狗音乐查询
-> - getWebPing 网址测速查询
+##### 🎨 Api查询方法
+> - getVideo 视频查询
+>- getDuJiTang *毒鸡汤*查询
+> - getTianGou *舔狗日记生成*
 > - getPhoneWhere 查询手机号码归属地
-> - getNongLi 农历查询
-> - getDouYinHost 查询抖音热搜榜单
+> - getYiYan *一言查询*
+> - getMusic *随机歌曲*
 > - getLinkShort 短网址生成
 > - getWeatherApi 天气api查询
 > - getHelloBot 聊天机器人
-> - getCOVID19 国内疫情查询
+> - getCOVID19 *全国*疫情查询
 
 ------------
 
@@ -178,3 +178,5 @@ __underline__
 
 ##### 🎨 **checkSensitiveDFA**方法
 > 基于dfa算法的关键字过滤，用于过滤敏感词
+>
+> 敏感词**sensitiveEncodeList**使用base64加密
