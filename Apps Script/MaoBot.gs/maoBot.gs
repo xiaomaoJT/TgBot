@@ -274,6 +274,8 @@ function processReplyWord(key, chatId) {
         "\n" +
         "💊  <a href='https://t.me/xiaomaoJT/15'>Telegram解除敏感群组限制教程</a>" +
         "\n" +
+        "💊  <a href='https://t.me/xiaomaoJT/147'>Telegram屏蔽私聊广告教程</a>" +
+        "\n" +
         "💊  <a href='https://t.me/xiaomaoJT/171'>Telegram多彩主题</a>" +
         "\n" +
         "💊  <a href='https://t.me/translation_zhcncc/92439'>更多Telegram教程</a>",
@@ -846,7 +848,7 @@ function getHelloBot(word) {
 }
 
 /**
- * 腾讯视频查询
+ * 视频查询
  * @param video
  * @returns
  */
