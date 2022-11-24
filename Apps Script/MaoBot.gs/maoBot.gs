@@ -256,9 +256,9 @@ function processReplyWord(key, chatId) {
         "💊  <a href='https://github.com/xiaomaoJT/QX_Script/tree/main/rewrite/xiaomao/NOAD'>去广告模块教程</a>" +
         "\n" +
         "\n" +
-        "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/rewrite/xiaomao/NOAD/noad_filter.list'>分流及规则修正</a>" +
+        "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/No_Ad_Branch/rewrite/xiaomao/NOAD/noad_filter.list'>分流及规则修正</a>" +
         "\n" +
-        "2⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/rewrite/xiaomao/NOAD/noad_rewrite.conf'>重写拒绝</a>" +
+        "2⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/No_Ad_Branch/rewrite/xiaomao/NOAD/noad_rewrite.conf'>重写拒绝</a>" +
         "\n" +
         "\n" +
         "<b>去广告模块日更补充，可能存在误杀，请反馈修正！</b>",
