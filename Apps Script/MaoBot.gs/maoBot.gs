@@ -12,6 +12,9 @@ var EXECNAME = "";
 // Telegram BOT ID - tg机器人Token
 var BOTID = "";
 // 用于判断消息类型 - inlinekey board回调 or 主动消息
+// 1 callback
+// 2 new member
+// 3 left member
 var MESSAGETYPE = 0;
 
 /**
@@ -20,9 +23,15 @@ var MESSAGETYPE = 0;
  */
 function doPost(e) {
   let userMessage = JSON.parse(e.postData.contents);
-  if (JSON.parse(e.postData.contents).callback_query) {
+  if (userMessage.callback_query) {
     MESSAGETYPE = 1;
     userMessage = JSON.parse(e.postData.contents).callback_query;
+  }
+  if (userMessage.message.left_chat_participant) {
+    MESSAGETYPE = 3;
+  }
+  if (userMessage.message.new_chat_participant) {
+    MESSAGETYPE = 2;
   }
   let payload = processData(userMessage);
   let data = {
@@ -32,7 +41,7 @@ function doPost(e) {
 
   // 分析文字消息是否包含关键字 未包含将不做匹配
   let htmlReplyState = true;
-  if (userMessage.message) {
+  if (MESSAGETYPE == 0 && userMessage.message) {
     // 判断消息类型 - 进行私聊或群聊回复
     let messageUserID =
       userMessage.message.chat.type == "private"
@@ -68,7 +77,7 @@ function processData(userMessage) {
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "QX去广告" }],
     [{ text: "接口查询" }, { text: "订阅转换" }, { text: "TG解限制" }],
-    [{ text: "公众号小帽集团" }],
+    [{ text: "微信公众号『小帽集团』" }],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -80,9 +89,8 @@ function processData(userMessage) {
       { text: "XiaoMao频道", url: "https://t.me/xiaomaoJT" },
       { text: "XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
     ],
-    [{ text: "微信公众号：小帽集团", callback_data: "WXGROUP" }],
+    [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
   ];
-
   // 定义底部键盘
   let keyboardParams = {
     keyboard: followKeyboard,
@@ -90,11 +98,112 @@ function processData(userMessage) {
     one_time_keyboard: true,
     selective: false,
   };
-
   // 定义在线回复消息键盘选项
   let keyboardFollowParams = {
     inline_keyboard: followMessageKeyboard,
   };
+
+  //判断消息类型 - 消息跟踪键盘 callback返回
+  if (MESSAGETYPE == 1) {
+    let callbackChatID = userMessage.message.chat.id.toFixed();
+    let payloadCallback;
+
+    if (userMessage.data == "WXGROUP") {
+      let dataPhoto = {
+        method: "post",
+        payload: {
+          method: "sendPhoto",
+          chat_id: callbackChatID,
+          photo:
+            "https://mmbiz.qpic.cn/mmbiz_jpg/RzNtrrcUJxlEcDQkiasYkNhwN60JMqGhZyvzM6ZUIODsvAXaaohmySWuPfFic2FK7Q8SRdUvIHAgbzp0yBLagGqg/640?wx_fmt=jpeg&wxfrom=5&wx_lazy=1&wx_co=1",
+        },
+      };
+      //   Google 请求域建立连接
+      UrlFetchApp.fetch(
+        "https://api.telegram.org/bot" + BOTID + "/",
+        dataPhoto
+      );
+
+      let callbackText =
+        "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+        "\n" +
+        "⏰ 响应时间：" +
+        getNowDate() +
+        "\n" +
+        "\n" +
+        "微信公众号『小帽集团』,欢迎您的关注！记得点赞收藏哟～" +
+        "\n" +
+        "\n" +
+        "推文集：" +
+        "<a href='http://mp.weixin.qq.com/mp/homepage?__biz=MzI3MjE3NTc4OA==&hid=1&sn=69f77280608382e9ab1e6afac8c2a881&scene=18#wechat_redirect'><b>点击查看 👈</b></a>";
+
+      payloadCallback = {
+        method: "sendMessage",
+        chat_id: callbackChatID,
+        text: callbackText,
+        parse_mode: "HTML",
+        // reply_markup: JSON.stringify(keyboardFollowParams),
+      };
+    }
+    payload = payloadCallback;
+    setStorage(userMessage, "CALLBACK");
+    return payload;
+  }
+
+  if (MESSAGETYPE == 2 || MESSAGETYPE == 3) {
+    let newMemberChatId = userMessage.message.chat.id.toString();
+    let memberList = "";
+
+    if (MESSAGETYPE == 2) {
+      userMessage.message["new_chat_members"].forEach((name, index) => {
+        memberList =
+          memberList +
+          (name.first_name || "") +
+          (name.last_name || "") +
+          (index < userMessage.message["new_chat_members"].length - 1
+            ? " 、 "
+            : " ");
+      });
+    } else {
+      memberList =
+        (userMessage.message["left_chat_member"].first_name || "") +
+        (userMessage.message["left_chat_member"].last_name || "");
+    }
+
+    let welcomeMessage =
+      "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+      "\n" +
+      "⏰ 响应时间：" +
+      getNowDate() +
+      "\n" +
+      "\n" +
+      "<b>👏👏👏 热烈欢迎小伙伴 </b> " +
+      memberList +
+      "<b> 的到来，入群不能水经验，但可以求罩！</b>";
+
+    let leftMessage =
+      "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+      "\n" +
+      "⏰ 响应时间：" +
+      getNowDate() +
+      "\n" +
+      "\n" +
+      "<b>😩😩😩 幺儿啊 </b> " +
+      memberList +
+      "<b> 这么好玩的群都退了，你能上哪去？</b>";
+
+    let newMemberPayload = {
+      method: "sendMessage",
+      chat_id: newMemberChatId,
+      text: MESSAGETYPE == 2 ? welcomeMessage : leftMessage,
+      parse_mode: "HTML",
+      reply_markup: JSON.stringify(keyboardFollowParams),
+      disable_web_page_preview: true,
+    };
+    payload = newMemberPayload;
+
+    return payload;
+  }
 
   //判断消息类型 - 文本消息
   // 暂时只识别文本类消息
@@ -132,6 +241,9 @@ function processData(userMessage) {
       let htmlReply =
         "<b>🕹 来自XiaoMaoBot的消息：</b>" +
         "\n" +
+        "⏰ 响应时间：" +
+        getNowDate() +
+        "\n" +
         "\n" +
         "<b>拦截到</b> " +
         " @" +
@@ -158,7 +270,7 @@ function processData(userMessage) {
     }
 
     if (
-      userMessage.message.text == "公众号小帽集团" ||
+      userMessage.message.text == "微信公众号『小帽集团』" ||
       userMessage.message.text.indexOf("Mao") != -1
     ) {
       payloadPostData.reply_markup = JSON.stringify(keyboardFollowParams);
@@ -166,25 +278,6 @@ function processData(userMessage) {
 
     payload = payloadPostData;
     setStorage(userMessage, "POSTDATA");
-  }
-
-  //判断消息类型 - 消息跟踪键盘 callback返回
-  if (MESSAGETYPE) {
-    let callbackChatID = userMessage.message.chat.id.toFixed();
-    let payloadCallback;
-
-    if (userMessage.data == "WXGROUP") {
-      payloadCallback = {
-        method: "sendMessage",
-        chat_id: callbackChatID,
-        text: "<a href='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI3MjE3NTc4OA==#wechat_redirect'><b>🕹 小帽集团公众号 点击查看</b></a>",
-        parse_mode: "HTML",
-        reply_markup: JSON.stringify(keyboardFollowParams),
-        disable_web_page_preview: true,
-      };
-    }
-    payload = payloadCallback;
-    setStorage(userMessage, "CALLBACK");
   }
 
   return payload;
@@ -340,6 +433,9 @@ function processReplyWord(key, chatId) {
   let htmlReply =
     "<b>🕹 来自XiaoMaoBot的消息：</b>" +
     "\n" +
+    "⏰ 响应时间：" +
+    getNowDate() +
+    "\n" +
     "\n" +
     "<b>呜呜呜，关键字</b> " +
     key +
@@ -352,7 +448,7 @@ function processReplyWord(key, chatId) {
     dfa: {},
   };
   //关键字排除
-  let outsideWord = ["公众号小帽集团", "@Xiao_MaoMao_bot"];
+  let outsideWord = ["微信公众号『小帽集团』", "@Xiao_MaoMao_bot"];
   // api key
   let commandWord = [
     { api: "/tq", apiId: 0 },
@@ -372,9 +468,15 @@ function processReplyWord(key, chatId) {
     htmlReply =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
+      "⏰ 响应时间：" +
+      getNowDate() +
       "\n" +
-      "当前时间：" +
-      getNowDate();
+      "\n" +
+      "微信公众号『小帽集团』,欢迎您的关注！记得点赞收藏哟～" +
+      "\n" +
+      "\n" +
+      "推文集：" +
+      "<a href='http://mp.weixin.qq.com/mp/homepage?__biz=MzI3MjE3NTc4OA==&hid=1&sn=69f77280608382e9ab1e6afac8c2a881&scene=18#wechat_redirect'><b>点击查看 👈</b></a>";
     returnHtmlReply.state = true;
   } else {
     let dfa = checkSensitiveDFA(key);
@@ -391,6 +493,9 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
+            "\n" +
             "\n" +
             getWeatherApi(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
@@ -399,18 +504,30 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
+            "\n" +
             "\n" +
             getLinkShort(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
         case 2:
           htmlReply =
-            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getMusic();
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
+            "\n" +
+            "\n" +
+            getMusic();
           returnHtmlReply.state = true;
           break;
         case 3:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
             "\n" +
             "\n" +
             getPhoneWhere(getString(key, isApi(commandWord, key).api));
@@ -420,6 +537,9 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
+            "\n" +
             "\n" +
             getTianGou(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
@@ -427,6 +547,9 @@ function processReplyWord(key, chatId) {
         case 5:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
             "\n" +
             "\n" +
             getDuJiTang(getString(key, isApi(commandWord, key).api));
@@ -436,6 +559,9 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
+            "\n" +
             "\n" +
             getVideo(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
@@ -443,12 +569,21 @@ function processReplyWord(key, chatId) {
           break;
         case 7:
           htmlReply =
-            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getYiYan();
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
+            "\n" +
+            "\n" +
+            getYiYan();
           returnHtmlReply.state = true;
           break;
         case 8:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
             "\n" +
             "\n" +
             getHelloBot(getString(key, isApi(commandWord, key).api));
@@ -458,6 +593,9 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
+            "\n" +
             "\n" +
             getCOVID19(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
@@ -465,6 +603,9 @@ function processReplyWord(key, chatId) {
         case 10:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "⏰ 响应时间：" +
+            getNowDate() +
             "\n" +
             "\n" +
             "Hello,我是 XiaoMao机器人,很高兴认识您！";
@@ -476,7 +617,13 @@ function processReplyWord(key, chatId) {
         item.keyword.forEach((element) => {
           if (key.indexOf(element) != -1) {
             htmlReply =
-              "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + item.replyWord;
+              "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+              "\n" +
+              "⏰ 响应时间：" +
+              getNowDate() +
+              "\n" +
+              "\n" +
+              item.replyWord;
             returnHtmlReply.state = true;
             return;
           }
@@ -499,6 +646,9 @@ function checkSensitiveDFA(content) {
   // 敏感词库
   // 内容已作加密处理base64
   let sensitiveEncodeList = [
+    "5pON5aWz",
+    "5pON5aW5",
+    "5pON5LuW",
     "5Yqg5b6u",
     "5YqgVg==",
     "5Yqgdg==",
@@ -856,17 +1006,21 @@ function getVideo() {
   let responseVideo = null;
   let returnText = "";
 
+  // http://tucdn.wpon.cn/api-girl/index.php?wpon=302
   try {
-    responseVideo = UrlFetchApp.fetch(
-      "https://v.api.aa1.cn/api/api-dy-girl/index.php?aa1=json"
-    );
-    let jsonData = JSON.parse(responseVideo.getContentText());
+    // responseVideo = UrlFetchApp.fetch(
+    //   "https://v.api.aa1.cn/api/api-dy-girl/index.php?aa1=json"
+    // );
+    // let jsonData = JSON.parse(responseVideo.getContentText());
+    let url =
+      "http://tucdn.wpon.cn/api-girl/index.php?wpon=" +
+      parseInt(Math.random() * 99999);
     returnText =
       "<b>以下数据来自aa1，由XiaoMao加工：</b>" +
       "\n" +
       "\n" +
-      "<a href='https://" +
-      jsonData.mp4.slice(4,jsonData.mp4.length) +
+      "<a href='" +
+      url +
       "'>点击播放</a>" +
       "\n";
   } catch (e) {
@@ -1226,7 +1380,7 @@ function getNowDate() {
   let hour = date.getHours(); // 时
   let minutes = date.getMinutes(); // 分
   let seconds = date.getSeconds(); //秒
-  let weekArr = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+  let weekArr = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
   let week = weekArr[date.getDay()];
   // 给一位数的数据前面加 “0”
   if (month >= 1 && month <= 9) {
@@ -1246,18 +1400,15 @@ function getNowDate() {
   }
   return (
     year +
-    "-" +
+    "/" +
     month +
-    "-" +
+    "/" +
     day +
     " " +
     hour +
     sign2 +
     minutes +
     sign2 +
-    seconds +
-    "(" +
-    week +
-    ")"
+    seconds
   );
 }
