@@ -41,15 +41,13 @@
 
 ##### 🎟 快速导航 · 目录
 
-📚 [XiaoMaoBot机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
-
-🌲 [XiaoMaoBot机器人源码 · 参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
-
 🚗 [Telegram Bot 搭建教程](https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md)
 
 📖 [仓库资源更新日志](https://github.com/xiaomaoJT/TgBot/blob/main/UPDATELOG.md)
 
+📚 [XiaoMaoBot机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
 
+🌲 [XiaoMaoBot机器人源码 · 参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
 
 ------------
 
