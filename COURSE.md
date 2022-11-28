@@ -6,6 +6,13 @@
 
 ------------
 
+#### 🎟 Telegram Bot 快速使用教程
+
+> 1. 关注并激活[XiaoMaoBot机器人](https://t.me/Xiao_MaoMao_bot)。
+> 2. 将XiaoMaoBot机器人拉入群聊。
+> 3. 授予XiaoMaoBot机器人管理员权限。
+> 4. 至此即可自动开启XiaoMaoBot机器人所有功能。
+
 #### <span id="couse">🎟 Telegram Bot 搭建教程</span>
 
 > 轻松上手，带你免费打造属于自己的telegram机器人
