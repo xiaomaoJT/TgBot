@@ -1,8 +1,12 @@
 /**
  * author ： @XiaoMao
+ * # 小版本更新请查看更新日志 ｜ 或加入xiaomao组织⬇️
+ * # 微信公众号 【小帽集团】
+ * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  * Google App Script
  * 用于执行tg机器人自动回复等功能
  *
+ * 源码开发不易，使用引用请注明出处！
  */
 
 // Google EXEC ID - 谷歌表格ID
@@ -82,7 +86,7 @@ function processData(userMessage) {
   // 定义在线内联键盘
   let followMessageKeyboard = [
     [
-      { text: "QX仓库", url: "https://github.com/xiaomaoJT/QX_Script" },
+      { text: "QX仓库", url: "https://github.com/xiaomaoJT/QxScript" },
       { text: "Bot仓库", url: "https://github.com/xiaomaoJT/TgBot" },
     ],
     [
@@ -296,17 +300,17 @@ function processReplyWord(key, chatId) {
       replyWord:
         "<b>iPhone/iPad设备 - 懒人规则</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XiaoMao_General.conf'>1⃣️ XiaoMao懒人规则通用版·XiaoMao推荐</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/general/QX_XiaoMao.conf'>1⃣️ XiaoMao懒人规则通用版·XiaoMao推荐</a>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QuantumultX_XIAOMAO.conf'>2⃣️ XiaoMao懒人规则自定义版</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/custom/QX_XiaoMao.conf'>2⃣️ XiaoMao懒人规则自定义版</a>" +
         "\n" +
         "\n" +
         "<b>Mac M芯片设备 - 懒人规则</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/main/lazy/xiaomao/QX_Mac/QuantumultX_XIAOMAO_Mac.conf'>1⃣️ XiaoMao懒人规则Mac版</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/macOS/QX_XiaoMao.conf'>1⃣️ XiaoMao懒人规则Mac版</a>" +
         "\n" +
         "\n" +
-        "<a href='https://github.com/xiaomaoJT/QX_Script'>💊 xiaomao懒人规则使用教程</a>",
+        "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则使用教程</a>",
     },
     {
       keyword: ["订阅", "节点", "网易云", "免费节点"],
@@ -346,12 +350,13 @@ function processReplyWord(key, chatId) {
     {
       keyword: ["去广告", "QX去广告"],
       replyWord:
-        "💊  <a href='https://github.com/xiaomaoJT/QX_Script/tree/main/rewrite/xiaomao/NOAD'>去广告模块教程</a>" +
+        "💊  <b>去广告模块</b>" +
         "\n" +
         "\n" +
-        "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/No_Ad_Branch/rewrite/xiaomao/NOAD/noad_filter.list'>分流及规则修正</a>" +
+        "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/AdAway.list'>分流及规则修正</a>" +
         "\n" +
-        "2⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QX_Script/No_Ad_Branch/rewrite/xiaomao/NOAD/noad_rewrite.conf'>重写拒绝</a>" +
+        "\n" +
+        "2⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/script/QX_XiaoMao_rw3.conf'>重写拒绝</a>" +
         "\n" +
         "\n" +
         "<b>去广告模块日更补充，可能存在误杀，请反馈修正！</b>",
@@ -1016,7 +1021,7 @@ function getVideo() {
       "http://tucdn.wpon.cn/api-girl/index.php?wpon=" +
       parseInt(Math.random() * 99999);
     returnText =
-      "<b>以下数据来自aa1，由XiaoMao加工：</b>" +
+      "<b>以下数据来自wpon，由XiaoMao加工：</b>" +
       "\n" +
       "\n" +
       "<a href='" +
