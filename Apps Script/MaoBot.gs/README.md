@@ -162,7 +162,7 @@ __underline__
 > - getLinkShort 短网址生成
 > - getWeatherApi 天气api查询
 > - getHelloBot 聊天机器人
-> - getCOVID19 *全国*疫情查询
+> - getCOVID19 *全国*疫情查询 功能已下架
 
 ------------
 

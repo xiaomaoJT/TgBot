@@ -105,5 +105,7 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 
 //返回下面内容，则tg机器人Token失效，请通过 @BotFather 进行重置，然后再次执行第四步 重新部署
 {"ok":false,"error_code":401,"description":"Unauthorized"}
+
+源码开发不易，使用引用请注明出处！遇到问题欢迎留言～
 ```
 
