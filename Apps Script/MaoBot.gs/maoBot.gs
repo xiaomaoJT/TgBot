@@ -426,11 +426,6 @@ function processReplyWord(key, chatId) {
         "🤖️ 示例：/hi 小帽 " +
         "\n" +
         "\n" +
-        "🔟 全国疫情查询" +
-        "\n" +
-        "🦠 示例：/yq " +
-        "\n" +
-        "\n" +
         "<b>接口数据来源于网络，可能存在查询拥挤情况，可稍后再试～</b>",
     },
   ];
@@ -465,7 +460,6 @@ function processReplyWord(key, chatId) {
     { api: "/video", apiId: 6 },
     { api: "/yy", apiId: 7 },
     { api: "/hi", apiId: 8 },
-    { api: "/yq", apiId: 9 },
     { api: "/start", apiId: 10 },
   ];
 
@@ -592,17 +586,6 @@ function processReplyWord(key, chatId) {
             "\n" +
             "\n" +
             getHelloBot(getString(key, isApi(commandWord, key).api));
-          returnHtmlReply.state = true;
-          break;
-        case 9:
-          htmlReply =
-            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
-            "\n" +
-            "\n" +
-            getCOVID19(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
         case 10:
@@ -898,84 +881,6 @@ function isApi(commandList, key) {
   return isApiStatus;
 }
 
-/**
- * 全国疫情查询✅
- * @param address
- * @returns
- */
-function getCOVID19(address) {
-  let responseCOVID19 = null;
-  let returnText = "";
-  try {
-    responseCOVID19 = UrlFetchApp.fetch(
-      "https://news.sina.com.cn/project/fymap/ncp2020_full_data.json?callback=jsoncallback"
-    );
-    let jsonData = JSON.parse(
-      responseCOVID19
-        .getContentText()
-        .slice(13, responseCOVID19.getContentText().length - 2)
-    );
-    returnText =
-      "<b>以下数据来自新浪，由XiaoMao加工：全国（含港澳台）" +
-      jsonData.data.times +
-      "</b>" +
-      "\n" +
-      "\n" +
-      "新增本土确诊：" +
-      jsonData.data.addAsymNum +
-      "例" +
-      "\n" +
-      "新增确诊：" +
-      jsonData.data.add_daily.addcon +
-      "例" +
-      "\n" +
-      "新增境外：" +
-      jsonData.data.add_daily.addjwsr_new +
-      "例" +
-      "\n" +
-      "新增无症状：" +
-      jsonData.data.addAsymNum +
-      "例" +
-      "\n" +
-      "现存本土确诊：" +
-      jsonData.data.localExistingNum +
-      "例" +
-      "\n" +
-      "现存确诊：" +
-      jsonData.data.econNum +
-      "例" +
-      "\n" +
-      "现存无症状：" +
-      jsonData.data.asymptomNum +
-      "例" +
-      "\n" +
-      "现存重症：" +
-      jsonData.data.heconNum +
-      "例" +
-      "\n" +
-      "累计确诊：" +
-      jsonData.data.gntotal +
-      "例" +
-      "\n" +
-      "累计死亡：" +
-      jsonData.data.deathtotal +
-      "例" +
-      "\n" +
-      "累计治愈：" +
-      jsonData.data.curetotal +
-      "例" +
-      "\n" +
-      "境外累计输入病例：" +
-      jsonData.data.jwsrNum +
-      "例" +
-      "\n";
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
-
-  return returnText;
-}
 /**
  * 聊天api✅
  * @param word
