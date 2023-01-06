@@ -81,7 +81,7 @@ function processData(userMessage) {
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "QX去广告" }],
     [{ text: "接口查询" }, { text: "订阅转换" }, { text: "TG解限制" }],
-    [{ text: "微信公众号『小帽集团』" }],
+    [{ text: "QX图文教程" },{ text: "微信公众号『小帽集团』" }],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -360,6 +360,17 @@ function processReplyWord(key, chatId) {
         "\n" +
         "\n" +
         "<b>去广告模块日更补充，可能存在误杀，请反馈修正！</b>",
+    },
+    {
+      keyword: ["教程", "QX图文教程"],
+      replyWord:
+        "💊  <b>QX图文教程</b>" +
+        "\n" +
+        "\n" +
+        "1⃣️ <a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'>QX图文教程 - 从入门到进阶</a>" +
+        "\n" +
+        "\n" +
+        "<b>欢迎点赞评论，感谢支持！</b>",
     },
     {
       keyword: ["TG解限制", "汉化", "群组限制"],
