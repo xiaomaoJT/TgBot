@@ -373,6 +373,15 @@ function processReplyWord(key, chatId) {
         "<b>欢迎点赞评论，感谢支持！</b>",
     },
     {
+      keyword: ["在吗", "在嘛","管理","群主"],
+      replyWord:
+        "💊  <b>咨询相关问题，请在群聊中直接提问或@管理，私信不回复喔～</b>" +
+        "\n" +
+        "\n" +
+        "<a href='https://t.me/hSuMjrQppKE5MWU9'>XiaoMao群聊 点击加入</a>" +
+        "\n" 
+    },
+    {
       keyword: ["TG解限制", "汉化", "群组限制"],
       replyWord:
         "<b>💊  <a href='https://mp.weixin.qq.com/s/YzYsF9QyHZVJK9P7bsrURQ'>外区Apple ID免费注册教程</a></b>" +
