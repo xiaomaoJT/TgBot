@@ -20,6 +20,8 @@ var BOTID = "";
 // 2 new member
 // 3 left member
 var MESSAGETYPE = 0;
+//接入时间戳
+var responseTime = "";
 
 /**
  * 用于接收用户传来的讯息JSON
@@ -27,6 +29,7 @@ var MESSAGETYPE = 0;
  */
 function doPost(e) {
   let userMessage = JSON.parse(e.postData.contents);
+  responseTime = new Date().getTime();
   if (userMessage.callback_query) {
     MESSAGETYPE = 1;
     userMessage = JSON.parse(e.postData.contents).callback_query;
@@ -81,7 +84,7 @@ function processData(userMessage) {
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "QX去广告" }],
     [{ text: "接口查询" }, { text: "订阅转换" }, { text: "TG解限制" }],
-    [{ text: "QX图文教程" },{ text: "微信公众号『小帽集团』" }],
+    [{ text: "QX图文教程" }, { text: "微信公众号『小帽集团』" }],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -131,8 +134,8 @@ function processData(userMessage) {
       let callbackText =
         "<b>🕹 来自XiaoMaoBot的消息：</b>" +
         "\n" +
-        "⏰ 响应时间：" +
-        getNowDate() +
+        "🪬 本次响应延迟：" +
+        getRelayTime(responseTime) +
         "\n" +
         "\n" +
         "微信公众号『小帽集团』,欢迎您的关注！记得点赞收藏哟～" +
@@ -177,8 +180,8 @@ function processData(userMessage) {
     let welcomeMessage =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
-      "⏰ 响应时间：" +
-      getNowDate() +
+      "🪬 本次响应延迟：" +
+      getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>👏👏👏 热烈欢迎小伙伴 </b> " +
@@ -188,8 +191,8 @@ function processData(userMessage) {
     let leftMessage =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
-      "⏰ 响应时间：" +
-      getNowDate() +
+      "🪬 本次响应延迟：" +
+      getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>😩😩😩 幺儿啊 </b> " +
@@ -245,8 +248,8 @@ function processData(userMessage) {
       let htmlReply =
         "<b>🕹 来自XiaoMaoBot的消息：</b>" +
         "\n" +
-        "⏰ 响应时间：" +
-        getNowDate() +
+        "🪬 本次响应延迟：" +
+        getRelayTime(responseTime) +
         "\n" +
         "\n" +
         "<b>拦截到</b> " +
@@ -350,7 +353,7 @@ function processReplyWord(key, chatId) {
     {
       keyword: ["去广告", "QX去广告"],
       replyWord:
-        "💊  <b>去广告模块</b>" +
+        "💊 <b>去广告模块</b>" +
         "\n" +
         "\n" +
         "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/AdAway.list'>分流及规则修正</a>" +
@@ -367,19 +370,27 @@ function processReplyWord(key, chatId) {
         "💊  <b>QX图文教程</b>" +
         "\n" +
         "\n" +
-        "1⃣️ <a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'>QX图文教程 - 从入门到进阶</a>" +
+        "<a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'>QX图文教程 - 从入门到进阶</a>" +
         "\n" +
         "\n" +
         "<b>欢迎点赞评论，感谢支持！</b>",
     },
     {
-      keyword: ["在吗", "在嘛","管理","群主"],
+      keyword: ["响应延迟", "延迟","/delay"],
+      replyWord:
+        "💊 <b>响应延迟说明</b>" +
+        "\n" +
+        "\n" +
+        "XiaoMaoBot响应延迟主要取决于三个方面，1⃣️ 算法匹配效率 2⃣️ GAS网络延迟 3⃣️ 接口请求延迟，GAS及接口皆来源于公共服务器，高峰期可能出现较高延迟状态。",
+    },
+    {
+      keyword: ["在吗", "在嘛", "管理", "群主"],
       replyWord:
         "💊  <b>咨询相关问题，请在群聊中直接提问或@管理，私信不回复喔～</b>" +
         "\n" +
         "\n" +
         "<a href='https://t.me/hSuMjrQppKE5MWU9'>XiaoMao群聊 点击加入</a>" +
-        "\n" 
+        "\n",
     },
     {
       keyword: ["TG解限制", "汉化", "群组限制"],
@@ -453,8 +464,8 @@ function processReplyWord(key, chatId) {
   let htmlReply =
     "<b>🕹 来自XiaoMaoBot的消息：</b>" +
     "\n" +
-    "⏰ 响应时间：" +
-    getNowDate() +
+    "🪬 本次响应延迟：" +
+    getRelayTime(responseTime) +
     "\n" +
     "\n" +
     "<b>呜呜呜，关键字</b> " +
@@ -487,8 +498,8 @@ function processReplyWord(key, chatId) {
     htmlReply =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
-      "⏰ 响应时间：" +
-      getNowDate() +
+      "🪬 本次响应延迟：" +
+      getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "微信公众号『小帽集团』,欢迎您的关注！记得点赞收藏哟～" +
@@ -512,8 +523,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getWeatherApi(getString(key, isApi(commandWord, key).api));
@@ -523,8 +534,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getLinkShort(getString(key, isApi(commandWord, key).api));
@@ -534,8 +545,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getMusic();
@@ -545,8 +556,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getPhoneWhere(getString(key, isApi(commandWord, key).api));
@@ -556,8 +567,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getTianGou(getString(key, isApi(commandWord, key).api));
@@ -567,8 +578,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getDuJiTang(getString(key, isApi(commandWord, key).api));
@@ -578,8 +589,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getVideo(getString(key, isApi(commandWord, key).api));
@@ -590,8 +601,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getYiYan();
@@ -601,8 +612,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getHelloBot(getString(key, isApi(commandWord, key).api));
@@ -612,8 +623,8 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "⏰ 响应时间：" +
-            getNowDate() +
+            "🪬 本次响应延迟：" +
+            getRelayTime(responseTime) +
             "\n" +
             "\n" +
             "Hello,我是 XiaoMao机器人,很高兴认识您！";
@@ -627,8 +638,8 @@ function processReplyWord(key, chatId) {
             htmlReply =
               "<b>🕹 来自XiaoMaoBot的消息：</b>" +
               "\n" +
-              "⏰ 响应时间：" +
-              getNowDate() +
+              "🪬 本次响应延迟：" +
+              getRelayTime(responseTime) +
               "\n" +
               "\n" +
               item.replyWord;
@@ -643,6 +654,19 @@ function processReplyWord(key, chatId) {
   returnHtmlReply.htmlReply = htmlReply;
 
   return returnHtmlReply;
+}
+
+/**
+ * 响应延迟计算
+ */
+function getRelayTime(responseTime) {
+  let time = new Date().getTime() - responseTime;
+  if (time > 1000) {
+    time = (time / 1000).toFixed(2);
+    return time + "s";
+  }
+
+  return time + "ms";
 }
 
 /**
