@@ -198,6 +198,12 @@ __underline__
 
 ---
 
+##### 🎨 **getRelayTime**方法
+
+> 用于计算响应延迟
+
+---
+
 ##### 🎨 **checkSensitiveDFA**方法
 
 > 基于 dfa 算法的关键字过滤，用于过滤敏感词
