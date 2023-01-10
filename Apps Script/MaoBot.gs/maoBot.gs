@@ -134,7 +134,7 @@ function processData(userMessage) {
       let callbackText =
         "<b>🕹 来自XiaoMaoBot的消息：</b>" +
         "\n" +
-        "🪬 本次响应延迟：" +
+        "🪬 本次响应延迟(/delay)：" +
         getRelayTime(responseTime) +
         "\n" +
         "\n" +
@@ -180,7 +180,7 @@ function processData(userMessage) {
     let welcomeMessage =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
-      "🪬 本次响应延迟：" +
+      "🪬 本次响应延迟(/delay)：" +
       getRelayTime(responseTime) +
       "\n" +
       "\n" +
@@ -191,7 +191,7 @@ function processData(userMessage) {
     let leftMessage =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
-      "🪬 本次响应延迟：" +
+      "🪬 本次响应延迟(/delay)：" +
       getRelayTime(responseTime) +
       "\n" +
       "\n" +
@@ -248,7 +248,7 @@ function processData(userMessage) {
       let htmlReply =
         "<b>🕹 来自XiaoMaoBot的消息：</b>" +
         "\n" +
-        "🪬 本次响应延迟：" +
+        "🪬 本次响应延迟(/delay)：" +
         getRelayTime(responseTime) +
         "\n" +
         "\n" +
@@ -464,7 +464,7 @@ function processReplyWord(key, chatId) {
   let htmlReply =
     "<b>🕹 来自XiaoMaoBot的消息：</b>" +
     "\n" +
-    "🪬 本次响应延迟：" +
+    "🪬 本次响应延迟(/delay)：" +
     getRelayTime(responseTime) +
     "\n" +
     "\n" +
@@ -498,7 +498,7 @@ function processReplyWord(key, chatId) {
     htmlReply =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
-      "🪬 本次响应延迟：" +
+      "🪬 本次响应延迟(/delay)：" +
       getRelayTime(responseTime) +
       "\n" +
       "\n" +
@@ -523,7 +523,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -534,7 +534,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -545,7 +545,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -556,7 +556,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -567,7 +567,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -578,7 +578,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -589,7 +589,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -601,7 +601,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -612,7 +612,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -623,7 +623,7 @@ function processReplyWord(key, chatId) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
-            "🪬 本次响应延迟：" +
+            "🪬 本次响应延迟(/delay)：" +
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
@@ -638,7 +638,7 @@ function processReplyWord(key, chatId) {
             htmlReply =
               "<b>🕹 来自XiaoMaoBot的消息：</b>" +
               "\n" +
-              "🪬 本次响应延迟：" +
+              "🪬 本次响应延迟(/delay)：" +
               getRelayTime(responseTime) +
               "\n" +
               "\n" +
