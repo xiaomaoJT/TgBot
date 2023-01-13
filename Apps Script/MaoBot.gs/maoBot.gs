@@ -84,7 +84,11 @@ function processData(userMessage) {
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "QX去广告" }],
     [{ text: "接口查询" }, { text: "订阅转换" }, { text: "TG解限制" }],
-    [{ text: "QX图文教程" }, { text: "微信公众号『小帽集团』" }],
+    [
+      { text: "QX教程" },
+      { text: "微信公众号『小帽集团』" },
+      { text: "QX脚本" },
+    ],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -376,12 +380,38 @@ function processReplyWord(key, chatId) {
         "<b>欢迎点赞评论，感谢支持！</b>",
     },
     {
-      keyword: ["响应延迟", "延迟","/delay"],
+      keyword: ["脚本", "QX脚本"],
+      replyWord:
+        "💊  <b>XiaoMao QX脚本合集</b>" +
+        "\n" +
+        "\n" +
+        "🧲 <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/boxJS/XiaoMao.json'>XiaoMao  BoxJs辅助订阅</a>" +
+        "\n" +
+        "\n" +
+        "1⃣️ <a href='https://t.me/xiaomaoJT/283'>Spotify歌词自动翻译</a>" +
+        "\n" +
+        "2⃣️ <a href='https://t.me/xiaomaoJT/285'>彩云天气Svip自定义</a>" +
+        "\n" +
+        "3⃣️ <a href='https://t.me/xiaomaoJT/312'>百度网盘Svip自定义</a>" +
+        "\n",
+    },
+    {
+      keyword: ["响应延迟", "延迟", "/delay"],
       replyWord:
         "💊 <b>响应延迟说明</b>" +
         "\n" +
         "\n" +
-        "XiaoMaoBot响应延迟主要取决于三个方面，1⃣️ 算法匹配效率 2⃣️ GAS网络延迟 3⃣️ 接口请求延迟，GAS及接口皆来源于公共服务器，高峰期可能出现较高延迟状态。",
+        "XiaoMaoBot响应延迟主要取决于四个方面" +
+        "\n" +
+        "1⃣️ 算法匹配效率" +
+        "\n" +
+        " 2⃣️ GAS网络延迟 " +
+        "\n" +
+        "3⃣️ 接口请求延迟 " +
+        "\n" +
+        "4⃣️ 手机外网网速" +
+        "\n" +
+        "GAS及接口皆来源于公共服务器，高峰期可能出现较高延迟状态。",
     },
     {
       keyword: ["在吗", "在嘛", "管理", "群主"],
