@@ -299,7 +299,7 @@ function processData(userMessage) {
  * keyword值唯一不可重复，用于匹配用户关键字是否包含，并触发自动回复
  * @param key 用户消息关键字
  */
-function processReplyWord(key, chatId) {
+function processReplyWord(key) {
   //关键字及回复列表
   let autoReply = [
     {
@@ -374,7 +374,18 @@ function processReplyWord(key, chatId) {
         "💊  <b>QX图文教程</b>" +
         "\n" +
         "\n" +
-        "<a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'>QX图文教程 - 从入门到进阶</a>" +
+        "🧰 <a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'><b>QuamtumultX图文教程合集</b></a>" +
+        "\n" +
+        "\n" +
+        "1⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485104&idx=1&sn=484e84c5cfcca5f478b64bc82eb60bea&chksm=eb37c173dc40486516b0c40e99ce1711a5192c3189d736421ecdc06c0b9d3f7fffb67a0801a9&scene=178&cur_album_id=2740008142629273602#rd'>入门：<b>下载、认识QX、上手使用</b></a>"+
+        "\n" +
+        "2⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485121&idx=1&sn=b3312a56be6a8bea2645229ebbdd3525&chksm=eb37c102dc404814fee94b97551b6267d8b7438bd45a74537b3825d2b7fbd38eba3a2e20cbaf&scene=178&cur_album_id=2740008142629273602#rd'>进阶1：<b>配置General、DNS、Policy策略组教程</b></a>"+
+        "\n" +
+        "3⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485144&idx=1&sn=39b004f00ff60e5125986cb73ffc601c&chksm=eb37c11bdc40480d1d4d49283e0a4b604c205daefe7621c58c8f8a612fa095276d9778bbef54&scene=178&cur_album_id=2740008142629273602#rd'>进阶2：<b>配置分流教程</b></a>"+
+        "\n" +
+        "4⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485172&idx=1&sn=a6a0bdc07f335b23d565f022df636944&chksm=eb37c137dc404821746da8a10b8e3b2c4b883c9a866031f3475786d719587caf98974b3486d2&scene=178&cur_album_id=2740008142629273602#rd'>进阶3：<b>配置重写教程</b></a>"+
+        "\n" +
+        "5⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'>番外：<b>配置BoxJs、SubStore教程</b></a>"+
         "\n" +
         "\n" +
         "<b>欢迎点赞评论，感谢支持！</b>",
@@ -393,7 +404,9 @@ function processReplyWord(key, chatId) {
         "2⃣️ <a href='https://t.me/xiaomaoJT/285'>彩云天气Svip自定义</a>" +
         "\n" +
         "3⃣️ <a href='https://t.me/xiaomaoJT/312'>百度网盘Svip自定义</a>" +
-        "\n",
+        "\n" +
+        "\n" +
+        "<b>对教程不熟悉？点击菜单 QX教程</b>",
     },
     {
       keyword: ["响应延迟", "延迟", "/delay"],
@@ -405,7 +418,7 @@ function processReplyWord(key, chatId) {
         "\n" +
         "1⃣️ 算法匹配效率" +
         "\n" +
-        " 2⃣️ GAS网络延迟 " +
+        "2⃣️ GAS网络延迟 " +
         "\n" +
         "3⃣️ 接口请求延迟 " +
         "\n" +
