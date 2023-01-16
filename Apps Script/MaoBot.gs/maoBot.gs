@@ -405,6 +405,8 @@ function processReplyWord(key) {
         "\n" +
         "3⃣️ <a href='https://t.me/xiaomaoJT/312'>百度网盘Svip自定义</a>" +
         "\n" +
+        "4⃣️ <a href='https://t.me/xiaomaoJT/317'>黄油相机vip、粉丝数自定义</a>" +
+        "\n" +
         "\n" +
         "<b>对教程不熟悉？点击菜单 QX教程</b>",
     },
