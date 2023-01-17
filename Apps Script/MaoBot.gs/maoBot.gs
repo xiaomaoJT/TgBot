@@ -391,7 +391,7 @@ function processReplyWord(key) {
         "<b>欢迎点赞评论，感谢支持！</b>",
     },
     {
-      keyword: ["脚本", "QX脚本"],
+      keyword: ["QX脚本"],
       replyWord:
         "💊  <b>XiaoMao QX脚本合集</b>" +
         "\n" +
@@ -406,6 +406,10 @@ function processReplyWord(key) {
         "3⃣️ <a href='https://t.me/xiaomaoJT/312'>百度网盘Svip自定义</a>" +
         "\n" +
         "4⃣️ <a href='https://t.me/xiaomaoJT/317'>黄油相机vip、粉丝数自定义</a>" +
+        "\n" +
+        "5⃣️ <a href='https://t.me/xiaomaoJT/319'>B612咔叽相机vip自定义</a>" +
+        "\n" +
+        "6⃣️ <a href='https://t.me/xiaomaoJT/321'>WPS会员、超级会员、稻壳会员自定义</a>" +
         "\n" +
         "\n" +
         "<b>对教程不熟悉？点击菜单 QX教程</b>",
