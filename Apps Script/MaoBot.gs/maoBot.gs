@@ -411,8 +411,10 @@ function processReplyWord(key) {
         "\n" +
         "6⃣️ <a href='https://t.me/xiaomaoJT/321'>WPS会员、超级会员、稻壳会员自定义</a>" +
         "\n" +
+        "7⃣️ <a href='https://t.me/xiaomaoJT/326'>扫描全能王会员及至尊帐户自定义</a>" +
         "\n" +
-        "<b>对教程不熟悉？点击菜单 QX教程</b>",
+        "\n" +
+        "<b>对脚本不熟悉？点击菜单 QX教程</b>",
     },
     {
       keyword: ["响应延迟", "延迟", "/delay"],
