@@ -413,6 +413,8 @@ function processReplyWord(key) {
         "\n" +
         "7⃣️ <a href='https://t.me/xiaomaoJT/326'>扫描全能王会员及至尊帐户自定义</a>" +
         "\n" +
+        "8⃣️ <a href='https://t.me/xiaomaoJT/340'>思维导图XMind vip自定义</a>" +
+        "\n" +
         "\n" +
         "<b>对脚本不熟悉？点击菜单 QX教程</b>",
     },
