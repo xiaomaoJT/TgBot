@@ -357,7 +357,7 @@ function processReplyWord(key) {
     {
       keyword: ["去广告", "QX去广告"],
       replyWord:
-        "💊 <b>去广告模块</b>" +
+        "💊 <a href='https://t.me/xiaomaoJT/314'><b>XiaoMao去广告模块介绍</b></a>" +
         "\n" +
         "\n" +
         "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/AdAway.list'>分流及规则修正</a>" +
