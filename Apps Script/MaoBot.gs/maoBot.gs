@@ -82,13 +82,13 @@ function processData(userMessage) {
   let payload;
   // 定义底部自定义键盘
   let followKeyboard = [
-    [{ text: "懒人配置" }, { text: "免费节点" }, { text: "QX去广告" }],
-    [{ text: "接口查询" }, { text: "订阅转换" }, { text: "TG解限制" }],
+    [{ text: "懒人配置" }, { text: "免费节点" }, { text: "订阅转换" }],
+    [{ text: "QX教程" }, { text: "QX脚本" }, { text: "QX去广告" }],
     [
-      { text: "QX教程" },
+      { text: "接口查询" },
       { text: "微信公众号『小帽集团』" },
-      { text: "QX脚本" },
-    ],
+      { text: "TG解限制" },
+    ]
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -360,10 +360,13 @@ function processReplyWord(key) {
         "💊 <a href='https://t.me/xiaomaoJT/314'><b>XiaoMao去广告模块介绍</b></a>" +
         "\n" +
         "\n" +
-        "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/AdAway.list'>分流及规则修正</a>" +
+        "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/ShuntCorrection.list'>分流修正</a>" +
         "\n" +
         "\n" +
-        "2⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/script/QX_XiaoMao_rw3.conf'>重写拒绝</a>" +
+        "2⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/AdAway.list'>分流拒绝</a>" +
+        "\n" +
+        "\n" +
+        "3⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/script/QX_XiaoMao_rw3.conf'>重写拒绝</a>" +
         "\n" +
         "\n" +
         "<b>去广告模块日更补充，可能存在误杀，请反馈修正！</b>",
@@ -377,15 +380,15 @@ function processReplyWord(key) {
         "🧰 <a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'><b>QuamtumultX图文教程合集</b></a>" +
         "\n" +
         "\n" +
-        "1⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485104&idx=1&sn=484e84c5cfcca5f478b64bc82eb60bea&chksm=eb37c173dc40486516b0c40e99ce1711a5192c3189d736421ecdc06c0b9d3f7fffb67a0801a9&scene=178&cur_album_id=2740008142629273602#rd'>入门：<b>下载、认识QX、上手使用</b></a>"+
+        "1⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485104&idx=1&sn=484e84c5cfcca5f478b64bc82eb60bea&chksm=eb37c173dc40486516b0c40e99ce1711a5192c3189d736421ecdc06c0b9d3f7fffb67a0801a9&scene=178&cur_album_id=2740008142629273602#rd'>入门：<b>下载、认识QX、上手使用</b></a>" +
         "\n" +
-        "2⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485121&idx=1&sn=b3312a56be6a8bea2645229ebbdd3525&chksm=eb37c102dc404814fee94b97551b6267d8b7438bd45a74537b3825d2b7fbd38eba3a2e20cbaf&scene=178&cur_album_id=2740008142629273602#rd'>进阶1：<b>配置General、DNS、Policy策略组教程</b></a>"+
+        "2⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485121&idx=1&sn=b3312a56be6a8bea2645229ebbdd3525&chksm=eb37c102dc404814fee94b97551b6267d8b7438bd45a74537b3825d2b7fbd38eba3a2e20cbaf&scene=178&cur_album_id=2740008142629273602#rd'>进阶1：<b>配置General、DNS、Policy策略组教程</b></a>" +
         "\n" +
-        "3⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485144&idx=1&sn=39b004f00ff60e5125986cb73ffc601c&chksm=eb37c11bdc40480d1d4d49283e0a4b604c205daefe7621c58c8f8a612fa095276d9778bbef54&scene=178&cur_album_id=2740008142629273602#rd'>进阶2：<b>配置分流教程</b></a>"+
+        "3⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485144&idx=1&sn=39b004f00ff60e5125986cb73ffc601c&chksm=eb37c11bdc40480d1d4d49283e0a4b604c205daefe7621c58c8f8a612fa095276d9778bbef54&scene=178&cur_album_id=2740008142629273602#rd'>进阶2：<b>配置分流教程</b></a>" +
         "\n" +
-        "4⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485172&idx=1&sn=a6a0bdc07f335b23d565f022df636944&chksm=eb37c137dc404821746da8a10b8e3b2c4b883c9a866031f3475786d719587caf98974b3486d2&scene=178&cur_album_id=2740008142629273602#rd'>进阶3：<b>配置重写教程</b></a>"+
+        "4⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485172&idx=1&sn=a6a0bdc07f335b23d565f022df636944&chksm=eb37c137dc404821746da8a10b8e3b2c4b883c9a866031f3475786d719587caf98974b3486d2&scene=178&cur_album_id=2740008142629273602#rd'>进阶3：<b>配置重写教程</b></a>" +
         "\n" +
-        "5⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'>番外：<b>配置BoxJs、SubStore教程</b></a>"+
+        "5⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'>番外：<b>配置BoxJs、SubStore教程</b></a>" +
         "\n" +
         "\n" +
         "<b>欢迎点赞评论，感谢支持！</b>",
@@ -449,6 +452,9 @@ function processReplyWord(key) {
       keyword: ["TG解限制", "汉化", "群组限制"],
       replyWord:
         "<b>💊  <a href='https://mp.weixin.qq.com/s/YzYsF9QyHZVJK9P7bsrURQ'>外区Apple ID免费注册教程</a></b>" +
+        "\n" +
+        "<b>💊  <a href='https://mp.weixin.qq.com/s/Ehi23fjFpeUc2DocnQb4hw'>Apple礼品卡购买教程</a></b>" +
+        "\n" +
         "\n" +
         "💊  <a href='https://t.me/xiaomaoJT/5'>解除 +86 私聊限制教程</a>" +
         "\n" +
