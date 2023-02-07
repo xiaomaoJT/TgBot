@@ -317,7 +317,10 @@ function processReplyWord(key) {
         "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/macOS/QX_XiaoMao.conf'>1⃣️ XiaoMao懒人规则Mac版</a>" +
         "\n" +
         "\n" +
-        "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则使用教程</a>",
+        "<a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/oldConfig'>🎏 懒人规则历史版本配置</a>" +
+        "\n" +
+        "\n" +
+        "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程</a>",
     },
     {
       keyword: ["订阅", "节点", "网易云", "免费节点"],
