@@ -88,7 +88,7 @@ function processData(userMessage) {
       { text: "接口查询" },
       { text: "微信公众号『小帽集团』" },
       { text: "TG解限制" },
-    ]
+    ],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -325,7 +325,7 @@ function processReplyWord(key) {
     {
       keyword: ["订阅", "节点", "网易云", "免费节点"],
       replyWord:
-        "永久节点订阅已内置于XiaoMao懒人规则" +
+        "永久节点订阅及网易云节点已内置于XiaoMao懒人规则" +
         "<b>[server_remote]</b>" +
         "标签中" +
         "\n" +
@@ -339,7 +339,9 @@ function processReplyWord(key) {
         "以获取转换地址" +
         "\n" +
         "\n" +
-        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'>💊 XiaoMao-Forever 长按复制订阅地址</a>",
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'>💊 XiaoMao-Forever 长按复制订阅地址</a>" +
+        "\n" +
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-NM'>💊 XiaoMao-NM 长按复制订阅地址</a>",
     },
     {
       keyword: ["订阅转换", "转换"],
