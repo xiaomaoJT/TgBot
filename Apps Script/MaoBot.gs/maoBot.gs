@@ -22,6 +22,8 @@ var BOTID = "";
 var MESSAGETYPE = 0;
 //接入时间戳
 var responseTime = "";
+// 用于推送主人消息 取主人tg id
+var KingId = "";
 
 /**
  * 用于接收用户传来的讯息JSON
@@ -291,6 +293,7 @@ function processData(userMessage) {
     setStorage(userMessage, "POSTDATA");
   }
 
+  pushDataToKing(userMessage);
   return payload;
 }
 
@@ -303,7 +306,7 @@ function processReplyWord(key) {
   //关键字及回复列表
   let autoReply = [
     {
-      keyword: ["懒人", "懒人规则", "懒人配置"],
+      keyword: ["懒人规则", "懒人配置"],
       replyWord:
         "<b>iPhone/iPad设备 - 懒人规则</b>" +
         "\n" +
@@ -323,7 +326,7 @@ function processReplyWord(key) {
         "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程</a>",
     },
     {
-      keyword: ["订阅", "节点", "网易云", "免费节点"],
+      keyword: ["网易云", "免费节点"],
       replyWord:
         "永久节点订阅及网易云节点已内置于XiaoMao懒人规则" +
         "<b>[server_remote]</b>" +
@@ -518,7 +521,12 @@ function processReplyWord(key) {
         "\n" +
         "9⃣️ 智慧聊天机器" +
         "\n" +
-        "🤖️ 示例：/hi 小帽 " +
+        "🤖️ 示例：/hi 早上好" +
+        "\n" +
+        "\n" +
+        "🔟 chatGPT" +
+        "\n" +
+        "🤖️ 示例：/chat 你能干什么" +
         "\n" +
         "\n" +
         "<b>接口数据来源于网络，可能存在查询拥挤情况，可稍后再试～</b>",
@@ -555,6 +563,7 @@ function processReplyWord(key) {
     { api: "/video", apiId: 6 },
     { api: "/yy", apiId: 7 },
     { api: "/hi", apiId: 8 },
+    { api: "/chat", apiId: 9 },
     { api: "/start", apiId: 10 },
   ];
 
@@ -683,6 +692,17 @@ function processReplyWord(key) {
             getHelloBot(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
+        case 9:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getChatBot(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
+          break;
         case 10:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
@@ -718,6 +738,51 @@ function processReplyWord(key) {
   returnHtmlReply.htmlReply = htmlReply;
 
   return returnHtmlReply;
+}
+
+/**
+ * 用于捕捉机器人信息
+ * @param key 用户消息
+ */
+function pushDataToKing(key) {
+  let userMessage = key;
+  //用于捕捉机器人信息
+  let messageToKing =
+    "<b>🧩 XiaoMaoBot捕捉到用户消息</b>" +
+    "\n" +
+    "\n" +
+    "<b>📝 信息内容：</b>" +
+    userMessage.message.text +
+    "\n" +
+    "\n" +
+    "<b>🎎 信息发送人：</b>" +
+    (userMessage.message.from.first_name != undefined
+      ? userMessage.message.from.first_name
+      : "") +
+    (userMessage.message.from.last_name != undefined
+      ? userMessage.message.from.last_name
+      : "") +
+    "\n" +
+    "\n" +
+    "<b>🛎 消息发送时间：</b>" +
+    getNowDate() +
+    "\n" +
+    "\n" +
+    "<b>📰 消息原始Json：</b>" +
+    "\n" +
+    JSON.stringify(userMessage);
+  let dataKing = {
+    method: "post",
+    payload: {},
+  };
+  dataKing.payload = {
+    method: "sendMessage",
+    chat_id: KingId,
+    text: messageToKing,
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  };
+  UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", dataKing);
 }
 
 /**
@@ -987,6 +1052,38 @@ function isApi(commandList, key) {
     }
   });
   return isApiStatus;
+}
+
+/**
+ * chat api✅
+ * @param word
+ * @returns
+ */
+function getChatBot(word) {
+  let responseHelloBot = null;
+  let returnText = "";
+
+  try {
+    responseHelloBot = UrlFetchApp.fetch(
+      "https://v1.apigpt.cn/?q=" + word + "&apitype=sql"
+    );
+    let jsonData = JSON.parse(responseHelloBot.getContentText());
+    returnText =
+      "<b>以下数据来自OpenAI&夏柔，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      "<pre><code class='language-python'>" +
+      jsonData.ChatGPT_Answer.toString()
+        .replace("\n\n", "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;") +
+      "</code></pre>";
+  } catch (e) {
+    returnText =
+      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
+  }
+  return returnText;
 }
 
 /**
