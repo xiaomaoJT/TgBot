@@ -24,6 +24,11 @@ var MESSAGETYPE = 0;
 var responseTime = "";
 // 用于推送主人消息 取主人tg id
 var KingId = "";
+// 1 全部类型
+// 2 群聊 + 私聊类型
+// 3 私聊类型
+// 4 群聊类型
+var KingType = 1;
 
 /**
  * 用于接收用户传来的讯息JSON
@@ -114,6 +119,40 @@ function processData(userMessage) {
   // 定义在线回复消息键盘选项
   let keyboardFollowParams = {
     inline_keyboard: followMessageKeyboard,
+  };
+  // 判断消息类型 - 进行私聊或群聊回复
+  let messageUserID =
+    userMessage.message.chat.type == "private"
+      ? userMessage.message.from.id.toString()
+      : userMessage.message.chat.id.toString();
+  let messageReplyID = userMessage.message.message_id.toString();
+
+  let messageNoType = userMessage.message.hasOwnProperty("text")
+    ? userMessage.message.text
+    : userMessage.message.hasOwnProperty("sticker")
+    ? "[表情消息]"
+    : userMessage.message.hasOwnProperty("photo")
+    ? "[图片消息]"
+    : userMessage.message.hasOwnProperty("video")
+    ? "[视频消息]"
+    : "[消息]";
+  let payloadPostData = {
+    method: "sendMessage",
+    chat_id: messageUserID,
+    text:
+      "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+      "\n" +
+      "🪬 本次响应延迟(/delay)：" +
+      getRelayTime(responseTime) +
+      "\n" +
+      "\n" +
+      "<b>呜呜呜，此类型 " +
+      messageNoType +
+      " 暂无法处理，XiaoMao正在逐步升级中！</b>",
+    reply_to_message_id: messageReplyID,
+    parse_mode: "HTML",
+    reply_markup: JSON.stringify(keyboardParams),
+    disable_web_page_preview: true,
   };
 
   //判断消息类型 - 消息跟踪键盘 callback返回
@@ -220,79 +259,79 @@ function processData(userMessage) {
 
   //判断消息类型 - 文本消息
   // 暂时只识别文本类消息
-  if (userMessage.message) {
-    // 判断消息类型 - 进行私聊或群聊回复
-    let messageUserID =
-      userMessage.message.chat.type == "private"
-        ? userMessage.message.from.id.toString()
-        : userMessage.message.chat.id.toString();
-    let messageReplyID = userMessage.message.message_id.toString();
+  try {
+    if (userMessage.message) {
+      if (processReplyWord(userMessage.message.text, messageUserID).htmlReply) {
+        let HTML_REPLY = processReplyWord(
+          userMessage.message.text,
+          messageUserID
+        ).htmlReply;
 
-    // let HTML_REPLY = "<b>🕹 来自XiaoMaoBot的消息：</b>" + userMessage.message.text;
-    let payloadPostData = {};
-    if (processReplyWord(userMessage.message.text, messageUserID).htmlReply) {
-      let HTML_REPLY = processReplyWord(
-        userMessage.message.text,
-        messageUserID
-      ).htmlReply;
+        payloadPostData = {
+          method: "sendMessage",
+          chat_id: messageUserID,
+          text: HTML_REPLY,
+          reply_to_message_id: messageReplyID,
+          parse_mode: "HTML",
+          reply_markup: JSON.stringify(keyboardParams),
+          disable_web_page_preview: true,
+        };
+      } else {
+        payloadPostData = {
+          method: "deleteMessage",
+          chat_id: userMessage.message.chat.id.toString(),
+          message_id: userMessage.message.message_id.toString(),
+        };
+        let htmlReply =
+          "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+          "\n" +
+          "🪬 本次响应延迟(/delay)：" +
+          getRelayTime(responseTime) +
+          "\n" +
+          "\n" +
+          "<b>拦截到</b> " +
+          " @" +
+          userMessage.message.from.username +
+          " 消息中含" +
+          processReplyWord(userMessage.message.text, messageUserID).dfa
+            .wordLength +
+          "<b>处敏感词，XiaoMao已自动删除消息，请文明聊天喔！</b>";
+        let payload = {
+          method: "sendMessage",
+          chat_id: messageUserID,
+          text: htmlReply,
+          reply_to_message_id: messageReplyID,
+          parse_mode: "HTML",
+          reply_markup: JSON.stringify(keyboardParams),
+          disable_web_page_preview: true,
+        };
 
-      payloadPostData = {
-        method: "sendMessage",
-        chat_id: messageUserID,
-        text: HTML_REPLY,
-        reply_to_message_id: messageReplyID,
-        parse_mode: "HTML",
-        reply_markup: JSON.stringify(keyboardParams),
-        disable_web_page_preview: true,
-      };
-    } else {
-      payloadPostData = {
-        method: "deleteMessage",
-        chat_id: userMessage.message.chat.id.toString(),
-        message_id: userMessage.message.message_id.toString(),
-      };
-      let htmlReply =
-        "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-        "\n" +
-        "🪬 本次响应延迟(/delay)：" +
-        getRelayTime(responseTime) +
-        "\n" +
-        "\n" +
-        "<b>拦截到</b> " +
-        " @" +
-        userMessage.message.from.username +
-        " 消息中含" +
-        processReplyWord(userMessage.message.text, messageUserID).dfa
-          .wordLength +
-        "<b>处敏感词，XiaoMao已自动删除消息，请文明聊天喔！</b>";
-      let payload = {
-        method: "sendMessage",
-        chat_id: messageUserID,
-        text: htmlReply,
-        reply_to_message_id: messageReplyID,
-        parse_mode: "HTML",
-        reply_markup: JSON.stringify(keyboardParams),
-        disable_web_page_preview: true,
-      };
+        let data = {
+          method: "post",
+          payload: payload,
+        };
+        UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+      }
 
+      if (
+        userMessage.message.text == "微信公众号『小帽集团』" ||
+        userMessage.message.text.indexOf("Mao") != -1
+      ) {
+        payloadPostData.reply_markup = JSON.stringify(keyboardFollowParams);
+      }
+    }
+  } catch (error) {
+    if (userMessage.message.chat.type == "private") {
       let data = {
         method: "post",
-        payload: payload,
+        payload: payloadPostData,
       };
       UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
     }
-
-    if (
-      userMessage.message.text == "微信公众号『小帽集团』" ||
-      userMessage.message.text.indexOf("Mao") != -1
-    ) {
-      payloadPostData.reply_markup = JSON.stringify(keyboardFollowParams);
-    }
-
-    payload = payloadPostData;
-    setStorage(userMessage, "POSTDATA");
   }
 
+  payload = payloadPostData;
+  setStorage(userMessage, "POSTDATA");
   pushDataToKing(userMessage);
   return payload;
 }
@@ -541,7 +580,7 @@ function processReplyWord(key) {
     "\n" +
     "\n" +
     "<b>呜呜呜，关键字</b> " +
-    key +
+    key.replace("@Xiao_MaoMao_bot", "") +
     "<b> 匹配失败，XiaoMao已采集，正在抓紧学习！</b>";
 
   // 自动回复关键字判断
@@ -745,6 +784,17 @@ function processReplyWord(key) {
  * @param key 用户消息
  */
 function pushDataToKing(key) {
+  if (
+    KingType == 2 &&
+    (key.message.chat.type == "private" ||
+      userMessage.message.chat.type == "supergroup")
+  ) {
+  } else if (KingType == 3 && key.message.chat.type == "private") {
+  } else if (KingType == 4 && key.message.chat.type == "supergroup") {
+  } else if (KingType == 1) {
+  } else {
+    return;
+  }
   let userMessage = key;
   //用于捕捉机器人信息
   let messageToKing =
@@ -752,7 +802,15 @@ function pushDataToKing(key) {
     "\n" +
     "\n" +
     "<b>📝 信息内容：</b>" +
-    userMessage.message.text +
+    (userMessage.message.hasOwnProperty("text")
+      ? "[文本消息] " + userMessage.message.text
+      : userMessage.message.hasOwnProperty("sticker")
+      ? "[表情消息]"
+      : userMessage.message.hasOwnProperty("photo")
+      ? "[图片消息]"
+      : userMessage.message.hasOwnProperty("video")
+      ? "[视频消息]"
+      : "[未知消息类型]") +
     "\n" +
     "\n" +
     "<b>🎎 信息发送人：</b>" +
@@ -762,6 +820,14 @@ function pushDataToKing(key) {
     (userMessage.message.from.last_name != undefined
       ? userMessage.message.from.last_name
       : "") +
+    "\n" +
+    "\n" +
+    "<b>🏖 消息发送位置：</b>" +
+    (userMessage.message.chat.type == "private"
+      ? "[私聊]"
+      : userMessage.message.chat.type == "supergroup"
+      ? "[群聊] " + userMessage.message.chat.title
+      : "[未知]") +
     "\n" +
     "\n" +
     "<b>🛎 消息发送时间：</b>" +
