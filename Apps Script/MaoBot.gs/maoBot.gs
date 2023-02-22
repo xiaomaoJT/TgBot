@@ -5,6 +5,7 @@
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  * Google App Script
  * 用于执行tg机器人自动回复等功能
+ * 入退群检测及欢迎欢送、广告敏感词过滤及自动删除、chatGPT接口、消息私人推送、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能
  *
  * 源码开发不易，使用引用请注明出处！
  */
@@ -29,6 +30,9 @@ var KingId = "";
 // 3 私聊类型
 // 4 群聊类型
 var KingType = 1;
+// 1 推送详情（原图片、视频、贴纸等）
+// 0 仅推送基础消息
+var KingInfo = 1;
 
 /**
  * 用于接收用户传来的讯息JSON
@@ -71,7 +75,7 @@ function doPost(e) {
   if (
     htmlReplyState ||
     userMessage.message.chat.type == "private" ||
-    (userMessage.message.entities[0].type == "mention" && htmlReplyState) ||
+    userMessage.message.entities[0].type == "mention" ||
     userMessage.message.entities[0].type == "bold"
   ) {
     UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
@@ -126,7 +130,6 @@ function processData(userMessage) {
       ? userMessage.message.from.id.toString()
       : userMessage.message.chat.id.toString();
   let messageReplyID = userMessage.message.message_id.toString();
-
   let messageNoType = userMessage.message.hasOwnProperty("text")
     ? userMessage.message.text
     : userMessage.message.hasOwnProperty("sticker")
@@ -135,7 +138,12 @@ function processData(userMessage) {
     ? "[图片消息]"
     : userMessage.message.hasOwnProperty("video")
     ? "[视频消息]"
+    : userMessage.message.hasOwnProperty("document")
+    ? "[文件消息]"
+    : userMessage.message.hasOwnProperty("voice")
+    ? "[音频消息]"
     : "[消息]";
+  //默认回复
   let payloadPostData = {
     method: "sendMessage",
     chat_id: messageUserID,
@@ -148,10 +156,10 @@ function processData(userMessage) {
       "\n" +
       "<b>呜呜呜，此类型 " +
       messageNoType +
-      " 暂无法处理，XiaoMao正在逐步升级中！</b>",
+      " 暂无法处理，XiaoMaoBot正在逐步升级中！可加入XiaoMao群聊咨询解决。</b>",
     reply_to_message_id: messageReplyID,
     parse_mode: "HTML",
-    reply_markup: JSON.stringify(keyboardParams),
+    reply_markup: JSON.stringify(keyboardFollowParams),
     disable_web_page_preview: true,
   };
 
@@ -262,10 +270,21 @@ function processData(userMessage) {
   try {
     if (userMessage.message) {
       if (processReplyWord(userMessage.message.text, messageUserID).htmlReply) {
-        let HTML_REPLY = processReplyWord(
-          userMessage.message.text,
-          messageUserID
-        ).htmlReply;
+        let HTML_REPLY =
+          processReplyWord(userMessage.message.text, messageUserID).htmlReply ==
+          "getTgId"
+            ? "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+              "\n" +
+              "🪬 本次响应延迟(/delay)：" +
+              getRelayTime(responseTime) +
+              "\n" +
+              "\n" +
+              "你的Tg_Chat_ID ： " +
+              "<b>" +
+              userMessage.message.from.id.toString() +
+              "</b>"
+            : processReplyWord(userMessage.message.text, messageUserID)
+                .htmlReply;
 
         payloadPostData = {
           method: "sendMessage",
@@ -565,7 +584,7 @@ function processReplyWord(key) {
         "\n" +
         "🔟 chatGPT" +
         "\n" +
-        "🤖️ 示例：/chat 你能干什么" +
+        "🧬 示例：/chat 你能干什么" +
         "\n" +
         "\n" +
         "<b>接口数据来源于网络，可能存在查询拥挤情况，可稍后再试～</b>",
@@ -603,7 +622,8 @@ function processReplyWord(key) {
     { api: "/yy", apiId: 7 },
     { api: "/hi", apiId: 8 },
     { api: "/chat", apiId: 9 },
-    { api: "/start", apiId: 10 },
+    { api: "/myid", apiId: 10 },
+    { api: "/start", apiId: 11 },
   ];
 
   if (outsideWord.indexOf(key) != -1) {
@@ -743,6 +763,10 @@ function processReplyWord(key) {
           returnHtmlReply.state = true;
           break;
         case 10:
+          htmlReply = "getTgId";
+          returnHtmlReply.state = true;
+          break;
+        case 11:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -782,35 +806,50 @@ function processReplyWord(key) {
 /**
  * 用于捕捉机器人信息
  * @param key 用户消息
+ * 当KingId未填写时，私人推送将不执行
  */
 function pushDataToKing(key) {
   if (
     KingType == 2 &&
+    KingId != "" &&
     (key.message.chat.type == "private" ||
       userMessage.message.chat.type == "supergroup")
   ) {
-  } else if (KingType == 3 && key.message.chat.type == "private") {
-  } else if (KingType == 4 && key.message.chat.type == "supergroup") {
-  } else if (KingType == 1) {
+  } else if (
+    KingType == 3 &&
+    KingId != "" &&
+    key.message.chat.type == "private"
+  ) {
+  } else if (
+    KingType == 4 &&
+    KingId != "" &&
+    key.message.chat.type == "supergroup"
+  ) {
+  } else if (KingType == 1 && KingId != "") {
   } else {
     return;
   }
   let userMessage = key;
+  let messageInfoType = userMessage.message.hasOwnProperty("text")
+    ? "[文本消息] " + userMessage.message.text
+    : userMessage.message.hasOwnProperty("sticker")
+    ? "[表情消息]"
+    : userMessage.message.hasOwnProperty("photo")
+    ? "[图片消息]"
+    : userMessage.message.hasOwnProperty("video")
+    ? "[视频消息]"
+    : userMessage.message.hasOwnProperty("document")
+    ? "[文件消息]"
+    : userMessage.message.hasOwnProperty("voice")
+    ? "[音频消息]"
+    : "[未知消息类型]";
   //用于捕捉机器人信息
   let messageToKing =
     "<b>🧩 XiaoMaoBot捕捉到用户消息</b>" +
     "\n" +
     "\n" +
     "<b>📝 信息内容：</b>" +
-    (userMessage.message.hasOwnProperty("text")
-      ? "[文本消息] " + userMessage.message.text
-      : userMessage.message.hasOwnProperty("sticker")
-      ? "[表情消息]"
-      : userMessage.message.hasOwnProperty("photo")
-      ? "[图片消息]"
-      : userMessage.message.hasOwnProperty("video")
-      ? "[视频消息]"
-      : "[未知消息类型]") +
+    messageInfoType +
     "\n" +
     "\n" +
     "<b>🎎 信息发送人：</b>" +
@@ -849,6 +888,42 @@ function pushDataToKing(key) {
     disable_web_page_preview: true,
   };
   UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", dataKing);
+
+  if (KingInfo) {
+    let dataKingInfo = {
+      method: "post",
+      payload: {
+        method: "",
+        chat_id: KingId,
+      },
+    };
+    userMessage.message.hasOwnProperty("caption")
+      ? (dataKingInfo.payload.caption = userMessage.message.caption)
+      : "";
+    if (messageInfoType == "[表情消息]") {
+      dataKingInfo.payload.method = "sendSticker";
+      dataKingInfo.payload.sticker = userMessage.message.sticker.file_id;
+    } else if (messageInfoType == "[图片消息]") {
+      dataKingInfo.payload.method = "sendPhoto";
+      dataKingInfo.payload.photo = userMessage.message.photo[0].file_id;
+    } else if (messageInfoType == "[视频消息]") {
+      dataKingInfo.payload.method = "sendVideo";
+      dataKingInfo.payload.video = userMessage.message.video.file_id;
+    } else if (messageInfoType == "[文件消息]") {
+      dataKingInfo.payload.method = "sendDocument";
+      dataKingInfo.payload.document = userMessage.message.document.file_id;
+    } else if (messageInfoType == "[音频消息]") {
+      dataKingInfo.payload.method = "sendVoice";
+      dataKingInfo.payload.voice = userMessage.message.voice.file_id;
+    } else {
+      return;
+    }
+
+    UrlFetchApp.fetch(
+      "https://api.telegram.org/bot" + BOTID + "/",
+      dataKingInfo
+    );
+  }
 }
 
 /**
@@ -1488,7 +1563,21 @@ function setStorage(MESSAGE, TYPE) {
     if (userAllName == "") {
       userAllName = "该用户未设置昵称";
     }
-    messageContent = MESSAGE.message.text;
+    let messageInfoType = MESSAGE.message.hasOwnProperty("text")
+      ? "[文本消息]"
+      : MESSAGE.message.hasOwnProperty("sticker")
+      ? "[表情消息]"
+      : MESSAGE.message.hasOwnProperty("photo")
+      ? "[图片消息]"
+      : MESSAGE.message.hasOwnProperty("video")
+      ? "[视频消息]"
+      : MESSAGE.message.hasOwnProperty("document")
+      ? "[文件消息]"
+      : MESSAGE.message.hasOwnProperty("voice")
+      ? "[音频消息]"
+      : "[未知消息类型]";
+
+    messageContent = messageInfoType + MESSAGE.message.text;
 
     messageSource =
       (MESSAGE.message.chat.type == "supergroup"
