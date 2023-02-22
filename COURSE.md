@@ -109,3 +109,42 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 源码开发不易，使用引用请注明出处！遇到问题欢迎留言～
 ```
 
+
+
+##### 🚗 新功能 · 内容补充
+
+> 此补充内容**自更新日期[20230220] 版本号@Beta4.3-228 起**。
+>
+> 补充内容为新升级项，非必填，若不填写则此服务不生效。
+>
+> 新增私人消息推送服务，涉及源码顶部参数 **KingId 、 KingType 、KingInfo**
+>
+> KingID可通过私聊 [XiaoMao机器人](https://t.me/Xiao_MaoMao_bot) 回复 **/myid** 获取
+
+```javascript
+私人消息推送服务，即会将机器人采集的指定内容实时推送给服务所有者或指定人。
+当前消息详情支持 表情、图片、视频、文件、音频 五种类型消息，其他类型消息只推送消息内容。 
+
+// 取需要推送的主人 TG 的 chat_id
+var KingId = "";
+// 1 全部类型
+// 2 群聊 + 私聊类型
+// 3 私聊类型
+// 4 群聊类型
+var KingType = 1;
+// 1 推送详情（原图片、视频、贴纸等）
+// 0 仅推送基础消息
+var KingInfo = 1;
+
+
+推送内容预览：
+
+🧩 XiaoMaoBot捕捉到用户消息
+📝 信息内容：[音频消息]
+🎎 信息发送人：xxxx
+🏖 消息发送位置：[私聊]
+🛎 消息发送时间：2023/02/22 09:52:24
+📰 消息原始Json：
+{"update_id":xxxx,"message":{"message_id":xxxx,"from":{"id":xxxx,"is_bot":false,"first_name":"xxxx","username":"xxxx","language_code":"zh-hans"},"chat":{"id":xxxx,"first_name":"xxxx","username":"xxxx","type":"private"},"date":xxxx,"voice":{"duration":0,"mime_type":"audio/ogg","file_id":"xxxx","file_unique_id":"xxxx","file_size":4200}}}
+```
+
