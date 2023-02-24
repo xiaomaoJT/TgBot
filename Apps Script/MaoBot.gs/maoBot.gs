@@ -1593,7 +1593,9 @@ function setStorage(MESSAGE, TYPE) {
       ? "[音频消息]"
       : "[未知消息类型]";
 
-    messageContent = messageInfoType + MESSAGE.message.text;
+    messageContent =
+      messageInfoType +
+      (messageInfoType.indexOf("[文本消息]") != -1 ? MESSAGE.message.text : "");
 
     messageSource =
       (MESSAGE.message.chat.type == "supergroup"
