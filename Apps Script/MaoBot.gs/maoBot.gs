@@ -381,7 +381,7 @@ function processReplyWord(key) {
         "<a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/oldConfig'>🎏 懒人规则历史版本配置</a>" +
         "\n" +
         "\n" +
-        "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程</a>",
+        "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程，更多教程点击菜单 QX教程</a>",
     },
     {
       keyword: ["网易云", "免费节点"],
@@ -391,18 +391,22 @@ function processReplyWord(key) {
         "标签中" +
         "\n" +
         "\n" +
-        "回复" +
+        "点击菜单" +
         "<b> 懒人规则 </b>" +
-        "以获取节点配置" +
+        "以获取懒人配置" +
         "\n" +
-        "回复" +
+        "点击菜单" +
         "<b> 订阅转换 </b>" +
         "以获取转换地址" +
         "\n" +
         "\n" +
-        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'>💊 XiaoMao-Forever 长按复制订阅地址</a>" +
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'>💊 XiaoMao-Forever 长按复制订阅地址（机场节点）</a>" +
         "\n" +
-        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-NM'>💊 XiaoMao-NM 长按复制订阅地址</a>",
+        "\n" +
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-NM'>💊 XiaoMao-NM 长按复制订阅地址（网易节点）</a>" +
+        "\n" +
+        "\n" +
+        "<b>订阅地址可适用于QX及Shadowrocket，不适配clash。</b>",
     },
     {
       keyword: ["订阅转换", "转换"],
@@ -418,7 +422,7 @@ function processReplyWord(key) {
         "<a href='https://sub.pet'>Subscription 转换</a>" +
         "\n" +
         "\n" +
-        "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换</b>",
+        "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换，对本地转换不熟悉？点击菜单 QX教程</b>",
     },
     {
       keyword: ["去广告", "QX去广告"],
@@ -435,7 +439,7 @@ function processReplyWord(key) {
         "3⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/script/QX_XiaoMao_rw3.conf'>重写拒绝</a>" +
         "\n" +
         "\n" +
-        "<b>去广告模块日更补充，可能存在误杀，请反馈修正！</b>",
+        "<b>去广告模块日更补充，可能存在误杀，请于XiaoMao群聊内反馈修正！</b>",
     },
     {
       keyword: ["教程", "QX图文教程"],
@@ -517,9 +521,9 @@ function processReplyWord(key) {
     {
       keyword: ["TG解限制", "汉化", "群组限制"],
       replyWord:
-        "<b>💊  <a href='https://mp.weixin.qq.com/s/YzYsF9QyHZVJK9P7bsrURQ'>外区Apple ID免费注册教程</a></b>" +
-        "\n" +
         "<b>💊  <a href='https://mp.weixin.qq.com/s/Ehi23fjFpeUc2DocnQb4hw'>Apple礼品卡购买教程</a></b>" +
+        "\n" +
+        "<b>💊  <a href='https://mp.weixin.qq.com/s/YzYsF9QyHZVJK9P7bsrURQ'>外区Apple ID免费注册教程</a></b>" +
         "\n" +
         "\n" +
         "💊  <a href='https://t.me/xiaomaoJT/5'>解除 +86 私聊限制教程</a>" +
@@ -830,6 +834,13 @@ function pushDataToKing(key) {
     return;
   }
   let userMessage = key;
+  let MessageUrl =
+    userMessage.message.chat.type == "private"
+      ? null
+      : "https://t.me/" +
+        userMessage.message.chat.username +
+        "/" +
+        userMessage.message.message_id;
   let messageInfoType = userMessage.message.hasOwnProperty("text")
     ? "[文本消息] " + userMessage.message.text
     : userMessage.message.hasOwnProperty("sticker")
@@ -845,14 +856,15 @@ function pushDataToKing(key) {
     : "[未知消息类型]";
   //用于捕捉机器人信息
   let messageToKing =
-    "<b>🧩 XiaoMaoBot捕捉到用户消息</b>" +
+    "<b>🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩</b>" +
+    "<b>XiaoMaoBot捕捉到用户讯息</b>" +
     "\n" +
     "\n" +
-    "<b>📝 信息内容：</b>" +
-    messageInfoType +
+    "<b>📝 讯息简要内容：</b>" +
+    messageInfoType.replace(/\n/g, " ").substring(0, 100) +
+    (messageInfoType.length > 100 ? "..." : "") +
     "\n" +
-    "\n" +
-    "<b>🎎 信息发送人：</b>" +
+    "<b>🎎 讯息原始用户：</b>" +
     (userMessage.message.from.first_name != undefined
       ? userMessage.message.from.first_name
       : "") +
@@ -860,22 +872,26 @@ function pushDataToKing(key) {
       ? userMessage.message.from.last_name
       : "") +
     "\n" +
-    "\n" +
-    "<b>🏖 消息发送位置：</b>" +
+    "<b>🏖 讯息来源位置：</b>" +
     (userMessage.message.chat.type == "private"
-      ? "[私聊]"
-      : userMessage.message.chat.type == "supergroup"
-      ? "[群聊] " + userMessage.message.chat.title
-      : "[未知]") +
+      ? "来自 " + "[私聊]"
+      : "<a href='" +
+        MessageUrl +
+        "'>" +
+        "来自" +
+        (userMessage.message.chat.type == "supergroup"
+          ? "[群聊] " + userMessage.message.chat.title
+          : "[未知]") +
+        "</a>") +
     "\n" +
-    "\n" +
-    "<b>🛎 消息发送时间：</b>" +
+    "<b>🛎 讯息发送时间：</b>" +
     getNowDate() +
     "\n" +
+    "<b>📰 讯息Json：</b>" +
     "\n" +
-    "<b>📰 消息原始Json：</b>" +
+    JSON.stringify(userMessage) +
     "\n" +
-    JSON.stringify(userMessage);
+    "<b>🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩</b>";
   let dataKing = {
     method: "post",
     payload: {},
