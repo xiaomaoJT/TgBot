@@ -778,7 +778,31 @@ function processReplyWord(key) {
             getRelayTime(responseTime) +
             "\n" +
             "\n" +
-            "Hello,我是 XiaoMao机器人,很高兴认识您！";
+            "Hello,我是 XiaoMao机器人,很高兴认识您！我能较出色的完成以下功能：" +
+            "\n" +
+            "1⃣️ 入退群检测及欢迎欢送" +
+            "\n" +
+            "2⃣️ 广告敏感词过滤及自动删除" +
+            "\n" +
+            "3⃣️ 自动接口查询及数据加工" +
+            "\n" +
+            "4⃣️ 自定义键盘" +
+            "\n" +
+            "5⃣️ 私聊及自动回复" +
+            "\n" +
+            "6⃣️ 关键字自动回复" +
+            "\n" +
+            "7⃣️ 消息存储" +
+            "\n" +
+            "8⃣️ 消息私人推送" +
+            "\n" +
+            "9⃣️ chatGPT查询" +
+            "\n" +
+            "\n" +
+            "或可通过底部快捷按键栏快速激活操作！"+
+            "\n" +
+            "\n" +
+            "<a href='https://github.com/xiaomaoJT/TgBot'>🏖 本机器人完全开源，可点击查看我的源码仓库获取免费搭建教程喔！</a>";
           returnHtmlReply.state = true;
           break;
       }
@@ -1220,6 +1244,11 @@ function getChatBot(word) {
   let responseHelloBot = null;
   let returnText = "";
 
+  if (word == "") {
+    returnText = "查询的内容为空，请在指令后面加上问题再试吧～";
+    return returnText;
+  }
+
   try {
     responseHelloBot = UrlFetchApp.fetch(
       "https://v1.apigpt.cn/?q=" + word + "&apitype=sql"
@@ -1251,6 +1280,11 @@ function getChatBot(word) {
 function getHelloBot(word) {
   let responseHelloBot = null;
   let returnText = "";
+
+  if (word == "") {
+    returnText = "查询的内容为空，请在指令后面加上问题再试吧～";
+    return returnText;
+  }
 
   try {
     responseHelloBot = UrlFetchApp.fetch(
@@ -1359,7 +1393,7 @@ function getPhoneWhere(phone) {
   let returnText = "";
 
   if (phone == "") {
-    returnText = "查询的手机号为空，请在关键字后面加上手机号码再试～";
+    returnText = "查询的手机号为空，请在指令后面加上手机号码再试～";
     return returnText;
   }
 
@@ -1463,6 +1497,11 @@ function getLinkShort(link) {
   let responseLinkShort = null;
   let returnText = "";
 
+  if (link == "") {
+    returnText = "查询的内容为空，请在指令后面加上链接再试吧～";
+    return returnText;
+  }
+
   try {
     let data = {
       url: link,
@@ -1504,6 +1543,11 @@ function getLinkShort(link) {
 function getWeatherApi(location) {
   let responseWeather = null;
   let returnText = "";
+
+  if (location == "") {
+    returnText = "查询的内容为空，请在指令后面加上地址再试吧～";
+    return returnText;
+  }
 
   try {
     responseWeather = UrlFetchApp.fetch(
