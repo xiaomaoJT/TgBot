@@ -73,7 +73,7 @@ function doPost(e) {
   //   Google 请求域建立连接
   // 判断消息，仅对私聊和@消息以及关键字进行回复
   if (
-    htmlReplyState ||
+    htmlReplyState &&
     userMessage.message.chat.type == "private" ||
     userMessage.message.entities[0].type == "mention" ||
     userMessage.message.entities[0].type == "bold"
@@ -94,7 +94,7 @@ function processData(userMessage) {
   // 定义底部自定义键盘
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "订阅转换" }],
-    [{ text: "QX教程" }, { text: "QX脚本" }, { text: "QX去广告" }],
+    [{ text: "QX&Clash教程" }, { text: "QX脚本" }, { text: "QX&Clash去广告" }],
     [
       { text: "接口查询" },
       { text: "微信公众号『小帽集团』" },
@@ -106,6 +106,7 @@ function processData(userMessage) {
     [
       { text: "QX仓库", url: "https://github.com/xiaomaoJT/QxScript" },
       { text: "Bot仓库", url: "https://github.com/xiaomaoJT/TgBot" },
+      { text: "Clash仓库", url: "https://github.com/xiaomaoJT/clash" },
     ],
     [
       { text: "XiaoMao频道", url: "https://t.me/xiaomaoJT" },
@@ -380,12 +381,14 @@ function processReplyWord(key) {
         "\n" +
         "<b>Clash版本（Win/Mac/Android） - 懒人规则（基于XiaoMao-Forever）</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/yaml/Clash_XiaoMao.yaml'>1⃣️ XiaoMao懒人规则Clash版本</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/clash/main/yaml/Clash_XiaoMao.yaml'>1⃣️ XiaoMao懒人规则科学版</a>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/yaml/Clash_XiaoMao_template.yaml'>1⃣️ XiaoMao懒人规则Clash版本 配置模板</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/clash/main/yaml/Clash_Cdn_XiaoMao.yaml'>2⃣️ XiaoMao懒人规则国内版</a>" +
+        "\n" +
+        "<a href='https://static-mp-4c1955c1-4e3f-4ed7-9f2b-ea2165e28195.next.bspapp.com/xiaomao-clash/index.html#/'>3⃣️ Clash配置在线生成</a>" +
         "\n" +
         "\n" +
-        "<a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/oldConfig'>🎏 懒人规则历史版本配置</a>" +
+        "<a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/oldConfig'>🎏 QX懒人规则历史版本配置</a>" +
         "\n" +
         "\n" +
         "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程，更多教程点击菜单 QX教程</a>",
@@ -432,7 +435,7 @@ function processReplyWord(key) {
         "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换，对本地转换不熟悉？点击菜单 QX教程</b>",
     },
     {
-      keyword: ["去广告", "QX去广告"],
+      keyword: ["去广告", "QX&Clash去广告"],
       replyWord:
         "💊 <a href='https://t.me/xiaomaoJT/314'><b>XiaoMao去广告模块介绍</b></a>" +
         "\n" +
@@ -446,15 +449,17 @@ function processReplyWord(key) {
         "3⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/script/QX_XiaoMao_rw3.conf'>重写拒绝</a>" +
         "\n" +
         "\n" +
+        "<b>Clash去广告请使用XiaoMaoClash配置网站生成专属懒人配置！点击QX&Clash获取</b>" +
+        "\n" +
         "<b>去广告模块日更补充，可能存在误杀，请于XiaoMao群聊内反馈修正！</b>",
     },
     {
-      keyword: ["教程", "QX图文教程"],
+      keyword: ["教程", "QX&Clash教程"],
       replyWord:
-        "💊  <b>QX图文教程</b>" +
+        "💊  <b>QX & Clash图文教程</b>" +
         "\n" +
         "\n" +
-        "🧰 <a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'><b>QuamtumultX图文教程合集</b></a>" +
+        "🧰 <a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'><b>QuamtumultX & Clash图文教程合集</b></a>" +
         "\n" +
         "\n" +
         "1⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485104&idx=1&sn=484e84c5cfcca5f478b64bc82eb60bea&chksm=eb37c173dc40486516b0c40e99ce1711a5192c3189d736421ecdc06c0b9d3f7fffb67a0801a9&scene=178&cur_album_id=2740008142629273602#rd'>入门：<b>下载、认识QX、上手使用</b></a>" +
@@ -468,7 +473,10 @@ function processReplyWord(key) {
         "5⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'>番外：<b>配置BoxJs、SubStore教程</b></a>" +
         "\n" +
         "\n" +
-        "🥎 <a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/yaml'><b>XiaoMao_Clash版本配置教程及软件下载</b></a>" +
+        "6⃣️ <a href='https://mp.weixin.qq.com/s/qfeNQvUh8lLYM8GOFQ_PVg'>XMC：<b>Clash配置教程</b></a>" +
+        "\n" +
+        "\n" +
+        "🥎 <a href='https://github.com/xiaomaoJT/clash'><b>XiaoMao_Clash版本配置教程及软件下载</b></a>" +
         "\n" +
         "\n" +
         "<b>欢迎点赞评论，感谢支持！</b>",
@@ -662,7 +670,6 @@ function processReplyWord(key) {
       returnHtmlReply.state = true;
       return returnHtmlReply;
     }
-
     if (isApi(commandWord, key).status) {
       switch (isApi(commandWord, key).id) {
         case 0:
@@ -814,6 +821,9 @@ function processReplyWord(key) {
             "\n" +
             "<a href='https://github.com/xiaomaoJT/TgBot'>🏖 本机器人完全开源，可点击查看我的源码仓库获取免费搭建教程喔！</a>";
           returnHtmlReply.state = true;
+          break;
+        default:
+          returnHtmlReply.state = false;
           break;
       }
     } else {
