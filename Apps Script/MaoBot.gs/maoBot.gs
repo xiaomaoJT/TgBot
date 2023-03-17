@@ -95,7 +95,7 @@ function processData(userMessage) {
   // 定义底部自定义键盘
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "订阅转换" }],
-    [{ text: "QX&Clash教程" }, { text: "QX脚本" }, { text: "QX&Clash去广告" }],
+    [{ text: "QX&Clash教程" }, { text: "QX脚本" }, { text: "去广告" }],
     [
       { text: "接口查询" },
       { text: "微信公众号『小帽集团』" },
@@ -417,6 +417,9 @@ function processReplyWord(key) {
         "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-NM'>💊 XiaoMao-NM 长按复制订阅地址（网易节点）</a>" +
         "\n" +
         "\n" +
+        "<a href='https://t.me/xiaomaoJT/77'>🧰 网易云解锁教程</a>" +
+        "\n" +
+        "\n" +
         "<b>订阅地址可适用于QX及Shadowrocket，不适配clash。</b>",
     },
     {
@@ -436,7 +439,7 @@ function processReplyWord(key) {
         "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换，对本地转换不熟悉？点击菜单 QX教程</b>",
     },
     {
-      keyword: ["去广告", "QX&Clash去广告"],
+      keyword: ["去广告"],
       replyWord:
         "💊 <a href='https://t.me/xiaomaoJT/314'><b>XiaoMao去广告模块介绍</b></a>" +
         "\n" +
@@ -450,12 +453,16 @@ function processReplyWord(key) {
         "3⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/script/QX_XiaoMao_rw3.conf'>重写拒绝</a>" +
         "\n" +
         "\n" +
-        "<b>Clash去广告请使用XiaoMaoClash配置网站生成专属懒人配置！点击QX&Clash获取</b>" +
+        "4⃣️ <b>Clash去广告，请使用XiaoMaoClash配置网站生成专属懒人配置！点击菜单 QX&Clash教程 获取教程⑥</b>" +
+        "\n" +
+        "\n" +
+        "5⃣️ <a href='https://t.me/xiaomaoJT/147'>TG去广告</a>" +
+        "\n" +
         "\n" +
         "<b>去广告模块日更补充，可能存在误杀，请于XiaoMao群聊内反馈修正！</b>",
     },
     {
-      keyword: ["教程", "QX&Clash教程"],
+      keyword: ["教程"],
       replyWord:
         "💊  <b>QX & Clash图文教程</b>" +
         "\n" +
@@ -472,7 +479,6 @@ function processReplyWord(key) {
         "4⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485172&idx=1&sn=a6a0bdc07f335b23d565f022df636944&chksm=eb37c137dc404821746da8a10b8e3b2c4b883c9a866031f3475786d719587caf98974b3486d2&scene=178&cur_album_id=2740008142629273602#rd'>进阶3：<b>配置重写教程</b></a>" +
         "\n" +
         "5⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'>番外：<b>配置BoxJs、SubStore教程</b></a>" +
-        "\n" +
         "\n" +
         "6⃣️ <a href='https://mp.weixin.qq.com/s/qfeNQvUh8lLYM8GOFQ_PVg'>XMC：<b>Clash配置教程</b></a>" +
         "\n" +
@@ -511,7 +517,7 @@ function processReplyWord(key) {
         "<b>对脚本不熟悉？点击菜单 QX教程</b>",
     },
     {
-      keyword: ["响应延迟", "延迟", "/delay"],
+      keyword: ["/delay"],
       replyWord:
         "💊 <b>响应延迟说明</b>" +
         "\n" +
@@ -538,7 +544,7 @@ function processReplyWord(key) {
         "\n",
     },
     {
-      keyword: ["TG解限制", "汉化", "群组限制"],
+      keyword: ["TG解限制", "汉化"],
       replyWord:
         "<b>💊  <a href='https://mp.weixin.qq.com/s/Ehi23fjFpeUc2DocnQb4hw'>Apple礼品卡购买教程</a></b>" +
         "\n" +
