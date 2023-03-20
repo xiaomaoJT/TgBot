@@ -34,6 +34,9 @@ var KingType = 1;
 // 0 仅推送基础消息
 var KingInfo = 1;
 
+//bot id
+var botIdAlone = "";
+
 /**
  * 用于接收用户传来的讯息JSON
  * @param {*} e
@@ -73,11 +76,12 @@ function doPost(e) {
   //   Google 请求域建立连接
   // 判断消息，仅对私聊和@消息以及关键字进行回复
   if (
+    (userMessage.message.reply_to_message &&
+      userMessage.message.reply_to_message.from.id == botIdAlone) ||
     htmlReplyState ||
     userMessage.message.chat.type == "private" ||
-    userMessage.message.entities[0].type == "mention" ||
-    userMessage.message.entities[0].type == "bold" ||
-    (userMessage.message.entities[0].type == "supergroup" && htmlReplyState)
+    (userMessage.message.entities[0].type == "mention" && htmlReplyState) ||
+    userMessage.message.entities[0].type == "bold"
   ) {
     UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
     setStorage(data, "MESSAGEBACK");
