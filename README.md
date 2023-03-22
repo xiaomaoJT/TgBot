@@ -7,9 +7,9 @@
 
 #### Telegram Bot机器人，基于Google Apps Script实现。
 
-| **最近更新时间** | **2023年03月20日**                                           |
+| **最近更新时间** | **2023年03月22日**                                           |
 | :--------------- | :----------------------------------------------------------- |
-| **当前版本**     | **Beta 4.3-285**                                             |
+| **当前版本**     | **Beta 4.3-291**                                             |
 | **Bot功能**      | **入群检测、退群检测、入群欢迎、退群欢送、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能** |
 | **仓库作者**     | **@XiaoMao**                                                 |
 | **搭建成本**     | **完全免费**                                                 |
@@ -43,7 +43,7 @@
 
 ##### 🎟 快速导航 · 目录
 
-🚗 [Telegram Bot 搭建教程](https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md)
+🚗 [Telegram Bot 搭建教程](https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md)  ｜ [🌈 新特性补充](https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md#-新功能--内容补充)
 
 📖 [仓库资源更新日志](https://github.com/xiaomaoJT/TgBot/blob/main/UPDATELOG.md)
 

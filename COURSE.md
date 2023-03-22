@@ -148,3 +148,12 @@ var KingInfo = 1;
 {"update_id":xxxx,"message":{"message_id":xxxx,"from":{"id":xxxx,"is_bot":false,"first_name":"xxxx","username":"xxxx","language_code":"zh-hans"},"chat":{"id":xxxx,"first_name":"xxxx","username":"xxxx","type":"private"},"date":xxxx,"voice":{"duration":0,"mime_type":"audio/ogg","file_id":"xxxx","file_unique_id":"xxxx","file_size":4200}}}
 ```
 
+
+
+> 新特性补充
+>
+> 此补充内容**自更新日期[20230322] 版本号@Beta4.3-291 起**。
+>
+> *新增参数**botIdAlone**，用于识别引用类型消息的回复*
+>
+> botIdAlone 取机器人的id值

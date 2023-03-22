@@ -14,7 +14,7 @@
 var EXECID = "";
 // Google EXEC ID - 谷歌表格 工作表名
 var EXECNAME = "";
-// Telegram BOT ID - tg机器人Token
+// Telegram BOT ID key - tg机器人Token
 var BOTID = "";
 // 用于判断消息类型 - inlinekey board回调 or 主动消息
 // 1 callback
@@ -34,7 +34,7 @@ var KingType = 1;
 // 0 仅推送基础消息
 var KingInfo = 1;
 
-//bot id
+//取bot id 用于识别引用消息
 var botIdAlone = "";
 
 /**
@@ -70,7 +70,8 @@ function doPost(e) {
         : userMessage.message.chat.id.toString();
     htmlReplyState = processReplyWord(
       userMessage.message.text,
-      messageUserID
+      messageUserID,
+      userMessage.message
     ).state;
   }
   //   Google 请求域建立连接
@@ -275,10 +276,19 @@ function processData(userMessage) {
   // 暂时只识别文本类消息
   try {
     if (userMessage.message) {
-      if (processReplyWord(userMessage.message.text, messageUserID).htmlReply) {
+      if (
+        processReplyWord(
+          userMessage.message.text,
+          messageUserID,
+          userMessage.message
+        ).htmlReply
+      ) {
         let HTML_REPLY =
-          processReplyWord(userMessage.message.text, messageUserID).htmlReply ==
-          "getTgId"
+          processReplyWord(
+            userMessage.message.text,
+            messageUserID,
+            userMessage.message
+          ).htmlReply == "getTgId"
             ? "<b>🕹 来自XiaoMaoBot的消息：</b>" +
               "\n" +
               "🪬 本次响应延迟(/delay)：" +
@@ -289,8 +299,11 @@ function processData(userMessage) {
               "<b>" +
               userMessage.message.from.id.toString() +
               "</b>"
-            : processReplyWord(userMessage.message.text, messageUserID)
-                .htmlReply;
+            : processReplyWord(
+                userMessage.message.text,
+                messageUserID,
+                userMessage.message
+              ).htmlReply;
 
         payloadPostData = {
           method: "sendMessage",
@@ -318,8 +331,11 @@ function processData(userMessage) {
           " @" +
           userMessage.message.from.username +
           " 消息中含" +
-          processReplyWord(userMessage.message.text, messageUserID).dfa
-            .wordLength +
+          processReplyWord(
+            userMessage.message.text,
+            messageUserID,
+            userMessage.message
+          ).dfa.wordLength +
           "<b>处敏感词，XiaoMao已自动删除消息，请文明聊天喔！</b>";
         let payload = {
           method: "sendMessage",
@@ -366,7 +382,7 @@ function processData(userMessage) {
  * keyword值唯一不可重复，用于匹配用户关键字是否包含，并触发自动回复
  * @param key 用户消息关键字
  */
-function processReplyWord(key) {
+function processReplyWord(key, useId, userJson) {
   //关键字及回复列表
   let autoReply = [
     {
@@ -838,22 +854,40 @@ function processReplyWord(key) {
           break;
       }
     } else {
-      autoReply.forEach((item) => {
-        item.keyword.forEach((element) => {
-          if (key.indexOf(element) != -1) {
-            htmlReply =
-              "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-              "\n" +
-              "🪬 本次响应延迟(/delay)：" +
-              getRelayTime(responseTime) +
-              "\n" +
-              "\n" +
-              item.replyWord;
-            returnHtmlReply.state = true;
-            return;
-          }
+      //关键字匹配 若匹配失败自动进入hello机器人
+      try {
+        autoReply.forEach((item) => {
+          item.keyword.forEach((element) => {
+            if (key.indexOf(element) != -1) {
+              htmlReply =
+                "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+                "\n" +
+                "🪬 本次响应延迟(/delay)：" +
+                getRelayTime(responseTime) +
+                "\n" +
+                "\n" +
+                item.replyWord;
+              returnHtmlReply.state = true;
+              throw new Error("匹配成功");
+            }
+          });
         });
-      });
+        if (
+          userJson &&
+          userJson.reply_to_message &&
+          userJson.reply_to_message.from.id == botIdAlone
+        ) {
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getHelloBot(key);
+          returnHtmlReply.state = true;
+        }
+      } catch (e) {}
     }
   }
 
