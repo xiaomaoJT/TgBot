@@ -10,19 +10,18 @@
  * 源码开发不易，使用引用请注明出处！
  */
 
+
+
+
+// ------------------------- 预定义参数·请补充对应内容·必填 -----------------
 // Google EXEC ID - 谷歌表格ID
 var EXECID = "";
 // Google EXEC ID - 谷歌表格 工作表名
 var EXECNAME = "";
 // Telegram BOT ID key - tg机器人Token
 var BOTID = "";
-// 用于判断消息类型 - inlinekey board回调 or 主动消息
-// 1 callback
-// 2 new member
-// 3 left member
-var MESSAGETYPE = 0;
-//接入时间戳
-var responseTime = "";
+
+// ------------------------- 自定义参数·请按需修改参数·引号内留空此功能失效 -----------------
 // 用于推送主人消息 取主人tg id
 var KingId = "";
 // 1 全部类型
@@ -30,12 +29,24 @@ var KingId = "";
 // 3 私聊类型
 // 4 群聊类型
 var KingType = 1;
-// 1 推送详情（原图片、视频、贴纸等）
+// 1 推送详情（原图片、视频、音频、贴纸等）
 // 0 仅推送基础消息
 var KingInfo = 1;
-
-//取bot id 用于识别引用消息
+//取 bot id 用于识别引用消息
 var botIdAlone = "";
+
+
+// ------------------------- 默认通用参数·无需改动 -----------------
+// 用于判断消息类型 - inlinekey board回调 or 主动消息
+// 1 callback
+// 2 new member
+// 3 left member
+var MESSAGETYPE = 0;
+//接入时间戳 
+var responseTime = "";
+
+
+
 
 /**
  * 用于接收用户传来的讯息JSON
