@@ -111,7 +111,7 @@ function processData(userMessage) {
   // 定义底部自定义键盘
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "订阅转换" }],
-    [{ text: "QX&Clash教程" }, { text: "QX脚本" }, { text: "去广告" }],
+    [{ text: "图文教程" }, { text: "QX脚本" }, { text: "去广告" }],
     [
       { text: "接口查询" },
       { text: "微信公众号『小帽集团』" },
@@ -399,25 +399,31 @@ function processReplyWord(key, useId, userJson) {
     {
       keyword: ["懒人规则", "懒人配置"],
       replyWord:
-        "<b>iPhone/iPad设备 - 懒人规则</b>" +
+        "<b>iPhone/iPad设备 - XiaoMao懒人规则</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/general/QX_XiaoMao.conf'>1⃣️ XiaoMao懒人规则通用版·XiaoMao推荐</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/general/QX_XiaoMao_CN.conf'>1⃣️ 通用版本·中文版·XiaoMao推荐</a>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/custom/QX_XiaoMao.conf'>2⃣️ XiaoMao懒人规则自定义版</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/custom/QX_XiaoMao_CN.conf'>2⃣️ 自定义版·中文版</a>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/general/QX_XiaoMao.conf'>3⃣️ 通用版本·英文版</a>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/custom/QX_XiaoMao.conf'>4⃣️ 自定义版·英文版</a>" +
         "\n" +
         "\n" +
-        "<b>Mac M芯片设备 - 懒人规则</b>" +
+        "<b>Mac M芯片设备 - XiaoMao懒人规则</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/macOS/QX_XiaoMao.conf'>1⃣️ XiaoMao懒人规则Mac版</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/macOS/QX_XiaoMao_CN.conf'>1⃣️ Mac版·中文版</a>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/macOS/QX_XiaoMao.conf'>2⃣️ Mac版·英文版</a>" +
         "\n" +
         "\n" +
-        "<b>Clash版本（Win/Mac/Android） - 懒人规则（基于XiaoMao-Forever）</b>" +
+        "<b>Clash版本（Win/Mac/Android） - XiaoMao懒人规则</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/clash/main/yaml/Clash_XiaoMao.yaml'>1⃣️ XiaoMao懒人规则科学版</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/clash/main/yaml/Clash_XiaoMao.yaml'>1⃣️ Clash·科学版</a>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/clash/main/yaml/Clash_Cdn_XiaoMao.yaml'>2⃣️ XiaoMao懒人规则国内版</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/clash/main/yaml/Clash_Cdn_XiaoMao.yaml'>2⃣️ Clash·国内版</a>" +
         "\n" +
-        "<a href='https://static-mp-4c1955c1-4e3f-4ed7-9f2b-ea2165e28195.next.bspapp.com/xiaomao-clash/index.html#/'>3⃣️ Clash配置在线生成</a>" +
+        "<a href='https://static-mp-4c1955c1-4e3f-4ed7-9f2b-ea2165e28195.next.bspapp.com/xiaomao-clash/index.html#/'>3⃣️ Clash配置在线生成·XiaoMao推荐</a>" +
         "\n" +
         "\n" +
         "<a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/oldConfig'>🎏 QX懒人规则历史版本配置</a>" +
@@ -493,7 +499,7 @@ function processReplyWord(key, useId, userJson) {
         "<b>去广告模块日更补充，可能存在误杀，请于XiaoMao群聊内反馈修正！</b>",
     },
     {
-      keyword: ["教程"],
+      keyword: ["图文教程"],
       replyWord:
         "💊  <b>QX & Clash图文教程</b>" +
         "\n" +
