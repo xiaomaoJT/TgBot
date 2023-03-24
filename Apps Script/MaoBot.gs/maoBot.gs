@@ -501,7 +501,7 @@ function processReplyWord(key, useId, userJson) {
     {
       keyword: ["图文教程"],
       replyWord:
-        "💊  <b>QX & Clash图文教程</b>" +
+        "💊  <b>QX & Clash & TgBot 图文教程</b>" +
         "\n" +
         "\n" +
         "🧰 <a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'><b>QuamtumultX & Clash图文教程合集</b></a>" +
@@ -518,6 +518,8 @@ function processReplyWord(key, useId, userJson) {
         "5⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'>番外：<b>配置BoxJs、SubStore教程</b></a>" +
         "\n" +
         "6⃣️ <a href='https://mp.weixin.qq.com/s/qfeNQvUh8lLYM8GOFQ_PVg'>XMC：<b>Clash配置教程</b></a>" +
+        "\n" +
+        "7⃣️ <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'>TgBot：<b>Tg机器人免费搭建教程</b></a>" +
         "\n" +
         "\n" +
         "🥎 <a href='https://github.com/xiaomaoJT/clash'><b>XiaoMao_Clash版本配置教程及软件下载</b></a>" +
