@@ -462,9 +462,9 @@ function processReplyWord(key, useId, userJson) {
     {
       keyword: ["订阅转换", "转换"],
       replyWord:
-        "1⃣️ <a href='https://t.me/QuanXNews/110'>Quantumult X资源解析器</a>" +
+        "1⃣️ <a href='https://t.me/QuanXNews/110'>Quantumult X资源解析器 ✅推荐</a>" +
         "\n" +
-        "2⃣️ <a href='https://t.me/cool_scripts/200'>Sub-Store本地订阅</a>" +
+        "2⃣️ <a href='https://t.me/cool_scripts/200'>Sub-Store本地订阅 ✅多订阅推荐</a>" +
         "\n" +
         "3⃣️ 在线订阅转换：" +
         "\n" +
@@ -472,8 +472,12 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "<a href='https://sub.pet'>Subscription 转换</a>" +
         "\n" +
+        "<a href='https://nexconvert.com'>奶昔 转换</a>" +
         "\n" +
-        "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换，对本地转换不熟悉？点击菜单 QX教程</b>",
+        "<a href='https://sub.xeton.dev'>菜市场 转换</a>" +
+        "\n" +
+        "\n" +
+        "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换，对SubStore本地转换不熟悉？点击菜单 QX教程</b>",
     },
     {
       keyword: ["去广告"],
