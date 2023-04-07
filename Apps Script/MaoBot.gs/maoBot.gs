@@ -10,9 +10,6 @@
  * 源码开发不易，使用引用请注明出处！
  */
 
-
-
-
 // ------------------------- 预定义参数·请补充对应内容·必填 -----------------
 // Google EXEC ID - 谷歌表格ID
 var EXECID = "";
@@ -35,16 +32,16 @@ var KingInfo = 1;
 //取 bot id 用于识别引用消息
 var botIdAlone = "";
 
-
 // ------------------------- 默认通用参数·无需改动 -----------------
 // 用于判断消息类型 - inlinekey board回调 or 主动消息
 // 1 callback
 // 2 new member
 // 3 left member
 var MESSAGETYPE = 0;
-//接入时间戳 
+//接入时间戳
 var responseTime = "";
-
+// 用于承接返回数据
+var dealMessage = {};
 
 
 
@@ -55,6 +52,7 @@ var responseTime = "";
 function doPost(e) {
   let userMessage = JSON.parse(e.postData.contents);
   responseTime = new Date().getTime();
+
   if (userMessage.callback_query) {
     MESSAGETYPE = 1;
     userMessage = JSON.parse(e.postData.contents).callback_query;
@@ -65,6 +63,20 @@ function doPost(e) {
   if (userMessage.message.new_chat_participant) {
     MESSAGETYPE = 2;
   }
+
+  //计算返回式
+  let messageUserID =
+    userMessage.message.chat.type == "private"
+      ? userMessage.message.from.id.toString()
+      : userMessage.message.chat.id.toString();
+
+  dealMessage = processReplyWord(
+    userMessage.message.text,
+    messageUserID,
+    userMessage.message
+  );
+
+  //回调响应逻辑
   let payload = processData(userMessage);
   let data = {
     method: "post",
@@ -75,15 +87,7 @@ function doPost(e) {
   let htmlReplyState = true;
   if (MESSAGETYPE == 0 && userMessage.message) {
     // 判断消息类型 - 进行私聊或群聊回复
-    let messageUserID =
-      userMessage.message.chat.type == "private"
-        ? userMessage.message.from.id.toString()
-        : userMessage.message.chat.id.toString();
-    htmlReplyState = processReplyWord(
-      userMessage.message.text,
-      messageUserID,
-      userMessage.message
-    ).state;
+    htmlReplyState = dealMessage.state;
   }
   //   Google 请求域建立连接
   // 判断消息，仅对私聊和@消息以及关键字进行回复
@@ -287,19 +291,9 @@ function processData(userMessage) {
   // 暂时只识别文本类消息
   try {
     if (userMessage.message) {
-      if (
-        processReplyWord(
-          userMessage.message.text,
-          messageUserID,
-          userMessage.message
-        ).htmlReply
-      ) {
+      if (dealMessage.dfa) {
         let HTML_REPLY =
-          processReplyWord(
-            userMessage.message.text,
-            messageUserID,
-            userMessage.message
-          ).htmlReply == "getTgId"
+          dealMessage.htmlReply == "getTgId"
             ? "<b>🕹 来自XiaoMaoBot的消息：</b>" +
               "\n" +
               "🪬 本次响应延迟(/delay)：" +
@@ -310,11 +304,7 @@ function processData(userMessage) {
               "<b>" +
               userMessage.message.from.id.toString() +
               "</b>"
-            : processReplyWord(
-                userMessage.message.text,
-                messageUserID,
-                userMessage.message
-              ).htmlReply;
+            : dealMessage.htmlReply;
 
         payloadPostData = {
           method: "sendMessage",
@@ -342,11 +332,7 @@ function processData(userMessage) {
           " @" +
           userMessage.message.from.username +
           " 消息中含" +
-          processReplyWord(
-            userMessage.message.text,
-            messageUserID,
-            userMessage.message
-          ).dfa.wordLength +
+          dealMessage.dfa.wordLength +
           "<b>处敏感词，XiaoMao已自动删除消息，请文明聊天喔！</b>";
         let payload = {
           method: "sendMessage",
@@ -550,11 +536,13 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "5⃣️ <a href='https://t.me/xiaomaoJT/319'>B612咔叽相机vip自定义</a>" +
         "\n" +
-        "6⃣️ <a href='https://t.me/xiaomaoJT/321'>WPS会员、超级会员、稻壳会员自定义</a>" +
+        "6⃣️ <a href='https://t.me/xiaomaoJT/321'>WPS会员、超级会员、稻壳会员、云空间自定义</a>" +
         "\n" +
         "7⃣️ <a href='https://t.me/xiaomaoJT/326'>扫描全能王会员及至尊帐户自定义</a>" +
         "\n" +
         "8⃣️ <a href='https://t.me/xiaomaoJT/340'>思维导图XMind vip自定义</a>" +
+        "\n" +
+        "9⃣️ <a href='https://t.me/xiaomaoJT/488'>今日热榜 vip自定义</a>" +
         "\n" +
         "\n" +
         "<b>对脚本不熟悉？点击菜单 QX教程</b>",
@@ -569,11 +557,13 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "1⃣️ 算法匹配效率" +
         "\n" +
-        "2⃣️ GAS网络延迟 " +
+        "2⃣️ GAS网络延迟及网络管制" +
         "\n" +
-        "3⃣️ 接口请求延迟 " +
+        "3⃣️ 接口请求延迟" +
         "\n" +
         "4⃣️ 手机外网网速" +
+        "\n" +
+        "5⃣️ 查询队列" +
         "\n" +
         "GAS及接口皆来源于公共服务器，高峰期可能出现较高延迟状态。",
     },
@@ -698,7 +688,7 @@ function processReplyWord(key, useId, userJson) {
     { api: "/start", apiId: 11 },
   ];
 
-  if (outsideWord.indexOf(key) != -1) {
+  if (outsideWord.findIndex((i) => key.indexOf(i) != -1) != -1) {
     htmlReply =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
@@ -723,6 +713,7 @@ function processReplyWord(key, useId, userJson) {
     if (isApi(commandWord, key).status) {
       switch (isApi(commandWord, key).id) {
         case 0:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -734,6 +725,7 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 1:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -745,6 +737,7 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 2:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -756,6 +749,7 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 3:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -767,6 +761,7 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 4:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -778,6 +773,7 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 5:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -789,6 +785,7 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 6:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -801,6 +798,7 @@ function processReplyWord(key, useId, userJson) {
 
           break;
         case 7:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -812,6 +810,7 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 8:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -823,6 +822,7 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 9:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -834,10 +834,12 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 10:
+          apiReply(useId, userJson);
           htmlReply = "getTgId";
           returnHtmlReply.state = true;
           break;
         case 11:
+          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -1324,13 +1326,52 @@ function isApi(commandList, key) {
 }
 
 /**
+ * 用于接口前的回复
+ */
+function apiReply(id, useJson) {
+  let followMessageKeyboard = [
+    [
+      { text: "QX仓库", url: "https://github.com/xiaomaoJT/QxScript" },
+      { text: "Bot仓库", url: "https://github.com/xiaomaoJT/TgBot" },
+      { text: "Clash仓库", url: "https://github.com/xiaomaoJT/clash" },
+    ],
+    [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
+  ];
+  let keyboardFollowParams = {
+    inline_keyboard: followMessageKeyboard,
+  };
+  let payloadPostData = {
+    method: "sendMessage",
+    chat_id: id,
+    text:
+      "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+      "\n" +
+      "🪬 本次响应延迟(/delay)：" +
+      getRelayTime(responseTime) +
+      "\n" +
+      "\n" +
+      "<b>您的查询指令已成功发送，本次查询过程中将受到运营商网络管制，若200s内无响应则此次通信将被异常终止，请稍后再试～</b>",
+    reply_to_message_id: useJson.message_id,
+    parse_mode: "HTML",
+    reply_markup: JSON.stringify(keyboardFollowParams),
+    disable_web_page_preview: true,
+  };
+  let data = {
+    method: "post",
+    payload: payloadPostData,
+  };
+  UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+}
+
+/**
  * chat api✅
  * @param word
  * @returns
  */
 function getChatBot(word) {
   let responseHelloBot = null;
-  let returnText = "";
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
 
   if (word == "") {
     returnText = "查询的内容为空，请在指令后面加上问题再试吧～";
@@ -1339,7 +1380,13 @@ function getChatBot(word) {
 
   try {
     responseHelloBot = UrlFetchApp.fetch(
-      "https://v1.apigpt.cn/?q=" + word + "&apitype=sql"
+      "https://v1.apigpt.cn/?q=" +
+        word +
+        "&apitype=sql&times=" +
+        new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+      }
     );
     let jsonData = JSON.parse(responseHelloBot.getContentText());
     returnText =
@@ -1353,10 +1400,7 @@ function getChatBot(word) {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;") +
       "</code></pre>";
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
+  } catch (e) {}
   return returnText;
 }
 
@@ -1367,7 +1411,8 @@ function getChatBot(word) {
  */
 function getHelloBot(word) {
   let responseHelloBot = null;
-  let returnText = "";
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
 
   if (word == "") {
     returnText = "查询的内容为空，请在指令后面加上问题再试吧～";
@@ -1376,7 +1421,13 @@ function getHelloBot(word) {
 
   try {
     responseHelloBot = UrlFetchApp.fetch(
-      "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + word
+      "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" +
+        word +
+        "&times=" +
+        new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+      }
     );
     let jsonData = JSON.parse(responseHelloBot.getContentText());
     returnText =
@@ -1384,10 +1435,7 @@ function getHelloBot(word) {
       "\n" +
       "\n" +
       jsonData.content;
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
+  } catch (e) {}
   return returnText;
 }
 
@@ -1397,30 +1445,18 @@ function getHelloBot(word) {
  * @returns
  */
 function getVideo() {
-  let responseVideo = null;
   let returnText = "";
-
-  // http://tucdn.wpon.cn/api-girl/index.php?wpon=302
-  try {
-    // responseVideo = UrlFetchApp.fetch(
-    //   "https://v.api.aa1.cn/api/api-dy-girl/index.php?aa1=json"
-    // );
-    // let jsonData = JSON.parse(responseVideo.getContentText());
-    let url =
-      "http://tucdn.wpon.cn/api-girl/index.php?wpon=" +
-      parseInt(Math.random() * 99999);
-    returnText =
-      "<b>以下数据来自wpon，由XiaoMao加工：</b>" +
-      "\n" +
-      "\n" +
-      "<a href='" +
-      url +
-      "'>点击播放</a>" +
-      "\n";
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
+  let url =
+    "http://tucdn.wpon.cn/api-girl/index.php?wpon=" +
+    parseInt(Math.random() * 99999);
+  returnText =
+    "<b>以下数据来自wpon，由XiaoMao加工：</b>" +
+    "\n" +
+    "\n" +
+    "<a href='" +
+    url +
+    "'>美女小姐姐视频·点击在线播放</a>" +
+    "\n";
 
   return returnText;
 }
@@ -1431,18 +1467,25 @@ function getVideo() {
  */
 function getDuJiTang() {
   let responseDuJiTang = null;
-  let returnText = "";
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
 
   try {
-    responseDuJiTang = UrlFetchApp.fetch("http://api.lkblog.net/ws/api.php");
+    responseDuJiTang = UrlFetchApp.fetch(
+      "https://v.api.aa1.cn/api/api-wenan-dujitang/index.php?aa1=json&times=" +
+        new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+      }
+    );
+
     let jsonData = JSON.parse(responseDuJiTang.getContentText());
     returnText =
-      "<b>以下数据来自LK，由XiaoMao加工：</b>" + "\n" + "\n" + jsonData.data;
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
-
+      "<b>以下数据来自LK，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      jsonData.data.dujitang;
+  } catch (e) {}
   return returnText;
 }
 /**
@@ -1452,21 +1495,52 @@ function getDuJiTang() {
  */
 function getTianGou() {
   let responseTianGou = null;
-  let returnText = "";
-
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+  // return returnText;
   try {
     responseTianGou = UrlFetchApp.fetch(
-      "https://api.ixiaowai.cn/tgrj/index.php"
+      "https://v.api.aa1.cn/api/tiangou?times=" + new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+      }
     );
+
     returnText =
       "<b>以下数据来自小歪，由XiaoMao加工：</b>" +
       "\n" +
       "\n" +
       responseTianGou.getContentText();
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
+  } catch (e) {}
+  return returnText;
+}
+
+/**
+ * 一言查询 ✅
+ * @returns
+ */
+function getYiYan() {
+  let responseYiYan = null;
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+
+  try {
+    responseYiYan = UrlFetchApp.fetch(
+      "https://v.api.aa1.cn/api/yiyan/index.php?times=" + new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+        followRedirects: true,
+        validateHttpsCertificates: false,
+      }
+    );
+    if (200 == responseYiYan.getResponseCode()) {
+      returnText =
+        "<b>以下数据来自小歪，由XiaoMao加工：</b>" +
+        "\n" +
+        "\n" +
+        responseYiYan.getContentText();
+    }
+  } catch (e) {}
 
   return returnText;
 }
@@ -1478,7 +1552,8 @@ function getTianGou() {
  */
 function getPhoneWhere(phone) {
   let responsePhone = null;
-  let returnText = "";
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
 
   if (phone == "") {
     returnText = "查询的手机号为空，请在指令后面加上手机号码再试～";
@@ -1489,7 +1564,12 @@ function getPhoneWhere(phone) {
     responsePhone = UrlFetchApp.fetch(
       "https://www.mxnzp.com/api/mobile_location/aim_mobile?mobile=" +
         phone +
-        "&app_id=rgihdrm0kslojqvm&app_secret=WnhrK251TWlUUThqaVFWbG5OeGQwdz09"
+        "&app_id=rgihdrm0kslojqvm&app_secret=WnhrK251TWlUUThqaVFWbG5OeGQwdz09" +
+        "&times=" +
+        new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+      }
     );
 
     let jsonData = JSON.parse(responsePhone.getContentText());
@@ -1506,35 +1586,10 @@ function getPhoneWhere(phone) {
       "\n" +
       "运营商：" +
       jsonData.data.carrier;
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
-
+  } catch (e) {}
   return returnText;
 }
-/**
- * 一言查询 ✅
- * @returns
- */
-function getYiYan() {
-  let responseYiYan = null;
-  let returnText = "";
 
-  try {
-    responseYiYan = UrlFetchApp.fetch("https://api.ixiaowai.cn/api/ylapi.php");
-    returnText =
-      "<b>以下数据来自小歪，由XiaoMao加工：</b>" +
-      "\n" +
-      "\n" +
-      responseYiYan.getContentText();
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
-
-  return returnText;
-}
 /**
  * 随机歌曲 ✅
  * @param text
@@ -1542,11 +1597,16 @@ function getYiYan() {
  */
 function getMusic() {
   let responseMusic = null;
-  let returnText = "";
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
 
   try {
     responseMusic = UrlFetchApp.fetch(
-      "https://anime-music.jijidown.com/api/v2/music"
+      "https://anime-music.jijidown.com/api/v2/music&times=" +
+        new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+      }
     );
     let jsonData = JSON.parse(responseMusic.getContentText());
     returnText =
@@ -1567,13 +1627,9 @@ function getMusic() {
       "\n" +
       "<a href='" +
       jsonData.res.play_url +
-      "'>点击播放</a>" +
+      "'>点击在线播放</a>" +
       "\n";
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
-
+  } catch (e) {}
   return returnText;
 }
 /**
@@ -1583,7 +1639,8 @@ function getMusic() {
  */
 function getLinkShort(link) {
   let responseLinkShort = null;
-  let returnText = "";
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
 
   if (link == "") {
     returnText = "查询的内容为空，请在指令后面加上链接再试吧～";
@@ -1596,6 +1653,8 @@ function getLinkShort(link) {
       token: "18a709553844b10c078c91bde2ec624f",
       mark: "来自pc网页",
       env_code: "self",
+      times: new Date().getTime(),
+      muteHttpExceptions: true,
     };
     let option = {
       method: "post",
@@ -1616,11 +1675,7 @@ function getLinkShort(link) {
       returnText =
         "<b>" + JSON.parse(responseLinkShort.getContentText()).msg + "</b>";
     }
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
-
+  } catch (e) {}
   return returnText;
 }
 /**
@@ -1633,13 +1688,19 @@ function getWeatherApi(location) {
   let returnText = "";
 
   if (location == "") {
-    returnText = "查询的内容为空，请在指令后面加上地址再试吧～";
+    returnText = "查询的内容为空，请在指令后面加上地区再试吧～";
     return returnText;
   }
 
   try {
     responseWeather = UrlFetchApp.fetch(
-      "https://query.asilu.com/weather/baidu/?city=" + location
+      "https://query.asilu.com/weather/baidu/?city=" +
+        location +
+        "&times=" +
+        new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+      }
     );
     let jsonData = JSON.parse(responseWeather.getContentText());
     if (jsonData.weather.length) {
@@ -1671,11 +1732,7 @@ function getWeatherApi(location) {
     } else {
       returnText = "<b>Oh! 出错了！</b>";
     }
-  } catch (e) {
-    returnText =
-      "你的指令已成功发送，但由于运营商网络管制，本次通信被异常中止。";
-  }
-
+  } catch (e) {}
   return returnText;
 }
 
