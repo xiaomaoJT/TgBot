@@ -43,8 +43,6 @@ var responseTime = "";
 // 用于承接返回数据
 var dealMessage = {};
 
-
-
 /**
  * 用于接收用户传来的讯息JSON
  * @param {*} e
@@ -70,11 +68,13 @@ function doPost(e) {
       ? userMessage.message.from.id.toString()
       : userMessage.message.chat.id.toString();
 
-  dealMessage = processReplyWord(
-    userMessage.message.text,
-    messageUserID,
-    userMessage.message
-  );
+  MESSAGETYPE == 0
+    ? (dealMessage = processReplyWord(
+        userMessage.message.text,
+        messageUserID,
+        userMessage.message
+      ))
+    : "";
 
   //回调响应逻辑
   let payload = processData(userMessage);
@@ -1371,7 +1371,7 @@ function apiReply(id, useJson) {
 function getChatBot(word) {
   let responseHelloBot = null;
   let returnText =
-    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
 
   if (word == "") {
     returnText = "查询的内容为空，请在指令后面加上问题再试吧～";
@@ -1400,7 +1400,9 @@ function getChatBot(word) {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;") +
       "</code></pre>";
-  } catch (e) {}
+  } catch (e) {
+    return returnText;
+  }
   return returnText;
 }
 
@@ -1412,7 +1414,7 @@ function getChatBot(word) {
 function getHelloBot(word) {
   let responseHelloBot = null;
   let returnText =
-    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
 
   if (word == "") {
     returnText = "查询的内容为空，请在指令后面加上问题再试吧～";
@@ -1435,7 +1437,9 @@ function getHelloBot(word) {
       "\n" +
       "\n" +
       jsonData.content;
-  } catch (e) {}
+  } catch (e) {
+    return returnText;
+  }
   return returnText;
 }
 
@@ -1468,7 +1472,7 @@ function getVideo() {
 function getDuJiTang() {
   let responseDuJiTang = null;
   let returnText =
-    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
 
   try {
     responseDuJiTang = UrlFetchApp.fetch(
@@ -1485,7 +1489,9 @@ function getDuJiTang() {
       "\n" +
       "\n" +
       jsonData.data.dujitang;
-  } catch (e) {}
+  } catch (e) {
+    return returnText;
+  }
   return returnText;
 }
 /**
@@ -1496,7 +1502,7 @@ function getDuJiTang() {
 function getTianGou() {
   let responseTianGou = null;
   let returnText =
-    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
   // return returnText;
   try {
     responseTianGou = UrlFetchApp.fetch(
@@ -1511,7 +1517,9 @@ function getTianGou() {
       "\n" +
       "\n" +
       responseTianGou.getContentText();
-  } catch (e) {}
+  } catch (e) {
+    return returnText;
+  }
   return returnText;
 }
 
@@ -1522,7 +1530,7 @@ function getTianGou() {
 function getYiYan() {
   let responseYiYan = null;
   let returnText =
-    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
 
   try {
     responseYiYan = UrlFetchApp.fetch(
@@ -1540,7 +1548,9 @@ function getYiYan() {
         "\n" +
         responseYiYan.getContentText();
     }
-  } catch (e) {}
+  } catch (e) {
+    return returnText;
+  }
 
   return returnText;
 }
@@ -1553,7 +1563,7 @@ function getYiYan() {
 function getPhoneWhere(phone) {
   let responsePhone = null;
   let returnText =
-    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
 
   if (phone == "") {
     returnText = "查询的手机号为空，请在指令后面加上手机号码再试～";
@@ -1586,7 +1596,9 @@ function getPhoneWhere(phone) {
       "\n" +
       "运营商：" +
       jsonData.data.carrier;
-  } catch (e) {}
+  } catch (e) {
+    return returnText;
+  }
   return returnText;
 }
 
@@ -1598,7 +1610,7 @@ function getPhoneWhere(phone) {
 function getMusic() {
   let responseMusic = null;
   let returnText =
-    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
 
   try {
     responseMusic = UrlFetchApp.fetch(
@@ -1629,7 +1641,9 @@ function getMusic() {
       jsonData.res.play_url +
       "'>点击在线播放</a>" +
       "\n";
-  } catch (e) {}
+  } catch (e) {
+    return returnText;
+  }
   return returnText;
 }
 /**
@@ -1640,7 +1654,7 @@ function getMusic() {
 function getLinkShort(link) {
   let responseLinkShort = null;
   let returnText =
-    "查询结果受运营商网络管制，本次通信被异常中止，此管控行为非人为可控，请稍后再试～";
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
 
   if (link == "") {
     returnText = "查询的内容为空，请在指令后面加上链接再试吧～";
@@ -1675,7 +1689,9 @@ function getLinkShort(link) {
       returnText =
         "<b>" + JSON.parse(responseLinkShort.getContentText()).msg + "</b>";
     }
-  } catch (e) {}
+  } catch (e) {
+    return returnText;
+  }
   return returnText;
 }
 /**
@@ -1732,7 +1748,9 @@ function getWeatherApi(location) {
     } else {
       returnText = "<b>Oh! 出错了！</b>";
     }
-  } catch (e) {}
+  } catch (e) {
+    return returnText;
+  }
   return returnText;
 }
 
