@@ -291,7 +291,7 @@ function processData(userMessage) {
   // 暂时只识别文本类消息
   try {
     if (userMessage.message) {
-      if (dealMessage.dfa) {
+      if (dealMessage.htmlReply) {
         let HTML_REPLY =
           dealMessage.htmlReply == "getTgId"
             ? "<b>🕹 来自XiaoMaoBot的消息：</b>" +
