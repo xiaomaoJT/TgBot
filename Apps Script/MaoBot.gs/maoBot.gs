@@ -527,23 +527,25 @@ function processReplyWord(key, useId, userJson) {
         "🧲 <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/boxJS/XiaoMao.json'>XiaoMao  BoxJs辅助订阅</a>" +
         "\n" +
         "\n" +
-        "1⃣️ <a href='https://t.me/xiaomaoJT/283'>Spotify歌词自动翻译</a>" +
+        "① <a href='https://t.me/xiaomaoJT/283'>Spotify歌词自动翻译</a>" +
         "\n" +
-        "2⃣️ <a href='https://t.me/xiaomaoJT/285'>彩云天气Svip自定义</a>" +
+        "② <a href='https://t.me/xiaomaoJT/285'>彩云天气Svip自定义</a>" +
         "\n" +
-        "3⃣️ <a href='https://t.me/xiaomaoJT/312'>百度网盘Svip自定义</a>" +
+        "③ <a href='https://t.me/xiaomaoJT/312'>百度网盘Svip自定义</a>" +
         "\n" +
-        "4⃣️ <a href='https://t.me/xiaomaoJT/317'>黄油相机vip、粉丝数自定义</a>" +
+        "④ <a href='https://t.me/xiaomaoJT/317'>黄油相机vip、粉丝数自定义</a>" +
         "\n" +
-        "5⃣️ <a href='https://t.me/xiaomaoJT/319'>B612咔叽相机vip自定义</a>" +
+        "⑤ <a href='https://t.me/xiaomaoJT/319'>B612咔叽相机vip自定义</a>" +
         "\n" +
-        "6⃣️ <a href='https://t.me/xiaomaoJT/321'>WPS会员、超级会员、稻壳会员、云空间自定义</a>" +
+        "⑥ <a href='https://t.me/xiaomaoJT/321'>WPS超级会员、云空间自定义</a>" +
         "\n" +
-        "7⃣️ <a href='https://t.me/xiaomaoJT/326'>扫描全能王会员及至尊帐户自定义</a>" +
+        "⑦ <a href='https://t.me/xiaomaoJT/326'>扫描全能王会员及至尊帐户自定义</a>" +
         "\n" +
-        "8⃣️ <a href='https://t.me/xiaomaoJT/340'>思维导图XMind vip自定义</a>" +
+        "⑧ <a href='https://t.me/xiaomaoJT/340'>思维导图XMind vip自定义</a>" +
         "\n" +
-        "9⃣️ <a href='https://t.me/xiaomaoJT/488'>今日热榜 vip自定义</a>" +
+        "⑨ <a href='https://t.me/xiaomaoJT/488'>今日热榜 vip自定义</a>" +
+        "\n" +
+        "⑩ <a href='https://t.me/xiaomaoJT/497'>阿里云盘 Svip自定义</a>" +
         "\n" +
         "\n" +
         "<b>对脚本不熟悉？点击菜单 QX教程</b>",
