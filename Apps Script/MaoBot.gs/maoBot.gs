@@ -43,6 +43,7 @@ var responseTime = "";
 // 用于承接返回数据
 var dealMessage = {};
 
+// ------------------------- 核心调用函数 -----------------
 /**
  * 用于接收用户传来的讯息JSON
  * @param {*} e
@@ -599,54 +600,40 @@ function processReplyWord(key, useId, userJson) {
     {
       keyword: ["接口查询"],
       replyWord:
-        "1⃣️ 天气状况查询" +
-        "\n" +
-        "☁️ 示例：/tq 广州 " +
+        "🌥 天气状况查询 🈯️➡️ /tq⁺地区" +
         "\n" +
         "\n" +
-        "2⃣️ 短链网址生成" +
-        "\n" +
-        "💻 示例：/suo https://www.baidu.com " +
+        "🔗 短链网址生成 🈯️➡️ /suo⁺https://www.google.com" +
         "\n" +
         "\n" +
-        "3⃣️ 随机音乐推送" +
-        "\n" +
-        "🎵 示例：/music " +
+        "🥁 随机音乐推送 🈯️➡️ /music" +
         "\n" +
         "\n" +
-        "4⃣️ 手机号码查询" +
-        "\n" +
-        "📱 示例：/phone 18888888888 " +
+        "☎️ 手机号码查询 🈯️➡️ /phone⁺电话号码" +
         "\n" +
         "\n" +
-        "5⃣️ 舔狗日记生成" +
-        "\n" +
-        "❤️ 示例：/tg " +
+        "🐶 舔狗日记生成 🈯️➡️ /tg" +
         "\n" +
         "\n" +
-        "6⃣️ 毒鸡汤查询" +
-        "\n" +
-        "🐔 示例：/djt " +
+        "🐔 毒鸡汤查询 🈯️➡️ /djt" +
         "\n" +
         "\n" +
-        "7⃣️ 随机小姐姐视频查询" +
-        "\n" +
-        "👩 示例：/video " +
+        "🧝‍♀️ 随机美女视频 🈯️➡️ /video" +
         "\n" +
         "\n" +
-        "8⃣️ 每日一言查询" +
-        "\n" +
-        "📖 示例：/yy " +
+        "📖 每日一言查询 🈯️➡️ /yy" +
         "\n" +
         "\n" +
-        "9⃣️ 智慧聊天机器" +
-        "\n" +
-        "🤖️ 示例：/hi 早上好" +
+        "🤖 智慧聊天机器 🈯️➡️ /hi⁺内容" +
         "\n" +
         "\n" +
-        "🔟 chatGPT" +
+        "💬 chatGPT查询 🈯️➡️ /chat⁺内容" +
         "\n" +
-        "🧬 示例：/chat 你能干什么" +
+        "\n" +
+        "💽 蓝奏云直链解析 🈯️➡️ /lan⁺蓝奏云链接&pwd=密码" +
+        "\n" +
+        "\n" +
+        "🚶‍♂️ 小微信运动刷步(Zeep Life账号) 🈯️➡️ /step⁺账号&password=密码&step=步数" +
         "\n" +
         "\n" +
         "<b>接口数据来源于网络，可能存在查询拥挤情况，可稍后再试～</b>",
@@ -686,6 +673,9 @@ function processReplyWord(key, useId, userJson) {
     { api: "/chat", apiId: 9 },
     { api: "/myid", apiId: 10 },
     { api: "/start", apiId: 11 },
+    { api: "/help", apiId: 11 },
+    { api: "/lan", apiId: 12 },
+    { api: "/step", apiId: 13 },
   ];
 
   if (outsideWord.findIndex((i) => key.indexOf(i) != -1) != -1) {
@@ -874,6 +864,30 @@ function processReplyWord(key, useId, userJson) {
             "<a href='https://github.com/xiaomaoJT/TgBot'>🏖 本机器人完全开源，可点击查看我的源码仓库获取免费搭建教程喔！</a>";
           returnHtmlReply.state = true;
           break;
+        case 12:
+          apiReply(useId, userJson);
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getLanLink(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
+          break;
+        case 13:
+          apiReply(useId, userJson);
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getMiSport(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
+          break;
         default:
           returnHtmlReply.state = false;
           break;
@@ -1055,6 +1069,8 @@ function pushDataToKing(key) {
     );
   }
 }
+
+// ------------------------- 核心逻辑函数 -----------------
 
 /**
  * 响应延迟计算
@@ -1325,6 +1341,7 @@ function isApi(commandList, key) {
   return isApiStatus;
 }
 
+// ------------------------- 核心api函数 -----------------
 /**
  * 用于接口前的回复
  */
@@ -1363,6 +1380,99 @@ function apiReply(id, useJson) {
   UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
 }
 
+/**
+ * 小米运动刷步 ✅
+ * @param step
+ * @returns
+ */
+function getMiSport(step) {
+  let responseStep = null;
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
+
+  try {
+    responseStep = UrlFetchApp.fetch(
+      "https://apis.jxcxin.cn/api/mi?user=" +
+        step +
+        "&times=" +
+        new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+      }
+    );
+    let jsonData = JSON.parse(responseStep.getContentText());
+    returnText =
+      "<b>以下数据来自API Store，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      "刷步结果：" +
+      (jsonData.code != 200
+        ? jsonData.msg
+        : jsonData.msg +
+          "\n" +
+          "\n" +
+          "刷步账号：" +
+          jsonData.user +
+          "\n" +
+          "当前步数" +
+          jsonData.step) +
+      "\n";
+  } catch (e) {
+    return returnText;
+  }
+  return returnText;
+}
+/**
+ * 蓝奏云直链解析 ✅
+ * @param link
+ * @returns
+ */
+function getLanLink(link) {
+  let responseLink = null;
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
+
+  try {
+    responseLink = UrlFetchApp.fetch(
+      "https://apis.jxcxin.cn/api/lanzou?url=" +
+        link +
+        "&times=" +
+        new Date().getTime(),
+      {
+        muteHttpExceptions: true,
+      }
+    );
+    let jsonData = JSON.parse(responseLink.getContentText());
+    returnText =
+      "<b>以下数据来自API Store，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      "解析结果：" +
+      (jsonData.code != 200
+        ? jsonData.msg
+        : jsonData.msg +
+          "\n" +
+          "\n" +
+          "资源名称：" +
+          jsonData.data.name +
+          "\n" +
+          "资源作者：" +
+          jsonData.data.author +
+          "\n" +
+          "资源大小：" +
+          jsonData.data.size +
+          "\n" +
+          "资源描述：" +
+          jsonData.data.describe +
+          "\n" +
+          "资源直链地址：" +
+          jsonData.data.url) +
+      "\n";
+  } catch (e) {
+    return returnText;
+  }
+  return returnText;
+}
 /**
  * chat api✅
  * @param word
@@ -1405,7 +1515,6 @@ function getChatBot(word) {
   }
   return returnText;
 }
-
 /**
  * 聊天api✅
  * @param word
@@ -1442,7 +1551,6 @@ function getHelloBot(word) {
   }
   return returnText;
 }
-
 /**
  * 视频查询
  * @param video
@@ -1488,7 +1596,7 @@ function getDuJiTang() {
       "<b>以下数据来自LK，由XiaoMao加工：</b>" +
       "\n" +
       "\n" +
-      jsonData.data.dujitang;
+      jsonData.data[0].dujitang;
   } catch (e) {
     return returnText;
   }
@@ -1506,7 +1614,7 @@ function getTianGou() {
   // return returnText;
   try {
     responseTianGou = UrlFetchApp.fetch(
-      "https://v.api.aa1.cn/api/tiangou?times=" + new Date().getTime(),
+      "https://v.api.aa1.cn/api/tiangou/index.php?times=" + new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
@@ -1522,7 +1630,6 @@ function getTianGou() {
   }
   return returnText;
 }
-
 /**
  * 一言查询 ✅
  * @returns
@@ -1534,7 +1641,8 @@ function getYiYan() {
 
   try {
     responseYiYan = UrlFetchApp.fetch(
-      "https://v.api.aa1.cn/api/yiyan/index.php?times=" + new Date().getTime(),
+      "https://apis.jxcxin.cn/api/yiyan?type=json&times=" +
+        new Date().getTime(),
       {
         muteHttpExceptions: true,
         followRedirects: true,
@@ -1542,11 +1650,12 @@ function getYiYan() {
       }
     );
     if (200 == responseYiYan.getResponseCode()) {
+      let jsonData = JSON.parse(responseYiYan.getContentText());
       returnText =
-        "<b>以下数据来自小歪，由XiaoMao加工：</b>" +
+        "<b>以下数据来自API Store，由XiaoMao加工：</b>" +
         "\n" +
         "\n" +
-        responseYiYan.getContentText();
+        jsonData.msg;
     }
   } catch (e) {
     return returnText;
@@ -1554,7 +1663,6 @@ function getYiYan() {
 
   return returnText;
 }
-
 /**
  * 查询手机号码归属地✅
  * @param phone
@@ -1601,7 +1709,6 @@ function getPhoneWhere(phone) {
   }
   return returnText;
 }
-
 /**
  * 随机歌曲 ✅
  * @param text
@@ -1753,6 +1860,8 @@ function getWeatherApi(location) {
   }
   return returnText;
 }
+
+// ------------------------- 核心存储函数 -----------------
 
 /**
  * 将讯息进行Google表格内存储
