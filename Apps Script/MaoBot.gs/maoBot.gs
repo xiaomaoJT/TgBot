@@ -25,6 +25,7 @@ var KingId = "";
 // 2 群聊 + 私聊类型
 // 3 私聊类型
 // 4 群聊类型
+// 5 关闭
 var KingType = 1;
 // 1 推送详情（原图片、视频、音频、贴纸等）
 // 0 仅推送基础消息
@@ -69,7 +70,7 @@ function doPost(e) {
       ? userMessage.message.from.id.toString()
       : userMessage.message.chat.id.toString();
 
-  MESSAGETYPE == 0
+  MESSAGETYPE == 0 && userMessage.message.hasOwnProperty("text")
     ? (dealMessage = processReplyWord(
         userMessage.message.text,
         messageUserID,
@@ -97,8 +98,11 @@ function doPost(e) {
       userMessage.message.reply_to_message.from.id == botIdAlone) ||
     htmlReplyState ||
     userMessage.message.chat.type == "private" ||
-    (userMessage.message.entities[0].type == "mention" && htmlReplyState) ||
-    userMessage.message.entities[0].type == "bold"
+    (userMessage.message.hasOwnProperty("entities") &&
+      userMessage.message.entities[0].type == "mention" &&
+      htmlReplyState) ||
+    (userMessage.message.hasOwnProperty("entities") &&
+      userMessage.message.entities[0].type == "bold")
   ) {
     UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
     setStorage(data, "MESSAGEBACK");
@@ -291,7 +295,7 @@ function processData(userMessage) {
   //判断消息类型 - 文本消息
   // 暂时只识别文本类消息
   try {
-    if (userMessage.message) {
+    if (userMessage.message && userMessage.message.hasOwnProperty("text")) {
       if (dealMessage.htmlReply) {
         let HTML_REPLY =
           dealMessage.htmlReply == "getTgId"
@@ -481,7 +485,7 @@ function processReplyWord(key, useId, userJson) {
         "3⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/script/QX_XiaoMao_rw3.conf'>重写拒绝</a>" +
         "\n" +
         "\n" +
-        "4⃣️ <b>Clash去广告，请使用XiaoMaoClash配置网站生成专属懒人配置！点击菜单 QX&Clash教程 获取教程⑥</b>" +
+        "4⃣️ <b>Clash去广告，请使用XiaoMaoClash配置网站生成专属懒人配置！点击菜单 图文教程 获取教程⑥</b>" +
         "\n" +
         "\n" +
         "5⃣️ <a href='https://t.me/xiaomaoJT/147'>TG去广告</a>" +
@@ -546,6 +550,12 @@ function processReplyWord(key, useId, userJson) {
         "⑨ <a href='https://t.me/xiaomaoJT/488'>今日热榜 vip自定义</a>" +
         "\n" +
         "⑩ <a href='https://t.me/xiaomaoJT/497'>阿里云盘 Svip自定义</a>" +
+        "\n" +
+        "⑪ <a href='https://t.me/xiaomaoJT/498'>靓图自动推送</a>" +
+        "\n" +
+        "⑫ <a href='https://t.me/xiaomaoJT/499'>每日Bing图自动推送</a>" +
+        "\n" +
+        "⑬ <a href='https://t.me/xiaomaoJT/500'>年度节日自动推送</a>" +
         "\n" +
         "\n" +
         "<b>对脚本不熟悉？点击菜单 QX教程</b>",
@@ -971,6 +981,7 @@ function pushDataToKing(key) {
         userMessage.message.chat.username +
         "/" +
         userMessage.message.message_id;
+  let MessageUseUrl = "https://t.me/" + userMessage.message.from.username;
   let messageInfoType = userMessage.message.hasOwnProperty("text")
     ? "[文本消息] " + userMessage.message.text
     : userMessage.message.hasOwnProperty("sticker")
@@ -995,12 +1006,16 @@ function pushDataToKing(key) {
     (messageInfoType.length > 100 ? "..." : "") +
     "\n" +
     "<b>🎎 讯息原始用户：</b>" +
+    "<a href='" +
+    MessageUseUrl +
+    "'>" +
     (userMessage.message.from.first_name != undefined
       ? userMessage.message.from.first_name
       : "") +
     (userMessage.message.from.last_name != undefined
       ? userMessage.message.from.last_name
       : "") +
+    "</a>" +
     "\n" +
     "<b>🏖 讯息来源位置：</b>" +
     (userMessage.message.chat.type == "private"
@@ -1022,6 +1037,7 @@ function pushDataToKing(key) {
     JSON.stringify(userMessage) +
     "\n" +
     "<b>🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩</b>";
+
   let dataKing = {
     method: "post",
     payload: {},
@@ -1616,7 +1632,8 @@ function getTianGou() {
   // return returnText;
   try {
     responseTianGou = UrlFetchApp.fetch(
-      "https://v.api.aa1.cn/api/tiangou/index.php?times=" + new Date().getTime(),
+      "https://v.api.aa1.cn/api/tiangou/index.php?times=" +
+        new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
