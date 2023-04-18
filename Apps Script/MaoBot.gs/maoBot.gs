@@ -420,7 +420,7 @@ function processReplyWord(key, useId, userJson) {
         "<a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/oldConfig'>🎏 QX懒人规则历史版本配置</a>" +
         "\n" +
         "\n" +
-        "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程，更多教程点击菜单 QX教程</a>",
+        "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程，更多教程点击菜单 图文教程</a>",
     },
     {
       keyword: ["网易云", "免费节点"],
@@ -459,16 +459,16 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "3⃣️ 在线订阅转换：" +
         "\n" +
-        "<a href='https://dove.589669.xyz/web'>Clash | Quantumult X | Surge 转换</a>" +
+        "<a href='https://dove.589669.xyz/web'>① Clash | Quantumult X | Surge 转换</a>" +
         "\n" +
-        "<a href='https://sub.pet'>Subscription 转换</a>" +
+        "<a href='https://sub.pet'>② Subscription 转换</a>" +
         "\n" +
-        "<a href='https://nexconvert.com'>奶昔 转换</a>" +
+        "<a href='https://nexconvert.com'>③ 奶昔 转换</a>" +
         "\n" +
-        "<a href='https://sub.xeton.dev'>菜市场 转换</a>" +
+        "<a href='https://sub.xeton.dev'>④ 菜市场 转换</a>" +
         "\n" +
         "\n" +
-        "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换，对SubStore本地转换不熟悉？点击菜单 QX教程</b>",
+        "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换，对SubStore本地转换不熟悉？点击菜单 图文教程</b>",
     },
     {
       keyword: ["去广告"],
@@ -512,12 +512,17 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "5⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'>番外：<b>配置BoxJs、SubStore教程</b></a>" +
         "\n" +
-        "6⃣️ <a href='https://mp.weixin.qq.com/s/qfeNQvUh8lLYM8GOFQ_PVg'>XMC：<b>Clash配置教程</b></a>" +
+        "6⃣️ <a href='https://mp.weixin.qq.com/s/8c-tn6OaSGCVXUo2DIWiww'>高阶：<b>Task脚本制作教程</b></a>" +
         "\n" +
-        "7⃣️ <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'>TgBot：<b>Tg机器人免费搭建教程</b></a>" +
         "\n" +
+        "7⃣️ <a href='https://mp.weixin.qq.com/s/qfeNQvUh8lLYM8GOFQ_PVg'>XMC：<b>Clash配置教程</b></a>" +
+        "\n" +
+        "\n" +
+        "🧰 <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'>TgBot：<b>Tg机器人免费搭建教程</b></a>" +
         "\n" +
         "🥎 <a href='https://github.com/xiaomaoJT/clash'><b>XiaoMao_Clash版本配置教程及软件下载</b></a>" +
+        "\n" +
+        "🧿 <a href='http://s.nfangbian.com/2P8'><b>QX本地脚本使用教程</b></a>" +
         "\n" +
         "\n" +
         "<b>欢迎点赞评论，感谢支持！</b>",
