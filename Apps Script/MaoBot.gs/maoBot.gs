@@ -476,6 +476,9 @@ function processReplyWord(key, useId, userJson) {
         "💊 <a href='https://t.me/xiaomaoJT/314'><b>XiaoMao去广告模块介绍</b></a>" +
         "\n" +
         "\n" +
+        "🌈 <a href='https://t.me/xiaomaoJT/540'>XiaoMao去广告图文视频教程</a>" +
+        "\n" +
+        "\n" +
         "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/ShuntCorrection.list'>分流修正</a>" +
         "\n" +
         "\n" +
@@ -502,6 +505,9 @@ function processReplyWord(key, useId, userJson) {
         "🧰 <a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'><b>QuamtumultX & Clash图文教程合集</b></a>" +
         "\n" +
         "\n" +
+        "🌈 <a href='http://mp.weixin.qq.com/mp/homepage?__biz=MzI3MjE3NTc4OA==&hid=1&sn=69f77280608382e9ab1e6afac8c2a881&scene=18#wechat_redirect'><b>XiaoMao推文合集</b></a>" +
+        "\n" +
+        "\n" +
         "1⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485104&idx=1&sn=484e84c5cfcca5f478b64bc82eb60bea&chksm=eb37c173dc40486516b0c40e99ce1711a5192c3189d736421ecdc06c0b9d3f7fffb67a0801a9&scene=178&cur_album_id=2740008142629273602#rd'>入门：<b>下载、认识QX、上手使用</b></a>" +
         "\n" +
         "2⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485121&idx=1&sn=b3312a56be6a8bea2645229ebbdd3525&chksm=eb37c102dc404814fee94b97551b6267d8b7438bd45a74537b3825d2b7fbd38eba3a2e20cbaf&scene=178&cur_album_id=2740008142629273602#rd'>进阶1：<b>配置General、DNS、Policy策略组教程</b></a>" +
@@ -512,13 +518,16 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "5⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'>番外：<b>配置BoxJs、SubStore教程</b></a>" +
         "\n" +
-        "6⃣️ <a href='https://mp.weixin.qq.com/s/8c-tn6OaSGCVXUo2DIWiww'>高阶：<b>Task脚本制作教程</b></a>" +
+        "6⃣️ <a href='https://mp.weixin.qq.com/s/8c-tn6OaSGCVXUo2DIWiww'>高阶1：<b>Task脚本制作教程</b></a>" +
         "\n" +
         "\n" +
-        "7⃣️ <a href='https://mp.weixin.qq.com/s/qfeNQvUh8lLYM8GOFQ_PVg'>XMC：<b>Clash配置教程</b></a>" +
+        "7⃣️ <a href='https://mp.weixin.qq.com/s/B_zMFU6vsAeE_IKyLXddtA'>高阶2：<b>广告拦截教程</b></a>" +
         "\n" +
         "\n" +
-        "🧰 <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'>TgBot：<b>Tg机器人免费搭建教程</b></a>" +
+        "8⃣️ <a href='https://mp.weixin.qq.com/s/qfeNQvUh8lLYM8GOFQ_PVg'>XMC：<b>Clash配置教程</b></a>" +
+        "\n" +
+        "\n" +
+        "🔮 <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'>TgBot：<b>Tg机器人免费搭建教程</b></a>" +
         "\n" +
         "🥎 <a href='https://github.com/xiaomaoJT/clash'><b>XiaoMao_Clash版本配置教程及软件下载</b></a>" +
         "\n" +
