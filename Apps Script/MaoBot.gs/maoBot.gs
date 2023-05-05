@@ -32,6 +32,9 @@ var KingType = 1;
 var KingInfo = 1;
 //取 bot id 用于识别引用消息
 var botIdAlone = "";
+// 用于过滤需要排除捕捉的群组信息
+// 请填入群组id,多个用,间隔 如 ['22222','11111]
+var forGotList = [];
 
 // ------------------------- 默认通用参数·无需改动 -----------------
 // 用于判断消息类型 - inlinekey board回调 or 主动消息
@@ -476,7 +479,7 @@ function processReplyWord(key, useId, userJson) {
         "💊 <a href='https://t.me/xiaomaoJT/314'><b>XiaoMao去广告模块介绍</b></a>" +
         "\n" +
         "\n" +
-        "🌈 <a href='https://t.me/xiaomaoJT/540'>XiaoMao去广告图文视频教程</a>" +
+        "🌈 <a href='https://t.me/xiaomaoJT/540'><b>XiaoMao去广告图文视频教程</b></a>" +
         "\n" +
         "\n" +
         "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/ShuntCorrection.list'>分流修正</a>" +
@@ -502,9 +505,6 @@ function processReplyWord(key, useId, userJson) {
         "💊  <b>QX & Clash & TgBot 图文教程</b>" +
         "\n" +
         "\n" +
-        "🧰 <a href='https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&__biz=MzI3MjE3NTc4OA==&scene=1&album_id=2740008142629273602&count=3#wechat_redirect'><b>QuamtumultX & Clash图文教程合集</b></a>" +
-        "\n" +
-        "\n" +
         "🌈 <a href='http://mp.weixin.qq.com/mp/homepage?__biz=MzI3MjE3NTc4OA==&hid=1&sn=69f77280608382e9ab1e6afac8c2a881&scene=18#wechat_redirect'><b>XiaoMao推文合集</b></a>" +
         "\n" +
         "\n" +
@@ -520,11 +520,10 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "6⃣️ <a href='https://mp.weixin.qq.com/s/8c-tn6OaSGCVXUo2DIWiww'>高阶1：<b>Task脚本制作教程</b></a>" +
         "\n" +
-        "\n" +
         "7⃣️ <a href='https://mp.weixin.qq.com/s/B_zMFU6vsAeE_IKyLXddtA'>高阶2：<b>广告拦截教程</b></a>" +
         "\n" +
         "\n" +
-        "8⃣️ <a href='https://mp.weixin.qq.com/s/qfeNQvUh8lLYM8GOFQ_PVg'>XMC：<b>Clash配置教程</b></a>" +
+        "8⃣️ <a href='http://s.nfangbian.com/2Ru'>XMC：<b>Clash配置教程</b></a>" +
         "\n" +
         "\n" +
         "🔮 <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'>TgBot：<b>Tg机器人免费搭建教程</b></a>" +
@@ -987,6 +986,10 @@ function pushDataToKing(key) {
   } else {
     return;
   }
+
+  if (forGotList.indexOf(key.message.chat.id.toString()) != -1) {
+    return;
+  }
   let userMessage = key;
   let MessageUrl =
     userMessage.message.chat.type == "private"
@@ -1011,7 +1014,7 @@ function pushDataToKing(key) {
     : "[未知消息类型]";
   //用于捕捉机器人信息
   let messageToKing =
-    "<b>🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩</b>" +
+    "<b>🔻🔻🔻🔻🔻🔻🔻🔻🔻🔻🔻🔻🔻🔻</b>" +
     "<b>XiaoMaoBot捕捉到用户讯息</b>" +
     "\n" +
     "\n" +
@@ -1050,7 +1053,7 @@ function pushDataToKing(key) {
     "\n" +
     JSON.stringify(userMessage) +
     "\n" +
-    "<b>🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩🧩</b>";
+    "<b>🔺🔺🔺🔺🔺🔺🔺🔺🔺🔺🔺🔺🔺🔺</b>";
 
   let dataKing = {
     method: "post",
