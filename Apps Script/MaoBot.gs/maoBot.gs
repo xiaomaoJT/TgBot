@@ -883,7 +883,10 @@ function processReplyWord(key, useId, userJson) {
             "9⃣️ chatGPT查询" +
             "\n" +
             "\n" +
-            "或可通过底部快捷按键栏快速激活操作！" +
+            "可通过底部快捷按键栏快速激活操作！" +
+            "\n" +
+            "\n" +
+            "<b>🉑️通过底部按钮 微信公众号『小帽集团』 加入XiaoMao组织喔～</b>"+
             "\n" +
             "\n" +
             "<a href='https://github.com/xiaomaoJT/TgBot'>🏖 本机器人完全开源，可点击查看我的源码仓库获取免费搭建教程喔！</a>";
@@ -1014,15 +1017,17 @@ function pushDataToKing(key) {
     : "[未知消息类型]";
   //用于捕捉机器人信息
   let messageToKing =
-    "<b>🔴🟠🟡🟢🔵🟣⚫️⚪️🟤</b>" +"\n"+
+    "<b>🍄🍄🍄🍄🍄🍄🍄🍄🍄🍄🍄🍄🍄🍄</b>" +
+    "\n" +
+    "\n" +
     "<b>XiaoMaoBot捕捉到用户讯息</b>" +
     "\n" +
     "\n" +
-    "<b>📝 讯息简要内容：</b>" +
+    "<b>📝 简要内容：</b>" +
     messageInfoType.replace(/\n/g, " ").substring(0, 100) +
     (messageInfoType.length > 100 ? "..." : "") +
     "\n" +
-    "<b>🎎 讯息原始用户：</b>" +
+    "<b>🎎 原始用户：</b>" +
     "<a href='" +
     MessageUseUrl +
     "'>" +
@@ -1034,7 +1039,7 @@ function pushDataToKing(key) {
       : "") +
     "</a>" +
     "\n" +
-    "<b>🏖 讯息来源位置：</b>" +
+    "<b>🏖 来源位置：</b>" +
     (userMessage.message.chat.type == "private"
       ? "来自 " + "[私聊]"
       : "<a href='" +
@@ -1046,14 +1051,15 @@ function pushDataToKing(key) {
           : "[未知]") +
         "</a>") +
     "\n" +
-    "<b>🛎 讯息发送时间：</b>" +
+    "<b>🛎 发送时间：</b>" +
     getNowDate() +
     "\n" +
-    "<b>📰 讯息Json：</b>" +
+    "<b>📰 原始数据：</b>" +
     "\n" +
     JSON.stringify(userMessage) +
     "\n" +
-    "<b>🟥🟧🟨🟩🟦🟪⬛️⬜️🟫</b>";
+    "\n" +
+    "<b>🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀</b>";
 
   let dataKing = {
     method: "post",
