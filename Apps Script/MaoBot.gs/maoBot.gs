@@ -123,11 +123,11 @@ function processData(userMessage) {
   // 定义底部自定义键盘
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "订阅转换" }],
-    [{ text: "图文教程" }, { text: "QX脚本" }, { text: "去广告" }],
+    [{ text: "图文教程" }, { text: "脚本合集" }, { text: "广告拦截" }],
     [
       { text: "接口查询" },
       { text: "微信公众号『小帽集团』" },
-      { text: "TG解限制" },
+      { text: "电报解禁" },
     ],
   ];
   // 定义在线内联键盘
@@ -474,7 +474,7 @@ function processReplyWord(key, useId, userJson) {
         "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换，对SubStore本地转换不熟悉？点击菜单 图文教程</b>",
     },
     {
-      keyword: ["去广告"],
+      keyword: ["广告拦截"],
       replyWord:
         "💊 <a href='https://t.me/xiaomaoJT/314'><b>XiaoMao去广告模块介绍</b></a>" +
         "\n" +
@@ -496,6 +496,8 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "5⃣️ <a href='https://t.me/xiaomaoJT/147'>TG去广告</a>" +
         "\n" +
+        "\n" +
+        "<b>更多小众软件广告拦截，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #广告截杀 </b>"+
         "\n" +
         "<b>去广告模块日更补充，可能存在误杀，请于XiaoMao群聊内反馈修正！</b>",
     },
@@ -536,7 +538,7 @@ function processReplyWord(key, useId, userJson) {
         "<b>欢迎点赞评论，感谢支持！</b>",
     },
     {
-      keyword: ["QX脚本"],
+      keyword: ["脚本合集"],
       replyWord:
         "💊  <b>XiaoMao QX脚本合集</b>" +
         "\n" +
@@ -544,34 +546,38 @@ function processReplyWord(key, useId, userJson) {
         "🧲 <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/boxJS/XiaoMao.json'>XiaoMao  BoxJs辅助订阅</a>" +
         "\n" +
         "\n" +
-        "① <a href='https://t.me/xiaomaoJT/283'>Spotify歌词自动翻译</a>" +
+        "① <a href='https://t.me/xiaomaoJT/283'>【辅助脚本】Spotify歌词翻译</a>" +
         "\n" +
-        "② <a href='https://t.me/xiaomaoJT/285'>彩云天气Svip自定义</a>" +
+        "② <a href='https://t.me/xiaomaoJT/285'>【会员脚本】彩云天气Svip</a>" +
         "\n" +
-        "③ <a href='https://t.me/xiaomaoJT/312'>百度网盘Svip自定义</a>" +
+        "③ <a href='https://t.me/xiaomaoJT/312'>【会员脚本】百度网盘Svip</a>" +
         "\n" +
-        "④ <a href='https://t.me/xiaomaoJT/317'>黄油相机vip、粉丝数自定义</a>" +
+        "④ <a href='https://t.me/xiaomaoJT/317'>【会员脚本】黄油相机vip</a>" +
         "\n" +
-        "⑤ <a href='https://t.me/xiaomaoJT/319'>B612咔叽相机vip自定义</a>" +
+        "⑤ <a href='https://t.me/xiaomaoJT/319'>【会员脚本】B612相机vip</a>" +
         "\n" +
-        "⑥ <a href='https://t.me/xiaomaoJT/321'>WPS超级会员、云空间自定义</a>" +
+        "⑥ <a href='https://t.me/xiaomaoJT/321'>【会员脚本】WPS超级会员</a>" +
         "\n" +
-        "⑦ <a href='https://t.me/xiaomaoJT/326'>扫描全能王会员及至尊帐户自定义</a>" +
+        "⑦ <a href='https://t.me/xiaomaoJT/326'>【会员脚本】扫描全能王至尊帐户</a>" +
         "\n" +
-        "⑧ <a href='https://t.me/xiaomaoJT/340'>思维导图XMind vip自定义</a>" +
+        "⑧ <a href='https://t.me/xiaomaoJT/340'>【会员脚本】XMind思维导图vip</a>" +
         "\n" +
-        "⑨ <a href='https://t.me/xiaomaoJT/488'>今日热榜 vip自定义</a>" +
+        "⑨ <a href='https://t.me/xiaomaoJT/488'>【会员脚本】今日热榜vip</a>" +
         "\n" +
-        "⑩ <a href='https://t.me/xiaomaoJT/497'>阿里云盘 Svip自定义</a>" +
+        "⑩ <a href='https://t.me/xiaomaoJT/497'>【会员脚本】阿里云盘Svip</a>" +
         "\n" +
-        "⑪ <a href='https://t.me/xiaomaoJT/498'>靓图自动推送</a>" +
+        "⑪ <a href='https://t.me/xiaomaoJT/498'>【自动任务】二次元靓图推送</a>" +
         "\n" +
-        "⑫ <a href='https://t.me/xiaomaoJT/499'>每日Bing图自动推送</a>" +
+        "⑫ <a href='https://t.me/xiaomaoJT/499'>【自动任务】每日Bing图推送</a>" +
         "\n" +
-        "⑬ <a href='https://t.me/xiaomaoJT/500'>年度节日自动推送</a>" +
+        "⑬ <a href='https://t.me/xiaomaoJT/500'>【自动任务】年度节日推送</a>" +
+        "\n" +
+        "⑭ <a href='https://t.me/xiaomaoJT/578'>【辅助脚本】百度贴吧解禁</a>" +
+        "\n" +
+        "⑮ <a href='https://t.me/xiaomaoJT/582'>【辅助脚本】酷安提链</a>" +
         "\n" +
         "\n" +
-        "<b>对脚本不熟悉？点击菜单 QX教程</b>",
+        "<b>脚本都支持自定义配置喔，快去boxJs设置吧。对脚本不熟悉？点击菜单 QX教程</b>",
     },
     {
       keyword: ["/delay"],
@@ -603,7 +609,7 @@ function processReplyWord(key, useId, userJson) {
         "\n",
     },
     {
-      keyword: ["TG解限制", "汉化"],
+      keyword: ["电报解禁", "汉化"],
       replyWord:
         "<b>💊  <a href='https://mp.weixin.qq.com/s/Ehi23fjFpeUc2DocnQb4hw'>Apple礼品卡购买教程</a></b>" +
         "\n" +
