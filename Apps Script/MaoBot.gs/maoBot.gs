@@ -420,7 +420,12 @@ function processReplyWord(key, useId, userJson) {
         "<a href='https://static-mp-4c1955c1-4e3f-4ed7-9f2b-ea2165e28195.next.bspapp.com/xiaomao-clash/index.html#/'>3⃣️ Clash配置在线生成·XiaoMao推荐</a>" +
         "\n" +
         "\n" +
-        "<a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/oldConfig'>🎏 QX懒人规则历史版本配置</a>" +
+        "<b>Stash版本 - XiaoMao懒人规则</b>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/stash/main/config/XiaoMao_Stash.yaml'>1⃣️ Stash·测试版</a>" +
+        "\n" +
+        "\n" +
+        "<a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/oldConfig'>🎏 QX懒人规则历史版本</a>" +
         "\n" +
         "\n" +
         "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程，更多教程点击菜单 图文教程</a>",
@@ -428,37 +433,43 @@ function processReplyWord(key, useId, userJson) {
     {
       keyword: ["网易云", "免费节点"],
       replyWord:
-        "永久节点订阅及网易云节点已内置于XiaoMao懒人规则" +
-        "<b>[server_remote]</b>" +
-        "标签中" +
+        "永久节点订阅及网易云节点已内置于XiaoMao懒人规则中" +
         "\n" +
         "\n" +
         "点击菜单" +
-        "<b> 懒人规则 </b>" +
-        "以获取懒人配置" +
+        "<b> 懒人配置 </b>" +
+        "以获取各版本懒人规则" +
         "\n" +
         "点击菜单" +
         "<b> 订阅转换 </b>" +
         "以获取转换地址" +
         "\n" +
         "\n" +
-        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'>💊 XiaoMao-Forever 长按复制订阅地址（机场节点）</a>" +
+        "<b>【机场节点】</b>" +
+        "\n" +
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'><b>1⃣️ XiaoMao-Forever</b></a>" +
+        "\n" +
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-FE-Clash'><b>2⃣️ XiaoMao-Forever-Clash</b></a>" +
         "\n" +
         "\n" +
-        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-NM'>💊 XiaoMao-NM 长按复制订阅地址（网易节点）</a>" +
+        "<b>【网易云节点】</b>" +
+        "\n" +
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-NM'><b>1⃣️ XiaoMao-NM</b></a>" +
         "\n" +
         "\n" +
-        "<a href='https://t.me/xiaomaoJT/77'>🧰 网易云解锁教程</a>" +
+        "<a href='https://t.me/xiaomaoJT/77'>🎸 网易云音乐解锁教程</a>" +
         "\n" +
         "\n" +
-        "<b>订阅地址可适用于QX及Shadowrocket，不适配clash。</b>",
+        "<b>订阅地址可适用于QX及Shadowrocket，转换无法使用，Clash及Stash请使用Clash专版；公开订阅采集于网络，受多方影响速度勉强。</b>",
     },
     {
       keyword: ["订阅转换", "转换"],
       replyWord:
         "1⃣️ <a href='https://t.me/QuanXNews/110'>Quantumult X资源解析器 ✅推荐</a>" +
         "\n" +
+        "\n" +
         "2⃣️ <a href='https://t.me/cool_scripts/200'>Sub-Store本地订阅 ✅多订阅推荐</a>" +
+        "\n" +
         "\n" +
         "3⃣️ 在线订阅转换：" +
         "\n" +
@@ -482,22 +493,22 @@ function processReplyWord(key, useId, userJson) {
         "🌈 <a href='https://t.me/xiaomaoJT/540'><b>XiaoMao去广告图文视频教程</b></a>" +
         "\n" +
         "\n" +
-        "1⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/ShuntCorrection.list'>分流修正</a>" +
+        "1⃣️ <a href='https://quantumult.app/x/open-app/add-resource?remote-resource=%7B%0A%20%20%20%20%22filter_remote%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%22https%3A%2F%2Fraw.githubusercontent.com%2FxiaomaoJT%2FQxScript%2Fmain%2Ffilter%2FShuntCorrection.list%2C%20tag%3D%E8%A7%84%E5%88%99%E4%BF%AE%E6%AD%A3%2C%20update-interval%3D172800%2C%20opt-parser%3Dfalse%2C%20%20enabled%3Dtrue%22%0A%20%20%20%20%5D%0A%7D'>分流修正(一键导入/更新)</a>" +
         "\n" +
         "\n" +
-        "2⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/filter/AdAway.list'>分流拒绝</a>" +
+        "2⃣️ <a href='https://quantumult.app/x/open-app/add-resource?remote-resource=%7B%0A%20%20%20%20%22filter_remote%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%22https%3A%2F%2Fraw.githubusercontent.com%2FxiaomaoJT%2FQxScript%2Fmain%2Ffilter%2FAdAway.list%2C%20tag%3D%E5%B9%BF%E5%91%8A%E6%8B%A6%E6%88%AA%C2%B7%E5%BA%94%E7%94%A8%2Cupdate-interval%3D604800%2C%20opt-parser%3Dfalse%2C%20enabled%3Dtrue%22%0A%20%20%20%20%5D%0A%7D'>分流拒绝(一键导入/更新)</a>" +
         "\n" +
         "\n" +
-        "3⃣️ <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/script/QX_XiaoMao_rw3.conf'>重写拒绝</a>" +
+        "3⃣️ <a href='https://quantumult.app/x/open-app/add-resource?remote-resource=%7B%0A%20%20%20%20%22rewrite_remote%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%22https%3A%2F%2Fraw.githubusercontent.com%2FxiaomaoJT%2FQxScript%2Fmain%2Frewrite%2Fscript%2FQX_XiaoMao_rw3.conf%2C%20tag%3D%E5%B9%BF%E5%91%8A%E6%8B%A6%E6%88%AA%C2%B7%E5%BA%94%E7%94%A8%C2%B7XiaoMao%E9%87%8D%E5%86%993%2C%20update-interval%3D172800%2C%20opt-parser%3Dfalse%2C%20enabled%3Dfalse%22%0A%20%20%20%20%5D%0A%7D'>重写拒绝(一键导入/更新)</a>" +
         "\n" +
         "\n" +
-        "4⃣️ <b>Clash去广告，请使用XiaoMaoClash配置网站生成专属懒人配置！点击菜单 图文教程 获取教程⑥</b>" +
+        "4⃣️ <b>Clash去广告，请使用XiaoMaoClash配置网站生成专属懒人配置！点击菜单 图文教程 获取教程8⃣️_Clash篇</b>" +
         "\n" +
         "\n" +
         "5⃣️ <a href='https://t.me/xiaomaoJT/147'>TG去广告</a>" +
         "\n" +
         "\n" +
-        "<b>更多小众软件广告拦截，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #广告截杀 </b>"+
+        "<b>更多小众软件广告拦截，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #广告截杀 </b>" +
         "\n" +
         "<b>去广告模块日更补充，可能存在误杀，请于XiaoMao群聊内反馈修正！</b>",
     },
@@ -510,25 +521,55 @@ function processReplyWord(key, useId, userJson) {
         "🌈 <a href='http://mp.weixin.qq.com/mp/homepage?__biz=MzI3MjE3NTc4OA==&hid=1&sn=69f77280608382e9ab1e6afac8c2a881&scene=18#wechat_redirect'><b>XiaoMao推文合集</b></a>" +
         "\n" +
         "\n" +
-        "1⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485104&idx=1&sn=484e84c5cfcca5f478b64bc82eb60bea&chksm=eb37c173dc40486516b0c40e99ce1711a5192c3189d736421ecdc06c0b9d3f7fffb67a0801a9&scene=178&cur_album_id=2740008142629273602#rd'>入门：<b>下载、认识QX、上手使用</b></a>" +
+        "<b>1⃣️ 入门篇</b>" +
         "\n" +
-        "2⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485121&idx=1&sn=b3312a56be6a8bea2645229ebbdd3525&chksm=eb37c102dc404814fee94b97551b6267d8b7438bd45a74537b3825d2b7fbd38eba3a2e20cbaf&scene=178&cur_album_id=2740008142629273602#rd'>进阶1：<b>配置General、DNS、Policy策略组教程</b></a>" +
-        "\n" +
-        "3⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485144&idx=1&sn=39b004f00ff60e5125986cb73ffc601c&chksm=eb37c11bdc40480d1d4d49283e0a4b604c205daefe7621c58c8f8a612fa095276d9778bbef54&scene=178&cur_album_id=2740008142629273602#rd'>进阶2：<b>配置分流教程</b></a>" +
-        "\n" +
-        "4⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485172&idx=1&sn=a6a0bdc07f335b23d565f022df636944&chksm=eb37c137dc404821746da8a10b8e3b2c4b883c9a866031f3475786d719587caf98974b3486d2&scene=178&cur_album_id=2740008142629273602#rd'>进阶3：<b>配置重写教程</b></a>" +
-        "\n" +
-        "5⃣️ <a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'>番外：<b>配置BoxJs、SubStore教程</b></a>" +
-        "\n" +
-        "6⃣️ <a href='https://mp.weixin.qq.com/s/8c-tn6OaSGCVXUo2DIWiww'>高阶1：<b>Task脚本制作教程</b></a>" +
-        "\n" +
-        "7⃣️ <a href='https://mp.weixin.qq.com/s/B_zMFU6vsAeE_IKyLXddtA'>高阶2：<b>广告拦截教程</b></a>" +
+        "<a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485104&idx=1&sn=484e84c5cfcca5f478b64bc82eb60bea&chksm=eb37c173dc40486516b0c40e99ce1711a5192c3189d736421ecdc06c0b9d3f7fffb67a0801a9&scene=178&cur_album_id=2740008142629273602#rd'><b>下载、认识QX、上手使用</b></a>" +
         "\n" +
         "\n" +
-        "8⃣️ <a href='http://s.nfangbian.com/2Ru'>XMC：<b>Clash配置教程</b></a>" +
+        "<b>2⃣️ 进阶篇一</b>" +
+        "\n" +
+        "<a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485121&idx=1&sn=b3312a56be6a8bea2645229ebbdd3525&chksm=eb37c102dc404814fee94b97551b6267d8b7438bd45a74537b3825d2b7fbd38eba3a2e20cbaf&scene=178&cur_album_id=2740008142629273602#rd'><b>配置General、DNS、Policy策略组教程</b></a>" +
         "\n" +
         "\n" +
-        "🔮 <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'>TgBot：<b>Tg机器人免费搭建教程</b></a>" +
+        "<b>3⃣️ 进阶篇二</b>" +
+        "\n" +
+        "<a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485144&idx=1&sn=39b004f00ff60e5125986cb73ffc601c&chksm=eb37c11bdc40480d1d4d49283e0a4b604c205daefe7621c58c8f8a612fa095276d9778bbef54&scene=178&cur_album_id=2740008142629273602#rd'><b>配置分流教程</b></a>" +
+        "\n" +
+        "\n" +
+        "<b>4⃣️ 进阶篇三</b>" +
+        "\n" +
+        "<a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485172&idx=1&sn=a6a0bdc07f335b23d565f022df636944&chksm=eb37c137dc404821746da8a10b8e3b2c4b883c9a866031f3475786d719587caf98974b3486d2&scene=178&cur_album_id=2740008142629273602#rd'><b>配置重写教程</b></a>" +
+        "\n" +
+        "\n" +
+        "<b>5⃣️ 番外篇</b>" +
+        "\n" +
+        "<a href='https://mp.weixin.qq.com/s?__biz=MzI3MjE3NTc4OA==&mid=2247485215&idx=1&sn=44b014dcbe0693b87b3b25e09877b63c&chksm=eb37c0dcdc4049ca70659ca0183e4a55e2d01f1fd328c0ad09a5cebad959c0489dadca53bc32&scene=178&cur_album_id=2740008142629273602#rd'><b>配置BoxJs、SubStore教程</b></a>" +
+        "\n" +
+        "\n" +
+        "<b>6⃣️ 高阶篇一</b>" +
+        "\n" +
+        "<a href='https://mp.weixin.qq.com/s/8c-tn6OaSGCVXUo2DIWiww'><b>Task脚本制作教程</b></a>" +
+        "\n" +
+        "\n" +
+        "<b>7⃣️ 高阶篇二</b>" +
+        "\n" +
+        "<a href='https://mp.weixin.qq.com/s/B_zMFU6vsAeE_IKyLXddtA'><b>广告拦截教程</b></a>" +
+        "\n" +
+        "\n" +
+        "\n" +
+        "<b>8⃣️ Clash篇_XMC</b>" +
+        "\n" +
+        "<a href='http://s.nfangbian.com/2Ru'><b>Clash自定义配置教程 For XiaoMaoClash</b></a>" +
+        "\n" +
+        "\n" +
+        "\n" +
+        "<b>9⃣️ Tg机器人篇_TgBot</b>" +
+        "\n" +
+        "<a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'><b>Tg机器人免费搭建教程</b></a>" +
+        "\n" +
+        "\n" +
+        "\n" +
+        "<b>🔟 其它教程</b>" +
         "\n" +
         "🥎 <a href='https://github.com/xiaomaoJT/clash'><b>XiaoMao_Clash版本配置教程及软件下载</b></a>" +
         "\n" +
@@ -543,7 +584,7 @@ function processReplyWord(key, useId, userJson) {
         "💊  <b>XiaoMao QX脚本合集</b>" +
         "\n" +
         "\n" +
-        "🧲 <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/boxJS/XiaoMao.json'>XiaoMao  BoxJs辅助订阅</a>" +
+        "🧲 <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/boxJS/XiaoMao.json'>XiaoMao_BoxJs辅助订阅</a>" +
         "\n" +
         "\n" +
         "① <a href='https://t.me/xiaomaoJT/283'>【辅助脚本】Spotify歌词翻译</a>" +
@@ -576,13 +617,19 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "⑮ <a href='https://t.me/xiaomaoJT/582'>【辅助脚本】酷安提链</a>" +
         "\n" +
+        "⑯ <a href='https://t.me/xiaomaoJT/16'>【辅助脚本】京东比价</a>" +
         "\n" +
-        "<b>脚本都支持自定义配置喔，快去boxJs设置吧。对脚本不熟悉？点击菜单 QX教程</b>",
+        "⑰ <a href='https://t.me/xiaomaoJT/528'>【快捷指令】XiaoMao充电助手</a>" +
+        "\n" +
+        "⑱ <a href='https://t.me/xiaomaoJT/626'>【自动任务】XiaoMao采精车</a>" +
+        "\n" +
+        "\n" +
+        "<b>脚本都支持自定义配置喔，快去boxJs设置吧。更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。对脚本、BoxJS不熟悉？点击菜单 图文教程</b>",
     },
     {
       keyword: ["/delay"],
       replyWord:
-        "💊 <b>响应延迟说明</b>" +
+        "💊 <b>XiaoMao_TgBot响应延迟说明</b>" +
         "\n" +
         "\n" +
         "XiaoMaoBot响应延迟主要取决于四个方面" +
@@ -600,7 +647,7 @@ function processReplyWord(key, useId, userJson) {
         "GAS及接口皆来源于公共服务器，高峰期可能出现较高延迟状态。",
     },
     {
-      keyword: ["在吗", "在嘛", "管理", "群主"],
+      keyword: ["在吗", "在嘛", "管理", "群主", "帽哥"],
       replyWord:
         "💊  <b>咨询相关问题，请在群聊中直接提问或@管理，私信不回复喔～</b>" +
         "\n" +
@@ -611,60 +658,84 @@ function processReplyWord(key, useId, userJson) {
     {
       keyword: ["电报解禁", "汉化"],
       replyWord:
-        "<b>💊  <a href='https://mp.weixin.qq.com/s/Ehi23fjFpeUc2DocnQb4hw'>Apple礼品卡购买教程</a></b>" +
-        "\n" +
-        "<b>💊  <a href='https://mp.weixin.qq.com/s/YzYsF9QyHZVJK9P7bsrURQ'>外区Apple ID免费注册教程</a></b>" +
-        "\n" +
+        "💊  <a href='https://t.me/xiaomaoJT/15'>Telegram解除敏感群组限制教程</a>" +
         "\n" +
         "💊  <a href='https://t.me/xiaomaoJT/5'>解除 +86 私聊限制教程</a>" +
         "\n" +
-        "💊  <a href='https://t.me/xiaomaoJT/6'>Telegram设置中文教程</a>" +
-        "\n" +
-        "💊  <a href='https://t.me/xiaomaoJT/15'>Telegram解除敏感群组限制教程</a>" +
-        "\n" +
         "💊  <a href='https://t.me/xiaomaoJT/147'>Telegram屏蔽私聊广告教程</a>" +
+        "\n" +
+        "💊  <a href='https://t.me/xiaomaoJT/6'>Telegram设置中文教程</a>" +
         "\n" +
         "💊  <a href='https://t.me/xiaomaoJT/171'>Telegram多彩主题</a>" +
         "\n" +
-        "💊  <a href='https://t.me/translation_zhcncc/92439'>更多Telegram教程</a>",
+        "💊  <a href='https://t.me/translation_zhcncc/92439'>更多Telegram教程</a>" +
+        "\n" +
+        "\n" +
+        "<b>💊  <a href='https://mp.weixin.qq.com/s/Ehi23fjFpeUc2DocnQb4hw'>Apple礼品卡购买教程</a></b>" +
+        "\n" +
+        "<b>💊  <a href='https://mp.weixin.qq.com/s/YzYsF9QyHZVJK9P7bsrURQ'>外区Apple ID免费注册教程</a></b>",
     },
     {
       keyword: ["接口查询"],
       replyWord:
-        "🌥 天气状况查询 🈯️➡️ /tq⁺地区" +
+        "🌥 天气状况查询" +
+        "\n" +
+        "🈯️➡️ /tq⁺地区" +
         "\n" +
         "\n" +
-        "🔗 短链网址生成 🈯️➡️ /suo⁺https://www.google.com" +
+        "🔗 短链网址生成" +
+        "\n" +
+        "🈯️➡️ /suo⁺https://www.google.com" +
         "\n" +
         "\n" +
-        "🥁 随机音乐推送 🈯️➡️ /music" +
+        "🥁 随机音乐推送" +
+        "\n" +
+        "🈯️➡️ /music" +
         "\n" +
         "\n" +
-        "☎️ 手机号码查询 🈯️➡️ /phone⁺电话号码" +
+        "☎️ 手机号码查询" +
+        "\n" +
+        "🈯️➡️ /phone⁺电话号码" +
         "\n" +
         "\n" +
-        "🐶 舔狗日记生成 🈯️➡️ /tg" +
+        "🐶 舔狗日记生成" +
+        "\n" +
+        "🈯️➡️ /tg" +
         "\n" +
         "\n" +
-        "🐔 毒鸡汤查询 🈯️➡️ /djt" +
+        "🐔 毒鸡汤查询" +
+        "\n" +
+        "🈯️➡️ /djt" +
         "\n" +
         "\n" +
-        "🧝‍♀️ 随机美女视频 🈯️➡️ /video" +
+        "🧝‍♀️ 随机美女视频" +
+        "\n" +
+        "🈯️➡️ /video" +
         "\n" +
         "\n" +
-        "📖 每日一言查询 🈯️➡️ /yy" +
+        "📖 每日一言查询" +
+        "\n" +
+        "🈯️➡️ /yy" +
         "\n" +
         "\n" +
-        "🤖 智慧聊天机器 🈯️➡️ /hi⁺内容" +
+        "🤖 智慧聊天机器" +
+        "\n" +
+        "🈯️➡️ /hi⁺内容" +
         "\n" +
         "\n" +
-        "💬 chatGPT查询 🈯️➡️ /chat⁺内容" +
+        "💬 chatGPT查询" +
+        "\n" +
+        "🈯️➡️ /chat⁺内容" +
         "\n" +
         "\n" +
-        "💽 蓝奏云直链解析 🈯️➡️ /lan⁺蓝奏云链接&pwd=密码" +
+        "💽 蓝奏云直链解析" +
+        "\n" +
+        "🈯️➡️ /lan⁺蓝奏云链接&pwd=密码" +
         "\n" +
         "\n" +
-        "🚶‍♂️ 小微信运动刷步(Zeep Life账号) 🈯️➡️ /step⁺账号&password=密码&step=步数" +
+        "🚶‍♂️ 微信运动刷步(Zeep Life账号)" +
+        "\n" +
+        "🈯️➡️ /step⁺账号&password=密码&step=步数" +
         "\n" +
         "\n" +
         "<b>接口数据来源于网络，可能存在查询拥挤情况，可稍后再试～</b>",
@@ -892,7 +963,7 @@ function processReplyWord(key, useId, userJson) {
             "可通过底部快捷按键栏快速激活操作！" +
             "\n" +
             "\n" +
-            "<b>🉑️通过底部按钮 微信公众号『小帽集团』 加入XiaoMao组织喔～</b>"+
+            "<b>🉑️通过底部按钮 微信公众号『小帽集团』 加入XiaoMao组织喔～</b>" +
             "\n" +
             "\n" +
             "<a href='https://github.com/xiaomaoJT/TgBot'>🏖 本机器人完全开源，可点击查看我的源码仓库获取免费搭建教程喔！</a>";
