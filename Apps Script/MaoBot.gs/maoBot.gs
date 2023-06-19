@@ -623,6 +623,8 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "⑱ <a href='https://t.me/xiaomaoJT/626'>【自动任务】XiaoMao采精车</a>" +
         "\n" +
+        "⑲ <a href='https://t.me/xiaomaoJT/639'>【自动任务】XiaoMao每日新闻60s</a>" +
+        "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧。更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。对脚本、BoxJS不熟悉？点击菜单 图文教程</b>",
     },
