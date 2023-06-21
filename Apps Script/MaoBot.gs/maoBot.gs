@@ -19,7 +19,7 @@ var EXECNAME = "";
 var BOTID = "";
 
 // ------------------------- 自定义参数·请按需修改参数·引号内留空此功能失效 -----------------
-// 用于推送主人消息 取主人tg id
+// 用于推送主人消息 取主人tg id - 私人消息主动功能必须填写此项
 var KingId = "";
 // 1 全部类型
 // 2 群聊 + 私聊类型
@@ -378,6 +378,7 @@ function processData(userMessage) {
 
   payload = payloadPostData;
   setStorage(userMessage, "POSTDATA");
+
   pushDataToKing(userMessage);
   return payload;
 }
@@ -780,6 +781,7 @@ function processReplyWord(key, useId, userJson) {
     { api: "/help", apiId: 11 },
     { api: "/lan", apiId: 12 },
     { api: "/step", apiId: 13 },
+    { api: "/reply", apiId: 14 },
   ];
 
   if (outsideWord.findIndex((i) => key.indexOf(i) != -1) != -1) {
@@ -993,6 +995,17 @@ function processReplyWord(key, useId, userJson) {
             "\n" +
             "\n" +
             getMiSport(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
+          break;
+        case 14:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getReply(userJson);
           returnHtmlReply.state = true;
           break;
         default:
@@ -1461,6 +1474,100 @@ function isApi(commandList, key) {
   return isApiStatus;
 }
 
+/**
+ * 用于主人对私聊信息进行bot角色回复
+ * @param userJson
+ * @returns
+ */
+function getReply(userJson) {
+  let followMessageKeyboard = [
+    [
+      { text: "✚ XiaoMao频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+    ],
+    [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
+  ];
+  let keyboardFollowParams = {
+    inline_keyboard: followMessageKeyboard,
+  };
+  let returnText = userJson.text.replace("/reply", "") || "";
+  if (
+    userJson.hasOwnProperty("chat") &&
+    userJson.chat.id.toString() != KingId
+  ) {
+    returnText =
+      "Bot消息私聊功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
+    return returnText;
+  } else {
+    if (!userJson.hasOwnProperty("reply_to_message")) {
+      returnText =
+        "未找到引用消息内容，Bot消息私聊功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
+      return returnText;
+    } else {
+      if (
+        userJson.reply_to_message.from.username != "Xiao_MaoMao_bot" &&
+        userJson.reply_to_message.from.is_bot != true &&
+        userJson.chat.type == "private"
+      ) {
+        returnText = "Bot消息私聊功能仅限于回复Bot端私聊消息喔！";
+        return returnText;
+      } else {
+        try {
+          let payloadPostData = {
+            method: "sendMessage",
+            chat_id: userJson.from.id.toString(),
+            text:
+              "<b>📣来自XiaoMaoBot管理员的主动回复</b>" +
+              "\n" +
+              "\n" +
+              "\n" +
+              "<b>===========================</b>" +
+              "\n" +
+              "\n" +
+              "<b>" +
+              returnText +
+              "</b>" +
+              "\n" +
+              "\n" +
+              "<b>===========================</b>" +
+              "\n",
+            parse_mode: "HTML",
+            reply_markup: JSON.stringify(keyboardFollowParams),
+            disable_web_page_preview: true,
+          };
+          if (userJson.reply_to_message.text.indexOf("来自[群聊]")) {
+            let textReply = userJson.reply_to_message.text;
+            let sub1 = textReply.indexOf("message_id");
+            let subText = textReply.substring(sub1, sub1 + 30);
+            let sub2 = subText.indexOf(":");
+            let sub3 = subText.indexOf(",");
+            let sub2Text = subText.substring(sub2 + 1, sub3);
+
+            let sub_1 = textReply.indexOf("chat");
+            let sub_Text = textReply.substring(sub_1 + 6, sub_1 + 30);
+            let sub_2 = sub_Text.indexOf(":");
+            let sub_3 = sub_Text.indexOf(",");
+            let sub2_Text = sub_Text.substring(sub_2 + 1, sub_3);
+            payloadPostData.chat_id = sub2_Text.toString();
+            payloadPostData.reply_to_message_id = sub2Text.toString();
+          }
+          let data = {
+            method: "post",
+            payload: payloadPostData,
+          };
+          UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+
+          return "<b>✅ 私聊信息已发送成功</b>";
+        } catch (e) {
+          returnText =
+            "出错了，消息发送失败！当前版本仅可用于回复文字消息，请注意检查回复内容及引用消息出处！";
+          return returnText;
+        }
+      }
+    }
+  }
+}
+
 // ------------------------- 核心api函数 -----------------
 /**
  * 用于接口前的回复
@@ -1704,19 +1811,17 @@ function getDuJiTang() {
 
   try {
     responseDuJiTang = UrlFetchApp.fetch(
-      "https://v.api.aa1.cn/api/api-wenan-dujitang/index.php?aa1=json&times=" +
-        new Date().getTime(),
+      "https://api.btstu.cn/yan/api.php&times=" + new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
     );
 
-    let jsonData = JSON.parse(responseDuJiTang.getContentText());
     returnText =
-      "<b>以下数据来自LK，由XiaoMao加工：</b>" +
+      "<b>以下数据来自博天，由XiaoMao加工：</b>" +
       "\n" +
       "\n" +
-      jsonData.data[0].dujitang;
+      responseDuJiTang.getContentText();
   } catch (e) {
     return returnText;
   }
@@ -1734,15 +1839,14 @@ function getTianGou() {
   // return returnText;
   try {
     responseTianGou = UrlFetchApp.fetch(
-      "https://v.api.aa1.cn/api/tiangou/index.php?times=" +
-        new Date().getTime(),
+      "https://cloud.qqshabi.cn/api/tiangou/api.php",
       {
         muteHttpExceptions: true,
       }
     );
 
     returnText =
-      "<b>以下数据来自小歪，由XiaoMao加工：</b>" +
+      "<b>以下数据来自God，由XiaoMao加工：</b>" +
       "\n" +
       "\n" +
       responseTianGou.getContentText();
