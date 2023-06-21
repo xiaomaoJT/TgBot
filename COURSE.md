@@ -148,6 +148,38 @@ var KingInfo = 1;
 {"update_id":xxxx,"message":{"message_id":xxxx,"from":{"id":xxxx,"is_bot":false,"first_name":"xxxx","username":"xxxx","language_code":"zh-hans"},"chat":{"id":xxxx,"first_name":"xxxx","username":"xxxx","type":"private"},"date":xxxx,"voice":{"duration":0,"mime_type":"audio/ogg","file_id":"xxxx","file_unique_id":"xxxx","file_size":4200}}}
 ```
 
+>**Bot消息主动回复 - 私人消息推送功能升级补充项** 更新日期[20230621] 版本 @Beta4.4-417
+>
+>[**部署图解**](*https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/配置图解)
+>
+>以下特性仅适用于开启私人消息推送服务后的MaoBot。
+>
+>**使用限制：**
+>
+>1、主动回复功能仅适用于Bot主人，及KingId所属者。
+>
+>2、主动回复功能仅可通过部署后的MaoBot私聊窗口进行回复。
+>
+>3、版本@Beta4.4-417 - 当前版本仅支持主动回复文本消息。
+>
+>4、不建议频繁使用Bot主动私聊功能，避免造成误封等不必要的麻烦，后果自负。
+>
+>
+>
+>**使用教程：**
+>
+>通过部署后的私人MaoBot聊天框，引用MaoBot所推送的【私聊】或【群聊】消息，通过私有指令 **/reply + 主动回复内容** 来激活主动回复功能。
+>
+>
+>
+>**使用效果：**
+>
+>1、正确引用消息并发送指令后，将收到反馈【**✅ 私聊信息已发送成功**】
+>
+>2、错误引用消息，将收到失败反馈。
+>
+>3、主动回复可支持回复 私聊消息 及 群聊消息，群聊消息支持针对性引用式回复。
+
 
 
 > **新特性补充**
