@@ -150,7 +150,7 @@ var KingInfo = 1;
 
 >**Bot消息主动回复 - 私人消息推送功能升级补充项** 更新日期[20230621] 版本 @Beta4.4-417
 >
->[**部署图解**](*https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/配置图解)
+>[**部署图解**](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/配置图解)
 >
 >以下特性仅适用于开启私人消息推送服务后的MaoBot。
 >

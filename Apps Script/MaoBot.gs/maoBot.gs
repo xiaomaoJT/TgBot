@@ -959,7 +959,7 @@ function processReplyWord(key, useId, userJson) {
             "\n" +
             "7⃣️ 消息存储" +
             "\n" +
-            "8⃣️ 消息私人推送" +
+            "8⃣️ 消息私人推送及主动回复" +
             "\n" +
             "9⃣️ chatGPT查询" +
             "\n" +
