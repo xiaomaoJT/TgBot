@@ -13,6 +13,12 @@
 > 3. 授予XiaoMaoBot机器人管理员权限。
 > 4. 至此即可自动开启XiaoMaoBot机器人所有功能。
 
+------
+
+------
+
+
+
 #### <span id="couse">🎟 Telegram Bot 搭建教程</span>
 
 > 轻松上手，带你免费打造属于自己的telegram机器人
@@ -109,10 +115,14 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 源码开发不易，使用引用请注明出处！遇到问题欢迎留言～
 ```
 
+------
+
 
 
 ##### 🚗 新功能 · 内容补充
 
+> **新特性补充-1.1**
+>
 > 此补充内容**自更新日期[20230220] 版本号@Beta4.3-228 起**。
 >
 > 补充内容为新升级项，非必填，若不填写则此服务不生效。
@@ -147,12 +157,16 @@ var KingInfo = 1;
 📰 消息原始Json：
 {"update_id":xxxx,"message":{"message_id":xxxx,"from":{"id":xxxx,"is_bot":false,"first_name":"xxxx","username":"xxxx","language_code":"zh-hans"},"chat":{"id":xxxx,"first_name":"xxxx","username":"xxxx","type":"private"},"date":xxxx,"voice":{"duration":0,"mime_type":"audio/ogg","file_id":"xxxx","file_unique_id":"xxxx","file_size":4200}}}
 ```
-
->**Bot消息主动回复 - 私人消息推送功能升级补充项** 更新日期[20230621] 版本 @Beta4.4-417
+------
+>**新特性补充-1.2**
+>
+>**Bot消息主动回复 - 私人消息推送功能升级补充项** 更新日期[20230621] 版本 **@Beta4.4-417**
 >
 >[**部署图解**](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/配置图解)
 >
 >以下特性仅适用于开启私人消息推送服务后的MaoBot。
+>
+>------
 >
 >**使用限制：**
 >
@@ -164,13 +178,13 @@ var KingInfo = 1;
 >
 >4、不建议频繁使用Bot主动私聊功能，避免造成误封等不必要的麻烦，后果自负。
 >
->
+>------
 >
 >**使用教程：**
 >
 >通过部署后的私人MaoBot聊天框，引用MaoBot所推送的【私聊】或【群聊】消息，通过私有指令 **/reply + 主动回复内容** 来激活主动回复功能。
 >
->
+>------
 >
 >**使用效果：**
 >
@@ -180,9 +194,11 @@ var KingInfo = 1;
 >
 >3、主动回复可支持回复 私聊消息 及 群聊消息，群聊消息支持针对性引用式回复。
 
+------
 
 
-> **新特性补充**
+
+> **新特性补充-2**
 >
 > 此补充内容**自更新日期[20230322] 版本号@Beta4.3-291 起**。
 >
@@ -190,9 +206,11 @@ var KingInfo = 1;
 >
 > botIdAlone 取机器人的id
 
+------
 
 
-> **新特性补充**
+
+> **新特性补充-3**
 >
 > 此补充内容**自更新日期[20230505] 版本号@Beta 4.4-382 起**。
 >
