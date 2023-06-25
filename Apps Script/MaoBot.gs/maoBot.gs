@@ -3,10 +3,14 @@
  * # 小版本更新请查看更新日志 ｜ 或加入xiaomao组织⬇️
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
+ * 
+ * 
  * Google App Script
- * 用于执行tg机器人自动回复等功能
- * 入退群检测及欢迎欢送、广告敏感词过滤及自动删除、chatGPT接口、消息私人推送、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能
+ * 用于执行tg机器人功能
+ * 入群检测、退群检测、入群欢迎、退群欢送、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能
  *
+ * 源码开发不易，使用引用请注明出处！
+ * 源码开发不易，使用引用请注明出处！
  * 源码开发不易，使用引用请注明出处！
  */
 
@@ -1946,8 +1950,7 @@ function getMusic() {
 
   try {
     responseMusic = UrlFetchApp.fetch(
-      "https://anime-music.jijidown.com/api/v2/music&times=" +
-        new Date().getTime(),
+      "https://anime-music.jijidown.com/api/v2/music",
       {
         muteHttpExceptions: true,
       }
