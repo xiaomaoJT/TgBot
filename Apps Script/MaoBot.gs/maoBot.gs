@@ -1526,12 +1526,12 @@ function getUnBanUser(userJson) {
     userJson.chat.id.toString() != KingId
   ) {
     returnText =
-      "Bot消息封禁功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
+      "Bot用户封禁功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
     return returnText;
   } else {
     if (!userJson.hasOwnProperty("reply_to_message")) {
       returnText =
-        "未找到引用消息内容，Bot消息私聊功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
+        "未找到引用消息内容，Bot用户封禁功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
       return returnText;
     } else {
       if (
@@ -1539,7 +1539,7 @@ function getUnBanUser(userJson) {
         userJson.reply_to_message.from.is_bot != true &&
         userJson.chat.type == "private"
       ) {
-        returnText = "Bot消息封禁功能仅限于回复Bot端私聊消息喔！";
+        returnText = "Bot用户封禁功能仅限于回复Bot端私聊消息喔！";
         return returnText;
       } else {
         try {
