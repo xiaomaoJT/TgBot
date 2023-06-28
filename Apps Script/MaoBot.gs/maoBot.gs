@@ -3,11 +3,11 @@
  * # 小版本更新请查看更新日志 ｜ 或加入xiaomao组织⬇️
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
- * 
- * 
+ *
+ *
  * Google App Script
  * 用于执行tg机器人功能
- * 入群检测、退群检测、入群欢迎、退群欢送、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能
+ * 入群检测、退群检测、入群欢迎、退群欢送、群管功能、用户封禁、用户解封、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能
  *
  * 源码开发不易，使用引用请注明出处！
  * 源码开发不易，使用引用请注明出处！
@@ -630,6 +630,10 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "⑲ <a href='https://t.me/xiaomaoJT/639'>【自动任务】XiaoMao每日新闻60s</a>" +
         "\n" +
+        "⑳ <a href='https://t.me/xiaomaoJT/648'>【会员脚本】NYMF Pro</a>" +
+        "\n" +
+        "㉑ <a href='https://t.me/xiaomaoJT/652'>【自动任务】XiaoMao每日油价</a>" +
+        "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧。更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。对脚本、BoxJS不熟悉？点击菜单 图文教程</b>",
     },
@@ -663,7 +667,7 @@ function processReplyWord(key, useId, userJson) {
         "\n",
     },
     {
-      keyword: ["电报解禁", "汉化"],
+      keyword: ["电报解禁", "汉化", "中文"],
       replyWord:
         "💊  <a href='https://t.me/xiaomaoJT/15'>Telegram解除敏感群组限制教程</a>" +
         "\n" +
@@ -786,6 +790,8 @@ function processReplyWord(key, useId, userJson) {
     { api: "/lan", apiId: 12 },
     { api: "/step", apiId: 13 },
     { api: "/reply", apiId: 14 },
+    { api: "/ban", apiId: 15 },
+    { api: "/unban", apiId: 16 },
   ];
 
   if (outsideWord.findIndex((i) => key.indexOf(i) != -1) != -1) {
@@ -967,6 +973,8 @@ function processReplyWord(key, useId, userJson) {
             "\n" +
             "9⃣️ chatGPT查询" +
             "\n" +
+            "🔟 群管功能、用户封禁与用户解封" +
+            "\n" +
             "\n" +
             "可通过底部快捷按键栏快速激活操作！" +
             "\n" +
@@ -1010,6 +1018,28 @@ function processReplyWord(key, useId, userJson) {
             "\n" +
             "\n" +
             getReply(userJson);
+          returnHtmlReply.state = true;
+          break;
+        case 15:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getBanUser(userJson);
+          returnHtmlReply.state = true;
+          break;
+        case 16:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getUnBanUser(userJson);
           returnHtmlReply.state = true;
           break;
         default:
@@ -1083,6 +1113,13 @@ function pushDataToKing(key) {
   ) {
   } else if (KingType == 1 && KingId != "") {
   } else {
+    return;
+  }
+
+  if (
+    KingId == key.message.from.id.toString() &&
+    key.message.chat.type == "private"
+  ) {
     return;
   }
 
@@ -1479,6 +1516,233 @@ function isApi(commandList, key) {
 }
 
 /**
+ * 解除封禁用户
+ * @param userJson
+ * @returns
+ */
+function getUnBanUser(userJson) {
+  if (
+    userJson.hasOwnProperty("chat") &&
+    userJson.chat.id.toString() != KingId
+  ) {
+    returnText =
+      "Bot消息封禁功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
+    return returnText;
+  } else {
+    if (!userJson.hasOwnProperty("reply_to_message")) {
+      returnText =
+        "未找到引用消息内容，Bot消息私聊功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
+      return returnText;
+    } else {
+      if (
+        userJson.reply_to_message.from.username != "Xiao_MaoMao_bot" &&
+        userJson.reply_to_message.from.is_bot != true &&
+        userJson.chat.type == "private"
+      ) {
+        returnText = "Bot消息封禁功能仅限于回复Bot端私聊消息喔！";
+        return returnText;
+      } else {
+        try {
+          let payloadPostData = {
+            method: "unbanChatMember",
+            chat_id: "",
+            user_id: "",
+          };
+          if (userJson.reply_to_message.text.indexOf("来自[群聊]")) {
+            let textReply = userJson.reply_to_message.text;
+            let sub_1 = textReply.indexOf("chat");
+            let sub_Text = textReply.substring(sub_1 + 6, sub_1 + 30);
+            let sub_2 = sub_Text.indexOf(":");
+            let sub_3 = sub_Text.indexOf(",");
+            let sub2_Text = sub_Text.substring(sub_2 + 1, sub_3);
+
+            let sub_user_1 = textReply.indexOf('"id"');
+            let sub_user_Text = textReply.substring(
+              sub_user_1 + 4,
+              sub_user_1 + 30
+            );
+            let sub_user_2 = sub_user_Text.indexOf(":");
+            let sub_user_3 = sub_user_Text.indexOf(",");
+            let sub2_user_Text = sub_user_Text.substring(
+              sub_user_2 + 1,
+              sub_user_3
+            );
+            payloadPostData.user_id = sub2_user_Text.toString();
+            payloadPostData.chat_id = sub2_Text.toString();
+
+            let data = {
+              method: "post",
+              payload: payloadPostData,
+            };
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              data
+            );
+
+            let payloadPostData2 = {
+              method: "sendMessage",
+              chat_id: payloadPostData.user_id,
+              text:
+                "<b>📣来自XiaoMaoBot管理员的操作提醒</b>" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "<b>===========================</b>" +
+                "\n" +
+                "\n" +
+                "<b>您已被XiaoMao管理员解除封禁，注意不要再次违规哟，" +
+                "<a href='https://t.me/hSuMjrQppKE5MWU9'> XiaoMao群聊 点击加入 </a>" +
+                "</b>" +
+                "\n" +
+                "\n" +
+                "<b>===========================</b>" +
+                "\n",
+              parse_mode: "HTML",
+              disable_web_page_preview: true,
+            };
+            let data2 = {
+              method: "post",
+              payload: payloadPostData2,
+            };
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              data2
+            );
+          } else {
+            returnText = "出错了，封禁功能仅限来自群聊类型消息喔！";
+            return returnText;
+          }
+
+          return "<b>✅ 用户 " + payloadPostData.user_id + "已解除封禁</b>";
+        } catch (e) {
+          returnText =
+            "出错了，请将以下错误码反馈给" +
+            "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+            "或" +
+            "<a href='https://t.me/hSuMjrQppKE5MWU9'>XiaoMao群聊管理员</a>" +
+            "\n\n" +
+            e;
+          return returnText;
+        }
+      }
+    }
+  }
+}
+/**
+ * 封禁用户
+ * @param userJson
+ * @returns
+ */
+function getBanUser(userJson) {
+  if (
+    userJson.hasOwnProperty("chat") &&
+    userJson.chat.id.toString() != KingId
+  ) {
+    returnText =
+      "Bot用户封禁功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
+    return returnText;
+  } else {
+    if (!userJson.hasOwnProperty("reply_to_message")) {
+      returnText =
+        "未找到引用消息内容，Bot用户封禁功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
+      return returnText;
+    } else {
+      if (
+        userJson.reply_to_message.from.username != "Xiao_MaoMao_bot" &&
+        userJson.reply_to_message.from.is_bot != true &&
+        userJson.chat.type == "private"
+      ) {
+        returnText = "Bot用户封禁功能仅限于回复Bot端私聊消息喔！";
+        return returnText;
+      } else {
+        try {
+          let payloadPostData = {
+            method: "banChatMember",
+            chat_id: "",
+            user_id: "",
+            until_date: 0,
+          };
+          if (userJson.reply_to_message.text.indexOf("来自[群聊]")) {
+            let textReply = userJson.reply_to_message.text;
+            let sub_1 = textReply.indexOf("chat");
+            let sub_Text = textReply.substring(sub_1 + 6, sub_1 + 30);
+            let sub_2 = sub_Text.indexOf(":");
+            let sub_3 = sub_Text.indexOf(",");
+            let sub2_Text = sub_Text.substring(sub_2 + 1, sub_3);
+
+            let sub_user_1 = textReply.indexOf('"id"');
+            let sub_user_Text = textReply.substring(
+              sub_user_1 + 4,
+              sub_user_1 + 30
+            );
+            let sub_user_2 = sub_user_Text.indexOf(":");
+            let sub_user_3 = sub_user_Text.indexOf(",");
+            let sub2_user_Text = sub_user_Text.substring(
+              sub_user_2 + 1,
+              sub_user_3
+            );
+            payloadPostData.user_id = sub2_user_Text.toString();
+            payloadPostData.chat_id = sub2_Text.toString();
+
+            let data = {
+              method: "post",
+              payload: payloadPostData,
+            };
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              data
+            );
+
+            let payloadPostData2 = {
+              method: "sendMessage",
+              chat_id: payloadPostData.user_id,
+              text:
+                "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "<b>===========================</b>" +
+                "\n" +
+                "\n" +
+                "<b>因存在违规行为，您已被管理员封禁，申诉请私聊" +
+                "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+                "</b>" +
+                "\n" +
+                "\n" +
+                "<b>===========================</b>" +
+                "\n",
+              parse_mode: "HTML",
+              disable_web_page_preview: true,
+            };
+            let data2 = {
+              method: "post",
+              payload: payloadPostData2,
+            };
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              data2
+            );
+          } else {
+            returnText = "出错了，用户封禁功能仅支持来自群聊类型消息喔！";
+            return returnText;
+          }
+          return "<b>✅ 用户 " + payloadPostData.user_id + "已被封禁</b>";
+        } catch (e) {
+          returnText =
+            "出错了，请将以下错误码反馈给" +
+            "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+            "或" +
+            "<a href='https://t.me/hSuMjrQppKE5MWU9'>XiaoMao群聊管理员</a>" +
+            "\n\n" +
+            e;
+          return returnText;
+        }
+      }
+    }
+  }
+}
+
+/**
  * 用于主人对私聊信息进行bot角色回复
  * @param userJson
  * @returns
@@ -1564,7 +1828,13 @@ function getReply(userJson) {
           return "<b>✅ 私聊信息已发送成功</b>";
         } catch (e) {
           returnText =
-            "出错了，消息发送失败！当前版本仅可用于回复文字消息，请注意检查回复内容及引用消息出处！";
+            "出错了，消息发送失败！当前版本仅可用于回复文字消息，请注意检查回复内容及引用消息出处！" +
+            "请将以下错误码反馈给" +
+            "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+            "或" +
+            "<a href='https://t.me/hSuMjrQppKE5MWU9'>XiaoMao群聊管理员</a>" +
+            "\n\n" +
+            e;
           return returnText;
         }
       }
