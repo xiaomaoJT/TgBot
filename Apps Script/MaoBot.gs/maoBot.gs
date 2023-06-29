@@ -7,12 +7,16 @@
  *
  * Google App Script
  * 用于执行tg机器人功能
- * 入群检测、退群检测、入群欢迎、退群欢送、群管功能、用户封禁、用户解封、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能
+ * 功能描述：❶ 超级群管功能❷ 广告词/敏感词过滤、自动删除/警告❸ 多样化接口查询、XiaoMao数据加工❹ 自定义聊天窗快捷键盘/消息跟随按钮❺ 关键字消息/私聊消息 自动回复❻ 私聊消息/群组消息 捕捉及消息私人推送❼ 私聊消息/群组消息 自动存储
+ * 
+ * 功能细则：入群检测、退群检测、入群欢迎、退群欢送、超级群管功能、用户封禁、用户解封、用户禁言、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能
  *
  * 源码开发不易，使用引用请注明出处！
  * 源码开发不易，使用引用请注明出处！
  * 源码开发不易，使用引用请注明出处！
  */
+
+
 
 // ------------------------- 预定义参数·请补充对应内容·必填 -----------------
 // Google EXEC ID - 谷歌表格ID
@@ -658,6 +662,54 @@ function processReplyWord(key, useId, userJson) {
         "GAS及接口皆来源于公共服务器，高峰期可能出现较高延迟状态。",
     },
     {
+      keyword: ["/manage", "私有指令", "隐藏指令"],
+      replyWord:
+        "💊 <b>XiaoMao机器人超级群管功能说明</b>" +
+        "\n" +
+        "\n" +
+        "\n" +
+        "<b>🤖XiaoMaoBot超级群管功能：</b>" +
+        "\n" +
+        "① 群员入群检测/退群欢送" +
+        "\n" +
+        "② 违规言论/广告词汇自动检测、删除、提醒" +
+        "\n" +
+        "③ 群员封禁、解封、禁言管理" +
+        "\n" +
+        "④ 个人ID查询【隐藏指令：/myid 】" +
+        "\n" +
+        "\n" +
+        "\n" +
+        "<b>🤖管理员私有指令：</b>" +
+        "\n" +
+        "⓵ 主动回复" +
+        "\n" +
+        "【功能描述】通过XiaoMao机器人主动回复 私聊/群聊 消息" +
+        "\n" +
+        "【私有指令】/reply ⁺ 回复内容" +
+        "\n" +
+        "\n" +
+        "⓶ 群员封禁" +
+        "\n" +
+        "【功能描述】通过XiaoMao机器人主动封禁违规群员，封禁时长分为三种（1、N分钟：Nm 如30分钟：30m ；2、N天：Nd 如30天：30d ；3、不填：永久封禁）" +
+        "\n" +
+        "【私有指令】/ban ⁺ 时长" +
+        "\n" +
+        "\n" +
+        "⓷ 群员解封" +
+        "\n" +
+        "【功能描述】通过XiaoMao机器人主动解除群员封禁" +
+        "\n" +
+        "【私有指令】/unban" +
+        "\n" +
+        "\n" +
+        "⓸ 群员禁言" +
+        "\n" +
+        "【功能描述】通过XiaoMao机器人主动禁言违规群员，封禁时长分为三种（1、N分钟：Nm 如30分钟：30m ；2、N天：Nd 如30天：30d ；3、不填：永久封禁）" +
+        "\n" +
+        "【私有指令】/restrict ⁺ 时长",
+    },
+    {
       keyword: ["在吗", "在嘛", "管理", "群主", "帽哥"],
       replyWord:
         "💊  <b>咨询相关问题，请在群聊中直接提问或@管理，私信不回复喔～</b>" +
@@ -792,6 +844,7 @@ function processReplyWord(key, useId, userJson) {
     { api: "/reply", apiId: 14 },
     { api: "/ban", apiId: 15 },
     { api: "/unban", apiId: 16 },
+    { api: "/restrict", apiId: 17 },
   ];
 
   if (outsideWord.findIndex((i) => key.indexOf(i) != -1) != -1) {
@@ -940,12 +993,11 @@ function processReplyWord(key, useId, userJson) {
           returnHtmlReply.state = true;
           break;
         case 10:
-          apiReply(useId, userJson);
+          // apiReply(useId, userJson);
           htmlReply = "getTgId";
           returnHtmlReply.state = true;
           break;
         case 11:
-          apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
@@ -955,31 +1007,23 @@ function processReplyWord(key, useId, userJson) {
             "\n" +
             "Hello,我是 XiaoMao机器人,很高兴认识您！我能较出色的完成以下功能：" +
             "\n" +
-            "1⃣️ 入退群检测及欢迎欢送" +
             "\n" +
-            "2⃣️ 广告敏感词过滤及自动删除" +
+            "❶ 超级群管功能（/manage）" +
             "\n" +
-            "3⃣️ 自动接口查询及数据加工" +
+            "❷ 广告词/敏感词过滤、自动删除/警告" +
             "\n" +
-            "4⃣️ 自定义键盘" +
+            "❸ 多样化接口查询、XiaoMao数据加工" +
             "\n" +
-            "5⃣️ 私聊及自动回复" +
+            "❹ 自定义聊天窗快捷键盘/消息跟随按钮" +
             "\n" +
-            "6⃣️ 关键字自动回复" +
+            "❺ 关键字消息/私聊消息 自动回复" +
             "\n" +
-            "7⃣️ 消息存储" +
+            "❻ 私聊消息/群组消息 捕捉及消息私人推送" +
             "\n" +
-            "8⃣️ 消息私人推送及主动回复" +
-            "\n" +
-            "9⃣️ chatGPT查询" +
-            "\n" +
-            "🔟 群管功能、用户封禁与用户解封" +
+            "❼ 私聊消息/群组消息 自动存储" +
             "\n" +
             "\n" +
-            "可通过底部快捷按键栏快速激活操作！" +
-            "\n" +
-            "\n" +
-            "<b>🉑️通过底部按钮 微信公众号『小帽集团』 加入XiaoMao组织喔～</b>" +
+            "<b>🉑️通过底部按钮 【 微信公众号『小帽集团』 】 加入XiaoMao组织喔～</b>" +
             "\n" +
             "\n" +
             "<a href='https://github.com/xiaomaoJT/TgBot'>🏖 本机器人完全开源，可点击查看我的源码仓库获取免费搭建教程喔！</a>";
@@ -1040,6 +1084,17 @@ function processReplyWord(key, useId, userJson) {
             "\n" +
             "\n" +
             getUnBanUser(userJson);
+          returnHtmlReply.state = true;
+          break;
+        case 17:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getRestrictUser(userJson);
           returnHtmlReply.state = true;
           break;
         default:
@@ -1634,6 +1689,7 @@ function getUnBanUser(userJson) {
  * @returns
  */
 function getBanUser(userJson) {
+  let timeFrame = userJson.text.replace("/ban", "") || "";
   if (
     userJson.hasOwnProperty("chat") &&
     userJson.chat.id.toString() != KingId
@@ -1660,7 +1716,7 @@ function getBanUser(userJson) {
             method: "banChatMember",
             chat_id: "",
             user_id: "",
-            until_date: 0,
+            until_date: getUnixTime(timeFrame).toString(),
           };
           if (userJson.reply_to_message.text.indexOf("来自[群聊]")) {
             let textReply = userJson.reply_to_message.text;
@@ -1704,7 +1760,9 @@ function getBanUser(userJson) {
                 "<b>===========================</b>" +
                 "\n" +
                 "\n" +
-                "<b>因存在违规行为，您已被管理员封禁，申诉请私聊" +
+                "<b>因存在违规行为，您已被管理员封禁（封禁时长：" +
+                (timeFrame ? timeFrame : "永久") +
+                "），申诉请私聊" +
                 "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
                 "</b>" +
                 "\n" +
@@ -1727,6 +1785,140 @@ function getBanUser(userJson) {
             return returnText;
           }
           return "<b>✅ 用户 " + payloadPostData.user_id + "已被封禁</b>";
+        } catch (e) {
+          returnText =
+            "出错了，请将以下错误码反馈给" +
+            "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+            "或" +
+            "<a href='https://t.me/hSuMjrQppKE5MWU9'>XiaoMao群聊管理员</a>" +
+            "\n\n" +
+            e;
+          return returnText;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * 限制用户权限
+ * @param userJson
+ * @returns
+ */
+function getRestrictUser(userJson) {
+  let timeFrame = userJson.text.replace("/restrict", "") || "";
+  if (
+    userJson.hasOwnProperty("chat") &&
+    userJson.chat.id.toString() != KingId
+  ) {
+    returnText =
+      "Bot用户限制功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
+    return returnText;
+  } else {
+    if (!userJson.hasOwnProperty("reply_to_message")) {
+      returnText =
+        "未找到引用消息内容，Bot用户限制功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
+      return returnText;
+    } else {
+      if (
+        userJson.reply_to_message.from.username != "Xiao_MaoMao_bot" &&
+        userJson.reply_to_message.from.is_bot != true &&
+        userJson.chat.type == "private"
+      ) {
+        returnText = "Bot用户限制功能仅限于回复Bot端私聊消息喔！";
+        return returnText;
+      } else {
+        try {
+          let permission = {
+            can_send_messages: false,
+            can_send_audios: false,
+            can_send_documents: false,
+            can_send_photos: false,
+            can_send_videos: false,
+            can_send_video_notes: false,
+            can_send_voice_notes: false,
+            can_send_polls: false,
+            can_send_other_messages: false,
+            can_add_web_page_previews: false,
+            can_change_info: false,
+            can_invite_users: false,
+            can_pin_messages: false,
+            can_manage_topics: false,
+          };
+          let payloadPostData = {
+            method: "restrictChatMember",
+            chat_id: "",
+            user_id: "",
+            until_date: getUnixTime(timeFrame).toString(),
+            permissions: JSON.stringify(permission),
+          };
+          if (userJson.reply_to_message.text.indexOf("来自[群聊]")) {
+            let textReply = userJson.reply_to_message.text;
+            let sub_1 = textReply.indexOf("chat");
+            let sub_Text = textReply.substring(sub_1 + 6, sub_1 + 30);
+            let sub_2 = sub_Text.indexOf(":");
+            let sub_3 = sub_Text.indexOf(",");
+            let sub2_Text = sub_Text.substring(sub_2 + 1, sub_3);
+
+            let sub_user_1 = textReply.indexOf('"id"');
+            let sub_user_Text = textReply.substring(
+              sub_user_1 + 4,
+              sub_user_1 + 30
+            );
+            let sub_user_2 = sub_user_Text.indexOf(":");
+            let sub_user_3 = sub_user_Text.indexOf(",");
+            let sub2_user_Text = sub_user_Text.substring(
+              sub_user_2 + 1,
+              sub_user_3
+            );
+            payloadPostData.user_id = sub2_user_Text.toString();
+            payloadPostData.chat_id = sub2_Text.toString();
+
+            let data = {
+              method: "post",
+              payload: payloadPostData,
+            };
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              data
+            );
+
+            let payloadPostData2 = {
+              method: "sendMessage",
+              chat_id: payloadPostData.user_id,
+              text:
+                "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "<b>===========================</b>" +
+                "\n" +
+                "\n" +
+                "<b>因存在违规行为，您已被管理员限制聊天（限制时长：" +
+                (timeFrame ? timeFrame : "永久") +
+                "），申诉请私聊" +
+                "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+                "</b>" +
+                "\n" +
+                "\n" +
+                "<b>===========================</b>" +
+                "\n",
+              parse_mode: "HTML",
+              disable_web_page_preview: true,
+            };
+            let data2 = {
+              method: "post",
+              payload: payloadPostData2,
+            };
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              data2
+            );
+          } else {
+            returnText = "出错了，用户限制功能仅支持来自群聊类型消息喔！";
+            return returnText;
+          }
+          return "<b>✅ 用户 " + payloadPostData.user_id + "已被限制</b>";
         } catch (e) {
           returnText =
             "出错了，请将以下错误码反馈给" +
@@ -2513,4 +2705,58 @@ function getNowDate() {
     sign2 +
     seconds
   );
+}
+
+/**
+ * 获取unix时间戳
+ * @param t N分钟后 Nm ; N天后 Nd
+ * @returns
+ */
+function getUnixTime(t = "") {
+  let text = t.toLowerCase().replace(/\s*/g, "");
+  if (text.indexOf("d") != -1) {
+    let dealText = text.replace("d", "") * -1;
+    return getGoneDay(dealText);
+  } else if (text.indexOf("m") != -1) {
+    let dealText = text.replace("m", "") * 1;
+    return getGoneMinutes(dealText);
+  } else {
+    return 0;
+  }
+
+  // 获取N分钟后的时间
+  function getGoneMinutes(params = 0) {
+    let date = new Date();
+    let min = date.getMinutes();
+    date.setMinutes(min + params);
+    let y = date.getFullYear();
+    let m =
+      date.getMonth() + 1 < 10
+        ? "0" + (date.getMonth() + 1)
+        : date.getMonth() + 1;
+    let d = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    let h = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+    let f =
+      date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+    let s =
+      date.getSeconds() < 10 ? "0" + date.getseconds() : date.getSeconds();
+    let formatDate = y + "-" + m + "-" + d + " " + h + ":" + f + ":" + s;
+    return Math.floor(new Date(formatDate).getTime() / 1000);
+  }
+
+  // 获取N天后的时间
+  function getGoneDay(n = 0, yearFlag = true) {
+    let myDate = new Date();
+    myDate.setDate(myDate.getDate() - n);
+    let month = myDate.getMonth() + 1;
+    let day = myDate.getDate();
+    let result =
+      "" +
+      (yearFlag ? myDate.getFullYear() : "") +
+      "/" +
+      (month < 10 ? "0" + month : month) +
+      "/" +
+      (day < 10 ? "0" + day : day);
+    return Math.floor(new Date(result).getTime() / 1000);
+  }
 }

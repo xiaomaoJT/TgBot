@@ -318,7 +318,9 @@ __underline__
 >
 > 此功能依赖于**pushDataToKing**推送服务
 >
-> 私有指令【/ban】
+> 封禁时长分为三种（1、N分钟：Nm 如30分钟：30m ；2、N天：Nd 如30天：30d ；3、不填：永久封禁）
+>
+> 私有指令【/ban + 时长】
 
 ##### 🎨 getUnBanUser方法
 
@@ -329,3 +331,19 @@ __underline__
 > 此功能依赖于**pushDataToKing**推送服务
 >
 > 私有指令【/unban】
+
+##### 🎨 getRestrictUser方法
+
+> *限制用户权限*
+>
+> **KindId**必填，此方法方可生效
+>
+> 此功能依赖于**pushDataToKing**推送服务
+>
+> 封禁时长分为三种（1、N分钟：Nm 如30分钟：30m ；2、N天：Nd 如30天：30d ；3、不填：永久封禁）
+>
+> 私有指令【/restrict + 时长】
+
+🎨 **getUnixTime方法**
+
+> *获取unix时间戳*
