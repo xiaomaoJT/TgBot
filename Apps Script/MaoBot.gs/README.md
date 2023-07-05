@@ -256,6 +256,9 @@ __underline__
 > - getMiSport 小米运动刷步
 > - getLanLink *蓝奏云直链解析*
 > - getChatBot chatGPT
+> - getHotList 热榜查询
+> - getHoroscopeList 星座运势
+> - getDouBan 豆瓣电影排行
 
 ---
 

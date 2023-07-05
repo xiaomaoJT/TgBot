@@ -8,15 +8,13 @@
  * Google App Script
  * 用于执行tg机器人功能
  * 功能描述：❶ 超级群管功能❷ 广告词/敏感词过滤、自动删除/警告❸ 多样化接口查询、XiaoMao数据加工❹ 自定义聊天窗快捷键盘/消息跟随按钮❺ 关键字消息/私聊消息 自动回复❻ 私聊消息/群组消息 捕捉及消息私人推送❼ 私聊消息/群组消息 自动存储
- * 
+ *
  * 功能细则：入群检测、退群检测、入群欢迎、退群欢送、超级群管功能、用户封禁、用户解封、用户禁言、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能
  *
  * 源码开发不易，使用引用请注明出处！
  * 源码开发不易，使用引用请注明出处！
  * 源码开发不易，使用引用请注明出处！
  */
-
-
 
 // ------------------------- 预定义参数·请补充对应内容·必填 -----------------
 // Google EXEC ID - 谷歌表格ID
@@ -638,6 +636,18 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "㉑ <a href='https://t.me/xiaomaoJT/652'>【自动任务】XiaoMao每日油价</a>" +
         "\n" +
+        "㉒ <a href='https://t.me/xiaomaoJT/667'>【自动任务】XiaoMao实时热榜</a>" +
+        "\n" +
+        "㉓ <a href='https://t.me/xiaomaoJT/670'>【自动任务】XiaoMao星座运势</a>" +
+        "\n" +
+        "㉔ <a href='https://t.me/xiaomaoJT/671'>【自动任务】XiaoMao豆瓣电影</a>" +
+        "\n" +
+        "㉕ <a href='https://t.me/xiaomaoJT/672'>【自动任务】XiaoMao每日新闻图片版</a>" +
+        "\n" +
+        "㉖ <a href='https://t.me/xiaomaoJT/673'>【自动任务】XiaoMao摸鱼人日历</a>" +
+        "\n" +
+        "㉗ <a href='https://t.me/xiaomaoJT/674'>【自动任务】XiaoMao职场人日历</a>" +
+        "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧。更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。对脚本、BoxJS不熟悉？点击菜单 图文教程</b>",
     },
@@ -746,6 +756,11 @@ function processReplyWord(key, useId, userJson) {
         "🈯️➡️ /tq⁺地区" +
         "\n" +
         "\n" +
+        "🔥 热榜查询" +
+        "\n" +
+        "🈯️➡️ /hot" +
+        "\n" +
+        "\n" +
         "🔗 短链网址生成" +
         "\n" +
         "🈯️➡️ /suo⁺https://www.google.com" +
@@ -764,6 +779,16 @@ function processReplyWord(key, useId, userJson) {
         "🐶 舔狗日记生成" +
         "\n" +
         "🈯️➡️ /tg" +
+        "\n" +
+        "\n" +
+        "🎬 豆瓣电影排行" +
+        "\n" +
+        "🈯️➡️ /db" +
+        "\n" +
+        "\n" +
+        "🌌 星座运势查询" +
+        "\n" +
+        "🈯️➡️ /xz" +
         "\n" +
         "\n" +
         "🐔 毒鸡汤查询" +
@@ -845,6 +870,9 @@ function processReplyWord(key, useId, userJson) {
     { api: "/ban", apiId: 15 },
     { api: "/unban", apiId: 16 },
     { api: "/restrict", apiId: 17 },
+    { api: "/hot", apiId: 18 },
+    { api: "/db", apiId: 19 },
+    { api: "/xz", apiId: 20 },
   ];
 
   if (outsideWord.findIndex((i) => key.indexOf(i) != -1) != -1) {
@@ -853,6 +881,9 @@ function processReplyWord(key, useId, userJson) {
       "\n" +
       "🪬 本次响应延迟(/delay)：" +
       getRelayTime(responseTime) +
+      "\n" +
+      "\n" +
+      "<b>若查询接口无需 @ 机器人喔～</b>" +
       "\n" +
       "\n" +
       "微信公众号『小帽集团』,欢迎您的关注！记得点赞收藏哟～" +
@@ -1095,6 +1126,42 @@ function processReplyWord(key, useId, userJson) {
             "\n" +
             "\n" +
             getRestrictUser(userJson);
+          returnHtmlReply.state = true;
+          break;
+        case 18:
+          apiReply(useId, userJson);
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getHotList(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
+          break;
+        case 19:
+          apiReply(useId, userJson);
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getDouBan(getString(key, isApi(commandWord, key).api));
+          returnHtmlReply.state = true;
+          break;
+        case 20:
+          apiReply(useId, userJson);
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "🪬 本次响应延迟(/delay)：" +
+            getRelayTime(responseTime) +
+            "\n" +
+            "\n" +
+            getHoroscopeList(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
         default:
@@ -2244,6 +2311,558 @@ function getHelloBot(word) {
   }
   return returnText;
 }
+
+/**
+ * 热榜查询
+ * @param type
+ * @returns
+ */
+function getHotList(type) {
+  let responseText = null;
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
+
+  let typeObj = {};
+  if (type == "") {
+    returnText =
+      "<b>查询的热榜参数为空，请在指令后面加上参数吧～</b>" +
+      "\n" +
+      "\n" +
+      "🔥热榜查询" +
+      "\n" +
+      "虎扑热榜：/hot hp" +
+      "\n" +
+      "知乎热榜：/hot zh" +
+      "\n" +
+      "36氪热榜：/hot 36" +
+      "\n" +
+      "百度热榜：/hot bd" +
+      "\n" +
+      "B站热榜：/hot bz" +
+      "\n" +
+      "贴吧热榜：/hot tb" +
+      "\n" +
+      "微博热榜：/hot wb" +
+      "\n" +
+      "抖音热榜：/hot dy" +
+      "\n" +
+      "豆瓣热榜：/hot db" +
+      "\n" +
+      "微信热榜：/hot wx" +
+      "\n" +
+      "少数派热榜：/hot ss" +
+      "\n" +
+      "IT资讯热榜：/hot it" +
+      "\n" +
+      "IT资讯新榜：/hot itn" +
+      "\n" +
+      "\n" +
+      "🌟趣榜查询" +
+      "\n" +
+      "历史上的今天：/hot ls" +
+      "\n" +
+      "微信美食榜：/hot ms" +
+      "\n" +
+      "微信财经榜：/hot cj" +
+      "\n" +
+      "微信搞笑榜：/hot gx" +
+      "\n" +
+      "微信科技榜：/hot kj" +
+      "\n" +
+      "微信八卦榜：/hot bg" +
+      "\n" +
+      "微信星座榜：/hot xz" +
+      "\n" +
+      "微信旅游榜：/hot ly";
+    return returnText;
+  } else {
+    let typeList = [
+      {
+        name: "虎扑热榜",
+        type: "hp",
+        params: "huPu",
+      },
+      {
+        name: "知乎热榜",
+        type: "zh",
+        params: "zhihuHot",
+      },
+      {
+        name: "36氪热榜",
+        type: "36",
+        params: "36Ke",
+      },
+      {
+        name: "百度热榜",
+        type: "bd",
+        params: "baiduRD",
+      },
+      {
+        name: "B站热榜",
+        type: "bz",
+        params: "bili",
+      },
+      {
+        name: "贴吧热榜",
+        type: "tb",
+        params: "baiduRY",
+      },
+      {
+        name: "微博热榜",
+        type: "wb",
+        params: "wbHot",
+      },
+      {
+        name: "抖音热榜",
+        type: "gy",
+        params: "douyinHot",
+      },
+      {
+        name: "豆瓣热榜",
+        type: "db",
+        params: "douban",
+      },
+      {
+        name: "微信热榜",
+        type: "wx",
+        params: "wxHot",
+      },
+      {
+        name: "少数派热榜",
+        type: "ss",
+        params: "ssPai",
+      },
+      {
+        name: "IT资讯热榜",
+        type: "it",
+        params: "itInfo",
+      },
+      {
+        name: "IT资讯新榜",
+        type: "itn",
+        params: "itNews",
+      },
+      {
+        name: "历史上的今天",
+        type: "ls",
+        params: "history",
+      },
+      {
+        name: "微信美食榜",
+        type: "ms",
+        params: "wxFood",
+      },
+      {
+        name: "微信搞笑榜",
+        type: "gx",
+        params: "wxJoke",
+      },
+      {
+        name: "微信财经榜",
+        type: "cj",
+        params: "wxMoney",
+      },
+      {
+        name: "微信科技榜",
+        type: "kj",
+        params: "wxKeJi",
+      },
+      {
+        name: "微信八卦榜",
+        type: "bg",
+        params: "wxBaGua",
+      },
+      {
+        name: "微信星座榜",
+        type: "xz",
+        params: "wxXingZuo",
+      },
+      {
+        name: "微信旅游榜",
+        type: "ly",
+        params: "wxLvYou",
+      },
+    ];
+    typeObj = typeList.find((el) => el.type == type);
+
+    if (typeObj == {}) {
+      returnText = "查询参数匹配失败，请核对参数正确性！";
+      return returnText;
+    }
+  }
+
+  try {
+    responseText = UrlFetchApp.fetch(
+      "https://api.vvhan.com/api/hotlist?type=" + typeObj.params,
+      {
+        muteHttpExceptions: true,
+      }
+    );
+    let jsonData = JSON.parse(responseText.getContentText());
+
+    let dealText = "内容获取失败，请稍后再试～";
+    if (jsonData.success && jsonData.data.length) {
+      dealText = "";
+      jsonData.data.forEach((el, i) => {
+        dealText =
+          dealText +
+          "[" +
+          el.index +
+          "] " +
+          (el.hasOwnProperty("hot")
+            ? "[" +
+              (i < 5 ? "🔥" : "") +
+              "热度：" +
+              el.hot
+                .toString()
+                .replace("热度", "")
+                .replace("万", "w")
+                .replace("千", "k") +
+              "] "
+            : "") +
+          "<a href='" +
+          el.mobilUrl +
+          "'>" +
+          el.title +
+          "</a>" +
+          "\n";
+      });
+    }
+    returnText =
+      "<b>以下数据来自韩小韩，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      "<b>🌟" +
+      "以下内容来自" +
+      typeObj.name +
+      "</b>" +
+      "\n" +
+      "<b>数据更新时间：" +
+      (jsonData.update_time || "-") +
+      "</b>" +
+      "\n" +
+      "\n" +
+      dealText;
+  } catch (e) {
+    return returnText;
+  }
+  return returnText;
+}
+
+/**
+ * 星座运势
+ * @param type
+ * @returns
+ */
+function getHoroscopeList(type) {
+  let responseText = null;
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
+
+  let typeObj = {};
+  let timeObj = {};
+  let typeArr = [];
+  let timeObjName = "";
+  if (type == "") {
+    returnText =
+      "<b>查询的星座参数为空，请在指令后面加上参数吧～</b>" +
+      "\n" +
+      "\n" +
+      "🌌支持的星座" +
+      "\n" +
+      "♈️白羊座：baiyang" +
+      "\n" +
+      "♉️金牛座：jinniu" +
+      "\n" +
+      "♊️双子座：shuangzi" +
+      "\n" +
+      "♌️狮子座：shizi" +
+      "\n" +
+      "♍️处女座：chunv" +
+      "\n" +
+      "♎️天秤座：tiancheng" +
+      "\n" +
+      "♏️天蝎座：tianxie" +
+      "\n" +
+      "♐️射手座：sheshou" +
+      "\n" +
+      "♑️摩羯座：mojie" +
+      "\n" +
+      "♒️水瓶座：shuiping" +
+      "\n" +
+      "♓️双鱼座：shuangyu" +
+      "\n" +
+      "\n" +
+      "🌟支持的范围" +
+      "\n" +
+      "今日运势：D" +
+      "\n" +
+      "明日运势：T" +
+      "\n" +
+      "本周运势：W" +
+      "\n" +
+      "本月运势：M" +
+      "\n" +
+      "本年运势：Y" +
+      "\n" +
+      "\n" +
+      "🔥星座运势查询" +
+      "\n" +
+      "双子座今日运势：/xz shuangzi+D" +
+      "\n" +
+      "天秤座本月运势：/xz tiancheng+M";
+    return returnText;
+  } else {
+    let typeList = [
+      { name: "♈️白羊座", type: "baiyang", params: "aries" },
+      { name: "♉️金牛座", type: "jinniu", params: "taurus" },
+      { name: "♊️双子座", type: "shuangzi", params: "gemini" },
+      { name: "♋️巨蟹座", type: "juxie", params: "cancer" },
+      { name: "♌️狮子座", type: "shizi", params: "leo" },
+      { name: "♍️处女座", type: "chunv", params: "virgo" },
+      { name: "♎️天秤座", type: "tiancheng", params: "libra" },
+      { name: "♏️天蝎座", type: "tianxie", params: "scorpio" },
+      { name: "♐️射手座", type: "sheshou", params: "sagittarius" },
+      { name: "♑️摩羯座", type: "mojie", params: "capricorn" },
+      { name: "♒️水瓶座", type: "shuiping", params: "aquarius" },
+      { name: "♓️双鱼座", type: "shuangyu", params: "pisces" },
+    ];
+    let timeList = [
+      {
+        name: "今日运势",
+        type: "D",
+        params: "today",
+      },
+      {
+        name: "明日运势",
+        type: "T",
+        params: "nextday",
+      },
+      {
+        name: "本周运势",
+        type: "W",
+        params: "week",
+      },
+      {
+        name: "本月运势",
+        type: "M",
+        params: "month",
+      },
+      {
+        name: "本年运势",
+        type: "Y",
+        params: "year",
+      },
+    ];
+    if (type) {
+      typeArr = type.split("+");
+    }
+
+    typeObj = typeList.find((el) => el.type == typeArr[0]);
+    timeObj = timeList.find((el) => el.type == typeArr[1]);
+    timeObjName = timeObj.name.slice(0, 2);
+    if (typeObj == {} || timeObj == {}) {
+      returnText = "查询参数匹配失败，请核对参数正确性！";
+      return returnText;
+    }
+  }
+
+  try {
+    responseText = UrlFetchApp.fetch(
+      "https://api.vvhan.com/api/horoscope?type=" +
+        typeObj.params +
+        "&time=" +
+        timeObj.params,
+      {
+        muteHttpExceptions: true,
+      }
+    );
+    let jsonData = JSON.parse(responseText.getContentText());
+
+    let dealText = "内容获取失败，请稍后再试～";
+    if (jsonData.success) {
+      dealText = "";
+      if (jsonData.data.hasOwnProperty("todo")) {
+        dealText =
+          dealText +
+          timeObjName +
+          "吉凶宜忌：" +
+          "\n" +
+          "✅适宜动作：" +
+          (jsonData.data.todo.yi || "- ") +
+          "\n" +
+          "❎忌讳动作：" +
+          (jsonData.data.todo.ji || "- ") +
+          "\n" +
+          "🔢幸运数字：" +
+          (jsonData.data.luckynumber || "- ") +
+          "\n" +
+          "🎨幸运颜色：" +
+          (jsonData.data.luckycolor || "- ") +
+          "\n" +
+          "❤️速配星座：" +
+          (jsonData.data.luckyconstellation || "- ") +
+          "\n" +
+          "💔提防星座：" +
+          (jsonData.data.badconstellation || "- ") +
+          "\n" +
+          "💮运势短评：" +
+          (jsonData.data.shortcomment || "- ") +
+          "\n\n";
+      }
+      if (jsonData.data.hasOwnProperty("fortune")) {
+        let starIndex = "🌟🌟🌟🌟🌟";
+        dealText =
+          dealText +
+          timeObjName +
+          "运势：" +
+          "\n" +
+          "🈴综合运势：" +
+          starIndex.slice(0, 2 * parseInt(jsonData.data.fortune.all)) +
+          "\n" +
+          "💞爱情运势：" +
+          starIndex.slice(0, 2 * parseInt(jsonData.data.fortune.love)) +
+          "\n" +
+          "📖事业运势：" +
+          starIndex.slice(0, 2 * parseInt(jsonData.data.fortune.work)) +
+          "\n" +
+          "💰财富运势：" +
+          starIndex.slice(0, 2 * parseInt(jsonData.data.fortune.money)) +
+          "\n" +
+          "💪健康运势：" +
+          starIndex.slice(0, 2 * parseInt(jsonData.data.fortune.health)) +
+          "\n\n";
+      }
+      if (jsonData.data.hasOwnProperty("index")) {
+        dealText =
+          dealText +
+          timeObjName +
+          "指数：" +
+          "\n" +
+          "🈴综合运势：" +
+          jsonData.data.index.all +
+          "\n" +
+          "💞爱情运势：" +
+          jsonData.data.index.love +
+          "\n" +
+          "📖事业运势：" +
+          jsonData.data.index.work +
+          "\n" +
+          "💰财富运势：" +
+          jsonData.data.index.money +
+          "\n" +
+          "💪健康运势：" +
+          jsonData.data.index.health +
+          "\n\n";
+      }
+      if (jsonData.data.hasOwnProperty("fortunetext")) {
+        dealText =
+          dealText +
+          timeObjName +
+          "运势解析：" +
+          "\n" +
+          "🈴综合运势：" +
+          jsonData.data.fortunetext.all +
+          "\n" +
+          "💞爱情运势：" +
+          jsonData.data.fortunetext.love +
+          "\n" +
+          "📖事业运势：" +
+          jsonData.data.fortunetext.work +
+          "\n" +
+          "💰财富运势：" +
+          jsonData.data.fortunetext.money +
+          "\n" +
+          "💪健康运势：" +
+          jsonData.data.fortunetext.health +
+          "\n" +
+          "😮‍💨解压秘诀：" +
+          (jsonData.data.fortunetext.decompression || "- ") +
+          "\n" +
+          "😄开运秘诀：" +
+          (jsonData.data.fortunetext.openluck || "- ") +
+          "\n\n";
+      }
+    }
+    returnText =
+      "<b>以下数据来自韩小韩，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      typeObj.name +
+      "- " +
+      jsonData.data.type +
+      "（" +
+      jsonData.data.time +
+      "）" +
+      "\n" +
+      "\n" +
+      dealText;
+  } catch (e) {
+    return returnText;
+  }
+  return returnText;
+}
+
+/**
+ * 豆瓣电影排行
+ * @param params
+ * @returns
+ */
+function getDouBan(params) {
+  let responseText = null;
+  let returnText =
+    "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
+  try {
+    responseText = UrlFetchApp.fetch("https://api.vvhan.com/api/douban", {
+      muteHttpExceptions: true,
+    });
+    let jsonData = JSON.parse(responseText.getContentText());
+
+    let dealText = "内容获取失败，请稍后再试～";
+    if (jsonData.success && jsonData.data.length) {
+      dealText = "";
+      jsonData.data.forEach((el, i) => {
+        dealText =
+          dealText +
+          "[" +
+          (i + 1) +
+          "] " +
+          "<a href='" +
+          el.info.url +
+          "'>" +
+          el.title +
+          "</a>" +
+          "\n" +
+          "<b>豆瓣评分：</b>" +
+          el.info.pingfen +
+          "\n" +
+          "<b>演员名单：</b>" +
+          el.info.yanyuan +
+          "\n" +
+          "<b>评价人数：</b>" +
+          el.info.pingjia +
+          "\n" +
+          "\n";
+      });
+    }
+    returnText =
+      "<b>以下数据来自韩小韩，由XiaoMao加工：</b>" +
+      "\n" +
+      "\n" +
+      "<b>🎬豆瓣电影排行</b>" +
+      "\n" +
+      "<b>数据更新时间：" +
+      (jsonData.time || "-") +
+      "</b>" +
+      "\n" +
+      "\n" +
+      dealText;
+  } catch (e) {
+    return returnText;
+  }
+  return returnText;
+}
+
 /**
  * 视频查询
  * @param video
