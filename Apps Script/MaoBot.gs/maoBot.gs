@@ -2485,7 +2485,7 @@ function getHotList(type) {
     ];
     typeObj = typeList.find((el) => el.type == type);
 
-    if (typeObj == {}) {
+    if (typeObj == undefined) {
       returnText = "查询参数匹配失败，请核对参数正确性！";
       return returnText;
     }
@@ -2659,12 +2659,12 @@ function getHoroscopeList(type) {
     }
 
     typeObj = typeList.find((el) => el.type == typeArr[0]);
-    timeObj = timeList.find((el) => el.type == typeArr[1]);
-    timeObjName = timeObj.name.slice(0, 2);
-    if (typeObj == {} || timeObj == {}) {
+    timeObj = timeList.find((el) => el.type == (typeArr[1] || "D"));
+    if (typeObj == undefined || timeObj == undefined) {
       returnText = "查询参数匹配失败，请核对参数正确性！";
       return returnText;
     }
+    timeObjName = timeObj.name.slice(0, 2);
   }
 
   try {
