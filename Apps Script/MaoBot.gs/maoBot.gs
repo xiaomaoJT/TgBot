@@ -594,6 +594,9 @@ function processReplyWord(key, useId, userJson) {
         "🧲 <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/boxJS/XiaoMao.json'>XiaoMao_BoxJs辅助订阅</a>" +
         "\n" +
         "\n" +
+        "❤️‍🔥 <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/boxJS/XiaoMaoAutoTask.json'>XiaoMao_自动任务订阅</a>" +
+        "\n" +
+        "\n" +
         "<b>XiaoMao脚本合集快速导航（点击/回复指令获取相关脚本）</b>" +
         "\n" +
         "🚇【会员脚本】 /js_vip" +
@@ -673,23 +676,25 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "③ <a href='https://t.me/xiaomaoJT/500'>【自动任务】年度节日推送</a>" +
         "\n" +
-        "④ <a href='https://t.me/xiaomaoJT/626'>【自动任务】XiaoMao采精车</a>" +
+        "④ <a href='https://t.me/xiaomaoJT/626'>【自动任务】采精车</a>" +
         "\n" +
-        "⑤ <a href='https://t.me/xiaomaoJT/639'>【自动任务】XiaoMao每日新闻60s</a>" +
+        "⑤ <a href='https://t.me/xiaomaoJT/639'>【自动任务】每日新闻60s</a>" +
         "\n" +
-        "⑥ <a href='https://t.me/xiaomaoJT/652'>【自动任务】XiaoMao每日油价</a>" +
+        "⑥ <a href='https://t.me/xiaomaoJT/652'>【自动任务】每日油价</a>" +
         "\n" +
-        "⑦ <a href='https://t.me/xiaomaoJT/667'>【自动任务】XiaoMao实时热榜</a>" +
+        "⑦ <a href='https://t.me/xiaomaoJT/667'>【自动任务】实时热榜</a>" +
         "\n" +
-        "⑧ <a href='https://t.me/xiaomaoJT/670'>【自动任务】XiaoMao星座运势</a>" +
+        "⑧ <a href='https://t.me/xiaomaoJT/670'>【自动任务】星座运势</a>" +
         "\n" +
-        "⑨ <a href='https://t.me/xiaomaoJT/671'>【自动任务】XiaoMao豆瓣电影</a>" +
+        "⑨ <a href='https://t.me/xiaomaoJT/671'>【自动任务】豆瓣电影</a>" +
         "\n" +
-        "⑩ <a href='https://t.me/xiaomaoJT/672'>【自动任务】XiaoMao每日新闻图片版</a>" +
+        "⑩ <a href='https://t.me/xiaomaoJT/672'>【自动任务】每日新闻图片版</a>" +
         "\n" +
-        "⑪ <a href='https://t.me/xiaomaoJT/673'>【自动任务】XiaoMao摸鱼人日历</a>" +
+        "⑪ <a href='https://t.me/xiaomaoJT/673'>【自动任务】摸鱼人日历</a>" +
         "\n" +
-        "⑫ <a href='https://t.me/xiaomaoJT/674'>【自动任务】XiaoMao职场人日历</a>" +
+        "⑫ <a href='https://t.me/xiaomaoJT/674'>【自动任务】职场人日历</a>" +
+        "\n" +
+        "⑬ <a href='https://t.me/xiaomaoJT/698'>【自动任务】实时线报</a>" +
         "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
