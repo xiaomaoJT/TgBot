@@ -659,6 +659,8 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "⑤ <a href='https://t.me/xiaomaoJT/16'>【辅助脚本】京东比价</a>" +
         "\n" +
+        "⑥ <a href='https://t.me/xiaomaoJT/723'>【辅助脚本】彩云天气Token捕获</a>" +
+        "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -695,6 +697,8 @@ function processReplyWord(key, useId, userJson) {
         "⑫ <a href='https://t.me/xiaomaoJT/674'>【自动任务】职场人日历</a>" +
         "\n" +
         "⑬ <a href='https://t.me/xiaomaoJT/698'>【自动任务】实时线报</a>" +
+        "\n" +
+        "⑭ <a href='https://t.me/xiaomaoJT/714'>【自动任务】台风监测</a>" +
         "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
