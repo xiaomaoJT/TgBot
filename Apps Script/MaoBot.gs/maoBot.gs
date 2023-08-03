@@ -132,7 +132,7 @@ function processData(userMessage) {
     [{ text: "图文教程" }, { text: "脚本合集" }, { text: "广告拦截" }],
     [
       { text: "接口查询" },
-      { text: "微信公众号『小帽集团』" },
+      { text: "资源仓库" },
       { text: "电报解禁" },
     ],
   ];
@@ -227,10 +227,10 @@ function processData(userMessage) {
         getRelayTime(responseTime) +
         "\n" +
         "\n" +
-        "微信公众号『小帽集团』,欢迎您的关注！记得点赞收藏哟～" +
+        "<b>✅微信公众号『小帽集团』，欢迎您的关注！记得点赞收藏哟～</b>" +
         "\n" +
         "\n" +
-        "推文集：" +
+        "XiaoMao推文集：" +
         "<a href='http://mp.weixin.qq.com/mp/homepage?__biz=MzI3MjE3NTc4OA==&hid=1&sn=69f77280608382e9ab1e6afac8c2a881&scene=18#wechat_redirect'><b>点击查看 👈</b></a>";
 
       payloadCallback = {
@@ -366,7 +366,7 @@ function processData(userMessage) {
       }
 
       if (
-        userMessage.message.text == "微信公众号『小帽集团』" ||
+        userMessage.message.text == "微信公众号『小帽集团』" ||userMessage.message.text == "资源仓库" ||
         userMessage.message.text.indexOf("Mao") != -1
       ) {
         payloadPostData.reply_markup = JSON.stringify(keyboardFollowParams);
@@ -902,7 +902,7 @@ function processReplyWord(key, useId, userJson) {
     dfa: {},
   };
   //关键字排除
-  let outsideWord = ["微信公众号『小帽集团』", "@Xiao_MaoMao_bot"];
+  let outsideWord = ["微信公众号『小帽集团』","资源仓库", "@Xiao_MaoMao_bot"];
   // api key
   let commandWord = [
     { api: "/tq", apiId: 0 },
@@ -929,7 +929,7 @@ function processReplyWord(key, useId, userJson) {
     { api: "/xz", apiId: 20 },
   ];
 
-  if (outsideWord.findIndex((i) => key.indexOf(i) != -1) != -1) {
+  if (outsideWord.findIndex((i) => key == i) != -1) {
     htmlReply =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
       "\n" +
@@ -937,13 +937,10 @@ function processReplyWord(key, useId, userJson) {
       getRelayTime(responseTime) +
       "\n" +
       "\n" +
-      "<b>若查询接口无需 @ 机器人喔～</b>" +
+      "<b>✅微信公众号『小帽集团』，欢迎您的关注！记得点赞收藏哟～</b>" +
       "\n" +
       "\n" +
-      "微信公众号『小帽集团』,欢迎您的关注！记得点赞收藏哟～" +
-      "\n" +
-      "\n" +
-      "推文集：" +
+      "XiaoMao推文集：" +
       "<a href='http://mp.weixin.qq.com/mp/homepage?__biz=MzI3MjE3NTc4OA==&hid=1&sn=69f77280608382e9ab1e6afac8c2a881&scene=18#wechat_redirect'><b>点击查看 👈</b></a>";
     returnHtmlReply.state = true;
   } else {
@@ -1108,7 +1105,7 @@ function processReplyWord(key, useId, userJson) {
             "❼ 私聊消息/群组消息 自动存储" +
             "\n" +
             "\n" +
-            "<b>🉑️通过底部按钮 【 微信公众号『小帽集团』 】 加入XiaoMao组织喔～</b>" +
+            "<b>🉑️通过底部按钮 【 资源仓库 】 加入XiaoMao组织喔～</b>" +
             "\n" +
             "\n" +
             "<a href='https://github.com/xiaomaoJT/TgBot'>🏖 本机器人完全开源，可点击查看我的源码仓库获取免费搭建教程喔！</a>";
@@ -1667,7 +1664,7 @@ function checkSensitiveDFA(content) {
  */
 function getString(key, keyApi) {
   const apiString = key.split(keyApi)[1] || "";
-  return apiString.replace(/\s*/g, "");
+  return apiString.replace(/\s*/g, "").replace('@Xiao_MaoMao_bot',"");
 }
 /**
  * 用于api接口参数识别
