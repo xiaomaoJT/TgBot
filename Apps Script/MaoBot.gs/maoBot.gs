@@ -130,11 +130,7 @@ function processData(userMessage) {
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "订阅转换" }],
     [{ text: "图文教程" }, { text: "脚本合集" }, { text: "广告拦截" }],
-    [
-      { text: "接口查询" },
-      { text: "资源仓库" },
-      { text: "电报解禁" },
-    ],
+    [{ text: "接口查询" }, { text: "资源仓库" }, { text: "电报解禁" }],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -366,7 +362,8 @@ function processData(userMessage) {
       }
 
       if (
-        userMessage.message.text == "微信公众号『小帽集团』" ||userMessage.message.text == "资源仓库" ||
+        userMessage.message.text == "微信公众号『小帽集团』" ||
+        userMessage.message.text == "资源仓库" ||
         userMessage.message.text.indexOf("Mao") != -1
       ) {
         payloadPostData.reply_markup = JSON.stringify(keyboardFollowParams);
@@ -902,7 +899,7 @@ function processReplyWord(key, useId, userJson) {
     dfa: {},
   };
   //关键字排除
-  let outsideWord = ["微信公众号『小帽集团』","资源仓库", "@Xiao_MaoMao_bot"];
+  let outsideWord = ["微信公众号『小帽集团』", "资源仓库", "@Xiao_MaoMao_bot"];
   // api key
   let commandWord = [
     { api: "/tq", apiId: 0 },
@@ -1348,14 +1345,19 @@ function pushDataToKing(key) {
     "<b>🏖 来源位置：</b>" +
     (userMessage.message.chat.type == "private"
       ? "来自 " + "[私聊]"
-      : "<a href='" +
+      : userMessage.message.chat.hasOwnProperty("username")
+      ? "<a href='" +
         MessageUrl +
         "'>" +
         "来自" +
         (userMessage.message.chat.type == "supergroup"
           ? "[群聊] " + userMessage.message.chat.title
           : "[未知]") +
-        "</a>") +
+        "</a>"
+      : "来自" +
+        (userMessage.message.chat.type == "supergroup"
+          ? "[私人群聊] " + userMessage.message.chat.title
+          : "[未知]")) +
     "\n" +
     "<b>🛎 发送时间：</b>" +
     getNowDate() +
@@ -1664,7 +1666,7 @@ function checkSensitiveDFA(content) {
  */
 function getString(key, keyApi) {
   const apiString = key.split(keyApi)[1] || "";
-  return apiString.replace(/\s*/g, "").replace('@Xiao_MaoMao_bot',"");
+  return apiString.replace(/\s*/g, "").replace("@Xiao_MaoMao_bot", "");
 }
 /**
  * 用于api接口参数识别
