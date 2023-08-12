@@ -658,6 +658,10 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "⑥ <a href='https://t.me/xiaomaoJT/723'>【辅助脚本】彩云天气Token捕获</a>" +
         "\n" +
+        "⑦ <a href='https://t.me/xiaomaoJT/739'>【辅助脚本】小小签到Token捕获</a>" +
+        "\n" +
+        "⑧ <a href='https://t.me/xiaomaoJT/741'>【快捷指令】小小签到刷金币</a>" +
+        "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -696,6 +700,8 @@ function processReplyWord(key, useId, userJson) {
         "⑬ <a href='https://t.me/xiaomaoJT/698'>【自动任务】实时线报</a>" +
         "\n" +
         "⑭ <a href='https://t.me/xiaomaoJT/714'>【自动任务】台风监测</a>" +
+        "\n" +
+        "⑮ <a href='https://t.me/xiaomaoJT/739'>【自动任务】小小签到刷金币</a>" +
         "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
