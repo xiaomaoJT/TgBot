@@ -590,17 +590,21 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "🧲 <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/boxJS/XiaoMao.json'>XiaoMao_BoxJs辅助订阅</a>" +
         "\n" +
-        "\n" +
         "❤️‍🔥 <a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/rewrite/boxJS/XiaoMaoAutoTask.json'>XiaoMao_自动任务订阅</a>" +
         "\n" +
         "\n" +
-        "<b>XiaoMao脚本合集快速导航（点击/回复指令获取相关脚本）</b>" +
+        "<b>XiaoMao脚本合集快速导航</b>" +
+        "\n" +
+        "<b>【点击/回复】指令获取相关脚本</b>" +
+        "\n" +
         "\n" +
         "🚇【会员脚本】 /js_vip" +
         "\n" +
         "🚂【辅助脚本】 /js_ass" +
         "\n" +
         "🚁【自动任务】 /js_auto" +
+        "\n" +
+        "🚗【快捷指令】 /js_st" +
         "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -610,30 +614,34 @@ function processReplyWord(key, useId, userJson) {
     {
       keyword: ["/js_vip", "会员脚本"],
       replyWord:
-        "🚇<b>XiaoMao会员脚本合集</b>" +
+        "🚇<b>XiaoMao 【会员脚本】 合集</b>" +
         "\n" +
         "\n" +
-        "① <a href='https://t.me/xiaomaoJT/285'>【会员脚本】彩云天气Svip</a>" +
+        "① <a href='https://t.me/xiaomaoJT/285'>彩云天气Svip</a>" +
         "\n" +
-        "② <a href='https://t.me/xiaomaoJT/312'>【会员脚本】百度网盘Svip</a>" +
+        "② <a href='https://t.me/xiaomaoJT/312'>百度网盘Svip</a>" +
         "\n" +
-        "③ <a href='https://t.me/xiaomaoJT/317'>【会员脚本】黄油相机vip</a>" +
+        "③ <a href='https://t.me/xiaomaoJT/317'>黄油相机vip</a>" +
         "\n" +
-        "④ <a href='https://t.me/xiaomaoJT/319'>【会员脚本】B612相机vip</a>" +
+        "④ <a href='https://t.me/xiaomaoJT/319'>B612相机vip</a>" +
         "\n" +
-        "⑤ <a href='https://t.me/xiaomaoJT/321'>【会员脚本】WPS超级会员</a>" +
+        "⑤ <a href='https://t.me/xiaomaoJT/321'>WPS超级会员</a>" +
         "\n" +
-        "⑥ <a href='https://t.me/xiaomaoJT/326'>【会员脚本】扫描全能王至尊帐户</a>" +
+        "⑥ <a href='https://t.me/xiaomaoJT/326'>扫描全能王至尊帐户</a>" +
         "\n" +
-        "⑦ <a href='https://t.me/xiaomaoJT/340'>【会员脚本】XMind思维导图vip</a>" +
+        "⑦ <a href='https://t.me/xiaomaoJT/340'>XMind思维导图vip</a>" +
         "\n" +
-        "⑧ <a href='https://t.me/xiaomaoJT/488'>【会员脚本】今日热榜vip</a>" +
+        "⑧ <a href='https://t.me/xiaomaoJT/488'>今日热榜vip</a>" +
         "\n" +
-        "⑨ <a href='https://t.me/xiaomaoJT/497'>【会员脚本】阿里云盘Svip</a>" +
+        "⑨ <a href='https://t.me/xiaomaoJT/497'>阿里云盘Svip</a>" +
         "\n" +
-        "⑩ <a href='https://t.me/xiaomaoJT/648'>【会员脚本】NYMF Pro</a>" +
+        "⑩ <a href='https://t.me/xiaomaoJT/648'>NYMF Pro</a>" +
         "\n" +
-        "⑪ <a href='https://t.me/xiaomaoJT/693'>【会员脚本】微博</a>" +
+        "⑪ <a href='https://t.me/xiaomaoJT/693'>微博</a>" +
+        "\n" +
+        "⑫ <a href='https://t.me/xiaomaoJT/748'>电池管家Ultimate</a>" +
+        "\n" +
+        "⑬ <a href='https://t.me/xiaomaoJT/749'>Picsew专业版</a>" +
         "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -643,24 +651,20 @@ function processReplyWord(key, useId, userJson) {
     {
       keyword: ["/js_ass", "辅助脚本"],
       replyWord:
-        "🚂 <b>XiaoMao辅助脚本合集</b>" +
+        "🚂 <b>XiaoMao 【辅助脚本】 合集</b>" +
         "\n" +
         "\n" +
-        "① <a href='https://t.me/xiaomaoJT/528'>【快捷指令】XiaoMao充电助手</a>" +
+        "① <a href='https://t.me/xiaomaoJT/283'>Spotify歌词翻译</a>" +
         "\n" +
-        "② <a href='https://t.me/xiaomaoJT/283'>【辅助脚本】Spotify歌词翻译</a>" +
+        "② <a href='https://t.me/xiaomaoJT/578'>百度贴吧解禁</a>" +
         "\n" +
-        "③ <a href='https://t.me/xiaomaoJT/578'>【辅助脚本】百度贴吧解禁</a>" +
+        "③ <a href='https://t.me/xiaomaoJT/582'>酷安提链</a>" +
         "\n" +
-        "④ <a href='https://t.me/xiaomaoJT/582'>【辅助脚本】酷安提链</a>" +
+        "④ <a href='https://t.me/xiaomaoJT/16'>京东比价</a>" +
         "\n" +
-        "⑤ <a href='https://t.me/xiaomaoJT/16'>【辅助脚本】京东比价</a>" +
+        "⑤ <a href='https://t.me/xiaomaoJT/723'>彩云天气Token捕获</a>" +
         "\n" +
-        "⑥ <a href='https://t.me/xiaomaoJT/723'>【辅助脚本】彩云天气Token捕获</a>" +
-        "\n" +
-        "⑦ <a href='https://t.me/xiaomaoJT/739'>【辅助脚本】小小签到Token捕获</a>" +
-        "\n" +
-        "⑧ <a href='https://t.me/xiaomaoJT/741'>【快捷指令】小小签到刷金币</a>" +
+        "⑥ <a href='https://t.me/xiaomaoJT/739'>小小签到Token捕获</a>" +
         "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -670,41 +674,59 @@ function processReplyWord(key, useId, userJson) {
     {
       keyword: ["/js_auto", "自动任务"],
       replyWord:
-        "🚁 <b>XiaoMao自动任务脚本合集</b>" +
+        "🚁 <b>XiaoMao 【自动任务】 脚本合集</b>" +
         "\n" +
         "\n" +
-        "① <a href='https://t.me/xiaomaoJT/498'>【自动任务】二次元靓图推送</a>" +
+        "① <a href='https://t.me/xiaomaoJT/498'>二次元靓图推送</a>" +
         "\n" +
-        "② <a href='https://t.me/xiaomaoJT/499'>【自动任务】每日Bing图推送</a>" +
+        "② <a href='https://t.me/xiaomaoJT/499'>每日Bing图推送</a>" +
         "\n" +
-        "③ <a href='https://t.me/xiaomaoJT/500'>【自动任务】年度节日推送</a>" +
+        "③ <a href='https://t.me/xiaomaoJT/500'>年度节日推送</a>" +
         "\n" +
-        "④ <a href='https://t.me/xiaomaoJT/626'>【自动任务】采精车</a>" +
+        "④ <a href='https://t.me/xiaomaoJT/626'>采精车</a>" +
         "\n" +
-        "⑤ <a href='https://t.me/xiaomaoJT/639'>【自动任务】每日新闻60s</a>" +
+        "⑤ <a href='https://t.me/xiaomaoJT/639'>每日新闻60s</a>" +
         "\n" +
-        "⑥ <a href='https://t.me/xiaomaoJT/652'>【自动任务】每日油价</a>" +
+        "⑥ <a href='https://t.me/xiaomaoJT/652'>每日油价</a>" +
         "\n" +
-        "⑦ <a href='https://t.me/xiaomaoJT/667'>【自动任务】实时热榜</a>" +
+        "⑦ <a href='https://t.me/xiaomaoJT/667'>实时热榜</a>" +
         "\n" +
-        "⑧ <a href='https://t.me/xiaomaoJT/670'>【自动任务】星座运势</a>" +
+        "⑧ <a href='https://t.me/xiaomaoJT/670'>星座运势</a>" +
         "\n" +
-        "⑨ <a href='https://t.me/xiaomaoJT/671'>【自动任务】豆瓣电影</a>" +
+        "⑨ <a href='https://t.me/xiaomaoJT/671'>豆瓣电影</a>" +
         "\n" +
-        "⑩ <a href='https://t.me/xiaomaoJT/672'>【自动任务】每日新闻图片版</a>" +
+        "⑩ <a href='https://t.me/xiaomaoJT/672'>每日新闻图片版</a>" +
         "\n" +
-        "⑪ <a href='https://t.me/xiaomaoJT/673'>【自动任务】摸鱼人日历</a>" +
+        "⑪ <a href='https://t.me/xiaomaoJT/673'>摸鱼人日历</a>" +
         "\n" +
-        "⑫ <a href='https://t.me/xiaomaoJT/674'>【自动任务】职场人日历</a>" +
+        "⑫ <a href='https://t.me/xiaomaoJT/674'>职场人日历</a>" +
         "\n" +
-        "⑬ <a href='https://t.me/xiaomaoJT/698'>【自动任务】实时线报</a>" +
+        "⑬ <a href='https://t.me/xiaomaoJT/698'>实时线报</a>" +
         "\n" +
-        "⑭ <a href='https://t.me/xiaomaoJT/714'>【自动任务】台风监测</a>" +
+        "⑭ <a href='https://t.me/xiaomaoJT/714'>台风监测</a>" +
         "\n" +
-        "⑮ <a href='https://t.me/xiaomaoJT/739'>【自动任务】小小签到刷金币</a>" +
+        "⑮ <a href='https://t.me/xiaomaoJT/739'>小小签到刷金币</a>" +
         "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
+        "\n" +
+        "更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。",
+    },
+    {
+      keyword: ["/js_st", "快捷指令"],
+      replyWord:
+        "🚗 <b>XiaoMao 【快捷指令】 合集</b>" +
+        "\n" +
+        "\n" +
+        "① <a href='https://t.me/xiaomaoJT/528'>XiaoMao充电助手</a>" +
+        "\n" +
+        "② <a href='https://t.me/xiaomaoJT/741'>小小签到刷金币</a>" +
+        "\n" +
+        "③ <a href='https://t.me/xiaomaoJT/757'>举牌小人生成器</a>" +
+        "\n" +
+        "\n" +
+        "<b>🧲<a href='http://s.nfangbian.com/3Gz'>【帽教程】快捷指令脚本制作教程</a></b>" +
+        "\n" +
         "\n" +
         "更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。",
     },
