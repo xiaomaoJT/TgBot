@@ -429,7 +429,12 @@ function processReplyWord(key, useId, userJson) {
         "<a href='https://raw.githubusercontent.com/xiaomaoJT/stash/main/config/XiaoMao_Stash.yaml'>1⃣️ Stash·测试版</a>" +
         "\n" +
         "\n" +
-        "<a href='https://github.com/xiaomaoJT/QxScript/tree/main/lazy/oldConfig'>🎏 QX懒人规则历史版本</a>" +
+        "<b>Surge版本 - XiaoMao懒人规则</b>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/Surge/main/config/XiaoMao_Surge.conf'>1⃣️ Surge·Mac版</a>" +
+        "\n" +
+        "\n" +
+        "<b><a href='https://t.me/xiaomaoJT/219'>🎏 更多XiaoMao资源汇总</a></b>" +
         "\n" +
         "\n" +
         "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程，更多教程点击菜单 图文教程</a>",
@@ -454,6 +459,8 @@ function processReplyWord(key, useId, userJson) {
         "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-Forever'><b>1⃣️ XiaoMao-Forever</b></a>" +
         "\n" +
         "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-FE-Clash'><b>2⃣️ XiaoMao-Forever-Clash</b></a>" +
+        "\n" +
+        "<a href='https://gist.githubusercontent.com/xiaomaoJT/921025f761277153bebb30abde7f784f/raw/XiaoMao-FE-Surge'><b>3⃣️ XiaoMao-Forever-Surge</b></a>" +
         "\n" +
         "\n" +
         "<b>【网易云节点】</b>" +
@@ -1471,6 +1478,9 @@ function checkSensitiveDFA(content) {
   // 敏感词库
   // 内容已作加密处理base64
   let sensitiveEncodeList = [
+    "5qOL54mM",
+    "5b2p56Wo",
+    "55yf5Lq6",
     "5pON5aWz",
     "5pON5aW5",
     "5pON5LuW",
