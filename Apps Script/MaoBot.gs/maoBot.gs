@@ -714,6 +714,12 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "⑮ <a href='https://t.me/xiaomaoJT/739'>小小签到刷金币</a>" +
         "\n" +
+        "⑯ <a href='https://t.me/xiaomaoJT/780'>全国辐射监测</a>" +
+        "\n" +
+        "⑰ <a href='https://t.me/xiaomaoJT/786'>福彩查询</a>" +
+        "\n" +
+        "⑱ <a href='https://t.me/xiaomaoJT/788'>体彩查询</a>" +
+        "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
