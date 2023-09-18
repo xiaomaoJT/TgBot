@@ -322,7 +322,7 @@ function processData(userMessage) {
           text: HTML_REPLY,
           reply_to_message_id: messageReplyID,
           parse_mode: "HTML",
-          reply_markup: JSON.stringify(keyboardParams),
+          // reply_markup: JSON.stringify(keyboardParams),
           disable_web_page_preview: true,
         };
       } else {
@@ -649,6 +649,12 @@ function processReplyWord(key, useId, userJson) {
         "⑫ <a href='https://t.me/xiaomaoJT/748'>电池管家Ultimate</a>" +
         "\n" +
         "⑬ <a href='https://t.me/xiaomaoJT/749'>Picsew专业版</a>" +
+        "\n" +
+        "⑭ <a href='https://t.me/xiaomaoJT/790'>公考雷达星钻vip</a>" +
+        "\n" +
+        "⑮ <a href='https://t.me/xiaomaoJT/792'>堆糖svip</a>" +
+        "\n" +
+        "⑯ <a href='https://t.me/xiaomaoJT/794'>MyJumpLab终生用户</a>" +
         "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
