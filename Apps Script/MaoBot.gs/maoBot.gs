@@ -656,6 +656,24 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "⑯ <a href='https://t.me/xiaomaoJT/794'>MyJumpLab终生用户</a>" +
         "\n" +
+        "⑯ <a href='https://t.me/xiaomaoJT/809'>Pillow永久订阅</a>" +
+        "\n" +
+        "⑰ <a href='https://t.me/xiaomaoJT/815'>问真八字钻石vip</a>" +
+        "\n" +
+        "⑱ <a href='https://t.me/xiaomaoJT/816'>解剖大师永久会员</a>" +
+        "\n" +
+        "⑲ <a href='https://t.me/xiaomaoJT/817'>Instapaper高级用户</a>" +
+        "\n" +
+        "⑳ <a href='https://t.me/xiaomaoJT/821'>日杂相机Pro</a>" +
+        "\n" +
+        "㉑ <a href='https://t.me/xiaomaoJT/832'>谜底时钟会员</a>" +
+        "\n" +
+        "㉒ <a href='https://t.me/xiaomaoJT/834'>BHPro vip</a>" +
+        "\n" +
+        "㉓ <a href='https://t.me/xiaomaoJT/839'>目标地图Pro</a>" +
+        "\n" +
+        "㉔ <a href='https://t.me/xiaomaoJT/840'>Agenda高级版</a>" +
+        "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -726,6 +744,8 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "⑱ <a href='https://t.me/xiaomaoJT/788'>体彩查询</a>" +
         "\n" +
+        "⑲ <a href='https://t.me/xiaomaoJT/799'>今日金价</a>" +
+        "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -742,6 +762,12 @@ function processReplyWord(key, useId, userJson) {
         "② <a href='https://t.me/xiaomaoJT/741'>小小签到刷金币</a>" +
         "\n" +
         "③ <a href='https://t.me/xiaomaoJT/757'>举牌小人生成器</a>" +
+        "\n" +
+        "④ <a href='https://t.me/xiaomaoJT/830'>OCR截图识屏翻译</a>" +
+        "\n" +
+        "⑤ <a href='https://t.me/xiaomaoJT/837'>二次元靓图</a>" +
+        "\n" +
+        "⑥ <a href='https://t.me/xiaomaoJT/838'>全网热榜</a>" +
         "\n" +
         "\n" +
         "<b>🧲<a href='http://s.nfangbian.com/3Gz'>【帽教程】快捷指令脚本制作教程</a></b>" +
