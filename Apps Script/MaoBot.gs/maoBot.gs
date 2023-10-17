@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @5.0-504
+ * @4.5-504
  *
  * Google App Script
  * 用于执行tg机器人功能

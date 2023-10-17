@@ -108,7 +108,7 @@ https://docs.google.com/spreadsheets/d/XXXXXXX这一串就是表格IDXXXXXXXXXXX
 
 ```text
 1⃣️ 打开刚刚创建的Google表格，点击工具栏 扩展程序 > Apps脚本
-2⃣️ 复制maoBot.gs代码，并全部覆盖粘贴到脚本内
+2⃣️ 复制maoBot.gs代码，⚠️并全部覆盖粘贴到脚本内⚠️，请注意删除网页上自带的所有代码！
 3⃣️ 完善EXECID - 谷歌表格ID；在引号内填入自己的谷歌表格ID
 4⃣️ 完善EXECNAME - 谷歌表格 工作表名；在引号内填入自己的谷歌表格工作表名
 5⃣️ 完善BOTID - tg机器人Token；在引号内填入自己的tg机器人Token
@@ -119,6 +119,7 @@ https://docs.google.com/spreadsheets/d/XXXXXXX这一串就是表格IDXXXXXXXXXXX
 🔟点击部署，进行全部授权，全部允许（左下角小字点开，选择展开后最下面的按钮）
 1⃣️1⃣️ 部署成功后，复制web应用网址，替换下面链接，并复制到浏览器打开进行机器人激活
 1⃣️2⃣️ 完成，可以通过群聊或者私聊自己的机器人进行消息回复了，并且交互的信息将会自动存于Google表格中。
+1⃣️3⃣️ 群聊请注意授予机器人管理权限，部分功能激活请根据源码参数解析提示补充完整必要参数。
 ```
 
 ```javascript
@@ -135,6 +136,14 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 {"ok":false,"error_code":401,"description":"Unauthorized"}
 
 源码开发不易，使用引用请注明出处！遇到问题欢迎留言～
+
+请注意，以上激活状态仅代表gas WEB部署完成，并不代表可完整运行。
+
+完整功能激活请注意检查以下几点：
+1、必要参数填写完整 ⚠️
+2、私聊检测。【私聊机器人 所有能力表现完整✅】
+3、群聊内赋予机器人管理权限。
+4、google表格内容会自动填充。
 ```
 
 ------
