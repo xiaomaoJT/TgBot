@@ -674,6 +674,12 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "㉔ <a href='https://t.me/xiaomaoJT/840'>Agenda高级版</a>" +
         "\n" +
+        "㉕ <a href='https://t.me/xiaomaoJT/841'>Fin高级版</a>" +
+        "\n" +
+        "㉖ <a href='https://t.me/xiaomaoJT/844'>快对作业vip</a>" +
+        "\n" +
+        "㉗ <a href='https://t.me/xiaomaoJT/848'>DailyArt会员</a>" +
+        "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -696,6 +702,8 @@ function processReplyWord(key, useId, userJson) {
         "⑤ <a href='https://t.me/xiaomaoJT/723'>彩云天气Token捕获</a>" +
         "\n" +
         "⑥ <a href='https://t.me/xiaomaoJT/739'>小小签到Token捕获</a>" +
+        "\n" +
+        "⑦ <a href='https://t.me/xiaomaoJT/845'>言橘资源捕获</a>" +
         "\n" +
         "\n" +
         "<b>脚本都支持自定义配置喔，快去boxJs设置吧，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
