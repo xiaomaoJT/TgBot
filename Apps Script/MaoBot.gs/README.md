@@ -47,11 +47,11 @@
 
 // 使用前请注意完善以下三个参数，即可部署运行。
 // Google EXEC ID - 谷歌表格ID
-var EXECID = "";
+var EXECID = ""; // ⚠️必填⚠️
 // Google EXEC ID - 谷歌表格 工作表名
-var EXECNAME = "";
+var EXECNAME = "";// ⚠️必填⚠️
 // Telegram BOT ID - tg机器人Token
-var BOTID = "";
+var BOTID = "";// ⚠️必填⚠️
 
 
 
@@ -60,7 +60,7 @@ var BOTID = "";
 //  ==== 选填参数 - 个性化功能项 ====
 
 // 用于推送主人消息 取主人tg id - 私人消息主动功能必须填写此项
-var KingId = "";
+var KingId = ""; // ⚠️建议填写，留空影响推送⚠️
 // 1 全部类型
 // 2 群聊 + 私聊类型
 // 3 私聊类型
@@ -71,7 +71,7 @@ var KingType = 1;
 // 0 仅推送基础消息
 var KingInfo = 1;
 //填写 bot id 用于识别引用消息
-var botIdAlone = "";
+var botIdAlone = ""; // ⚠️建议填写，留空影响引用类型消息⚠️
 // 用于过滤需要排除捕捉的群组信息
 // 请填入群组id,多个用,间隔 如 ['22222','11111]
 var forGotList = [];
