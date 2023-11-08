@@ -54,9 +54,7 @@ var responseTime = "";
 // 用于承接返回数据
 var dealMessage = {};
 
-
 // ------------------------- 核心调用函数 -----------------
-
 
 /**
  * 用于接收用户传来的讯息JSON
@@ -122,7 +120,6 @@ function doPost(e) {
   }
 }
 
-
 /**
  * 用于处理用户信息并进行回复
  * @param {*} userMessage
@@ -135,11 +132,7 @@ function processData(userMessage) {
   let followKeyboard = [
     [{ text: "懒人配置" }, { text: "免费节点" }, { text: "订阅转换" }],
     [{ text: "图文教程" }, { text: "脚本合集" }, { text: "广告拦截" }],
-    [
-      { text: "接口查询" },
-      { text: "资源仓库" },
-      { text: "电报解禁" },
-    ],
+    [{ text: "接口查询" }, { text: "资源仓库" }, { text: "电报解禁" }],
   ];
   // 定义在线内联键盘
   let followMessageKeyboard = [
@@ -371,7 +364,8 @@ function processData(userMessage) {
       }
 
       if (
-        userMessage.message.text == "微信公众号『小帽集团』" ||userMessage.message.text == "资源仓库" ||
+        userMessage.message.text == "微信公众号『小帽集团』" ||
+        userMessage.message.text == "资源仓库" ||
         userMessage.message.text.indexOf("Mao") != -1
       ) {
         payloadPostData.reply_markup = JSON.stringify(keyboardFollowParams);
@@ -407,13 +401,9 @@ function processReplyWord(key, useId, userJson) {
       replyWord:
         "<b>iPhone/iPad设备 - XiaoMao懒人规则</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/general/QX_XiaoMao_CN.conf'>1⃣️ 通用版本·中文版·XiaoMao推荐</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/general/QX_XiaoMao_CN.conf'>1⃣️ 通用版本·XiaoMao推荐</a>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/custom/QX_XiaoMao_CN.conf'>2⃣️ 自定义版·中文版</a>" +
-        "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/general/QX_XiaoMao.conf'>3⃣️ 通用版本·英文版</a>" +
-        "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/custom/QX_XiaoMao.conf'>4⃣️ 自定义版·英文版</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/QxScript/main/lazy/iOS/custom/QX_XiaoMao_CN.conf'>2⃣️ 自定义版</a>" +
         "\n" +
         "\n" +
         "<b>Mac M芯片设备 - XiaoMao懒人规则</b>" +
@@ -540,59 +530,38 @@ function processReplyWord(key, useId, userJson) {
         "🌈 <a href='http://s.nfangbian.com/3wo'><b>XiaoMao推文合集</b></a>" +
         "\n" +
         "\n" +
-        "<b>1⃣️ 入门篇</b>" +
-        "\n" +
-        "<a href='http://s.nfangbian.com/3wp'><b>下载、认识QX、上手使用</b></a>" +
+        "<a href='http://s.nfangbian.com/3wp'><b>⒈ 入门：QX上手</b></a>" +
         "\n" +
         "\n" +
-        "<b>2⃣️ 进阶篇一</b>" +
-        "\n" +
-        "<a href='http://s.nfangbian.com/3wq'><b>配置General、DNS、Policy策略组教程</b></a>" +
+        "<a href='http://s.nfangbian.com/3wq'><b>⒉ 进阶：QX配置</b></a>" +
         "\n" +
         "\n" +
-        "<b>3⃣️ 进阶篇二</b>" +
-        "\n" +
-        "<a href='http://s.nfangbian.com/3wr'><b>配置分流教程</b></a>" +
+        "<a href='http://s.nfangbian.com/3wr'><b>⒊ 进阶：QX分流</b></a>" +
         "\n" +
         "\n" +
-        "<b>4⃣️ 进阶篇三</b>" +
-        "\n" +
-        "<a href='http://s.nfangbian.com/3ws'><b>配置重写教程</b></a>" +
+        "<a href='http://s.nfangbian.com/3ws'><b>⒋ 进阶：QX重写</b></a>" +
         "\n" +
         "\n" +
-        "<b>5⃣️ 番外篇</b>" +
-        "\n" +
-        "<a href='http://s.nfangbian.com/3wt'><b>配置BoxJs、SubStore教程</b></a>" +
+        "<a href='http://s.nfangbian.com/3wt'><b>⒌ 番外：BoxJs和SubStore</b></a>" +
         "\n" +
         "\n" +
-        "<b>6⃣️ 高阶篇一</b>" +
-        "\n" +
-        "<a href='https://mp.weixin.qq.com/s/8c-tn6OaSGCVXUo2DIWiww'><b>Task脚本制作教程</b></a>" +
+        "<a href='https://mp.weixin.qq.com/s/8c-tn6OaSGCVXUo2DIWiww'><b>⒍ 高阶：Task脚本制作</b></a>" +
         "\n" +
         "\n" +
-        "<b>7⃣️ 高阶篇二</b>" +
+        "<a href='https://mp.weixin.qq.com/s/B_zMFU6vsAeE_IKyLXddtA'><b>⒎ 高阶：广告拦截</b></a>" +
         "\n" +
-        "<a href='https://mp.weixin.qq.com/s/B_zMFU6vsAeE_IKyLXddtA'><b>广告拦截教程</b></a>" +
+        "\n" +
+        "<a href='https://t.me/xiaomaoJT/876'><b>⒏ 高阶：会员恢复购买</b></a>" +
         "\n" +
         "\n" +
         "\n" +
-        "<b>8⃣️ Clash篇_XMC</b>" +
+        "<b>⒐ 其它</b>" +
         "\n" +
-        "<a href='http://s.nfangbian.com/2Ru'><b>Clash自定义配置教程 For XiaoMaoClash</b></a>" +
+        "🥎 <a href='http://s.nfangbian.com/2Ru'><b>Clash配置</b></a>" +
         "\n" +
+        "🥎 <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'><b>Tg机器人搭建</b></a>" +
         "\n" +
-        "\n" +
-        "<b>9⃣️ Tg机器人篇_TgBot</b>" +
-        "\n" +
-        "<a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'><b>Tg机器人免费搭建教程</b></a>" +
-        "\n" +
-        "\n" +
-        "\n" +
-        "<b>🔟 其它教程</b>" +
-        "\n" +
-        "🥎 <a href='https://github.com/xiaomaoJT/clash'><b>XiaoMao_Clash版本配置教程及软件下载</b></a>" +
-        "\n" +
-        "🧿 <a href='http://s.nfangbian.com/2P8'><b>QX本地脚本使用教程</b></a>" +
+        "🥎 <a href='http://s.nfangbian.com/2P8'><b>QX本地脚本使用教程</b></a>" +
         "\n" +
         "\n" +
         "<b>欢迎点赞评论，感谢支持！</b>",
@@ -632,71 +601,109 @@ function processReplyWord(key, useId, userJson) {
         "🚇<b>XiaoMao 【会员脚本】 合集</b>" +
         "\n" +
         "\n" +
-        "① <a href='https://t.me/XiaoMaoScript/7'>「彩云天气」</a>" +
+        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/7'>「彩云天气/彩云天气Pro」</a>" +
         "\n" +
-        "② <a href='https://t.me/XiaoMaoScript/8'>「百度网盘」</a>" +
+        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/8'>「百度网盘」</a>" +
         "\n" +
-        "③ <a href='https://t.me/XiaoMaoScript/9'>「黄油相机」</a>" +
+        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/9'>「黄油相机」</a>" +
         "\n" +
-        "④ <a href='https://t.me/XiaoMaoScript/10'>「B612咔叽」</a>" +
+        "𝟘𝟜 <a href='https://t.me/XiaoMaoScript/10'>「B612咔叽」</a>" +
         "\n" +
-        "⑤ <a href='https://t.me/XiaoMaoScript/11'>「WPS」</a>" +
+        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/11'>「WPS」</a>" +
         "\n" +
-        "⑥ <a href='https://t.me/XiaoMaoScript/12'>「扫描全能王」</a>" +
+        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/12'>「扫描全能王」</a>" +
         "\n" +
-        "⑦ <a href='https://t.me/XiaoMaoScript/13'>「Xmind」</a>" +
+        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/13'>「Xmind」</a>" +
         "\n" +
-        "⑧ <a href='https://t.me/XiaoMaoScript/14'>「今日热榜」</a>" +
+        "𝟘𝟠 <a href='https://t.me/XiaoMaoScript/14'>「今日热榜」</a>" +
         "\n" +
-        "⑨ <a href='https://t.me/XiaoMaoScript/15'>「阿里云盘」</a>" +
+        "𝟘𝟡 <a href='https://t.me/XiaoMaoScript/15'>「阿里云盘」</a>" +
         "\n" +
-        "⑩ <a href='https://t.me/XiaoMaoScript/16'>「NYMF」</a>" +
+        "𝟙𝟘 <a href='https://t.me/XiaoMaoScript/16'>「NYMF」</a>" +
         "\n" +
-        "⑪ <a href='https://t.me/XiaoMaoScript/17'>「微博/微博轻享版」</a>" +
+        "𝟙𝟙 <a href='https://t.me/XiaoMaoScript/17'>「微博/微博轻享版」</a>" +
         "\n" +
-        "⑫ <a href='https://t.me/XiaoMaoScript/18'>「AllMyBatteries」</a>" +
+        "𝟙𝟚 <a href='https://t.me/XiaoMaoScript/18'>「AllMyBatteries」</a>" +
         "\n" +
-        "⑬ <a href='https://t.me/XiaoMaoScript/19'>「Picsew专业版」</a>" +
+        "𝟙𝟛 <a href='https://t.me/XiaoMaoScript/19'>「Picsew专业版」</a>" +
         "\n" +
-        "⑭ <a href='https://t.me/XiaoMaoScript/20'>「公考雷达」</a>" +
+        "𝟙𝟜 <a href='https://t.me/XiaoMaoScript/20'>「公考雷达」</a>" +
         "\n" +
-        "⑮ <a href='https://t.me/XiaoMaoScript/21'>「堆糖」</a>" +
+        "𝟙𝟝 <a href='https://t.me/XiaoMaoScript/21'>「堆糖」</a>" +
         "\n" +
-        "⑯ <a href='https://t.me/XiaoMaoScript/22'>「MyJumpLab」</a>" +
+        "𝟙𝟞 <a href='https://t.me/XiaoMaoScript/22'>「MyJumpLab」</a>" +
         "\n" +
-        "⑯ <a href='https://t.me/XiaoMaoScript/23'>「Pillow」</a>" +
+        "𝟙𝟟 <a href='https://t.me/XiaoMaoScript/23'>「Pillow」</a>" +
         "\n" +
-        "⑰ <a href='https://t.me/XiaoMaoScript/24'>「问真八字」</a>" +
+        "𝟙𝟠 <a href='https://t.me/XiaoMaoScript/24'>「问真八字」</a>" +
         "\n" +
-        "⑱ <a href='https://t.me/XiaoMaoScript/25'>「解剖大师」</a>" +
+        "𝟙𝟡 <a href='https://t.me/XiaoMaoScript/25'>「解剖大师」</a>" +
         "\n" +
-        "⑲ <a href='https://t.me/XiaoMaoScript/26'>「Instapaper」</a>" +
+        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/26'>「Instapaper」</a>" +
         "\n" +
-        "⑳ <a href='https://t.me/XiaoMaoScript/27'>「日杂相机」</a>" +
+        "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/27'>「日杂相机」</a>" +
         "\n" +
-        "㉑ <a href='https://t.me/XiaoMaoScript/28'>「谜底时钟」</a>" +
+        "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/28'>「谜底时钟」</a>" +
         "\n" +
-        "㉒ <a href='https://t.me/XiaoMaoScript/29'>「BHPro」</a>" +
+        "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/29'>「BHPro」</a>" +
         "\n" +
-        "㉓ <a href='https://t.me/XiaoMaoScript/30'>「目标地图」</a>" +
+        "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/30'>「目标地图」</a>" +
         "\n" +
-        "㉔ <a href='https://t.me/XiaoMaoScript/31'>「Agenda」</a>" +
+        "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/31'>「Agenda」</a>" +
         "\n" +
-        "㉕ <a href='https://t.me/XiaoMaoScript/32'>「Fin」</a>" +
+        "𝟚𝟞 <a href='https://t.me/XiaoMaoScript/32'>「Fin」</a>" +
         "\n" +
-        "㉖ <a href='https://t.me/XiaoMaoScript/33'>「快对」</a>" +
+        "𝟚𝟟 <a href='https://t.me/XiaoMaoScript/33'>「快对」</a>" +
         "\n" +
-        "㉗ <a href='https://t.me/XiaoMaoScript/34'>「DailyArt」</a>" +
+        "𝟚𝟠 <a href='https://t.me/XiaoMaoScript/34'>「DailyArt」</a>" +
         "\n" +
-        "㉘ <a href='https://t.me/XiaoMaoScript/35'>「Alarmy」</a>" +
+        "𝟚𝟡 <a href='https://t.me/XiaoMaoScript/35'>「Alarmy」</a>" +
         "\n" +
-        "㉙ <a href='https://t.me/XiaoMaoScript/36'>「1Blocker」</a>" +
+        "𝟛𝟘 <a href='https://t.me/XiaoMaoScript/36'>「1Blocker」</a>" +
         "\n" +
-        "㉚ <a href='https://t.me/XiaoMaoScript/37'>「SleepCycle」</a>" +
+        "𝟛𝟙 <a href='https://t.me/XiaoMaoScript/37'>「SleepCycle」</a>" +
         "\n" +
-        "㉛ <a href='https://t.me/XiaoMaoScript/38'>「幻休」</a>" +
+        "𝟛𝟚 <a href='https://t.me/XiaoMaoScript/38'>「幻休」</a>" +
         "\n" +
-        "㉜ <a href='https://t.me/XiaoMaoScript/39'>「小睡眠」</a>" +
+        "𝟛𝟛 <a href='https://t.me/XiaoMaoScript/39'>「小睡眠」</a>" +
+        "\n" +
+        "𝟛𝟜 <a href='https://t.me/XiaoMaoScript/71'>「和讯财经」</a>" +
+        "\n" +
+        "𝟛𝟝 <a href='https://t.me/XiaoMaoScript/72'>「EF Hello」</a>" +
+        "\n" +
+        "𝟛𝟞 <a href='https://t.me/XiaoMaoScript/73'>「Drops」</a>" +
+        "\n" +
+        "𝟛𝟟 <a href='https://t.me/XiaoMaoScript/75'>「Mix」</a>" +
+        "\n" +
+        "𝟛𝟠 <a href='https://t.me/XiaoMaoScript/77'>「海豚记账本」</a>" +
+        "\n" +
+        "𝟛𝟡 <a href='https://t.me/XiaoMaoScript/78'>「MoneyThings」</a>" +
+        "\n" +
+        "𝟜𝟘 <a href='https://t.me/XiaoMaoScript/79'>「Noted」</a>" +
+        "\n" +
+        "𝟜𝟙 <a href='https://t.me/XiaoMaoScript/80'>「Pandora」</a>" +
+        "\n" +
+        "𝟜𝟚 <a href='https://t.me/XiaoMaoScript/81'>「Aphrodite」</a>" +
+        "\n" +
+        "𝟜𝟛 <a href='https://t.me/XiaoMaoScript/82'>「Apollo」</a>" +
+        "\n" +
+        "𝟜𝟜 <a href='https://t.me/XiaoMaoScript/83'>「WidgetArt」</a>" +
+        "\n" +
+        "𝟜𝟝 <a href='https://t.me/XiaoMaoScript/83'>「Hermes」</a>" +
+        "\n" +
+        "𝟜𝟞 <a href='https://t.me/XiaoMaoScript/86'>「PureLibro」</a>" +
+        "\n" +
+        "𝟜𝟟 <a href='https://t.me/XiaoMaoScript/87'>「Pure记账」</a>" +
+        "\n" +
+        "𝟜𝟠 <a href='https://t.me/XiaoMaoScript/88'>「ProKnockOut」</a>" +
+        "\n" +
+        "𝟜𝟡 <a href='https://t.me/XiaoMaoScript/89'>「ChatAI」</a>" +
+        "\n" +
+        "𝟝𝟘 <a href='https://t.me/XiaoMaoScript/90'>「Not Boring系列」</a>" +
+        "\n" +
+        "𝟝𝟙 <a href='https://t.me/XiaoMaoScript/91'>「我的时间」</a>" +
+        "\n" +
+        "𝟝𝟚 <a href='https://t.me/XiaoMaoScript/92'>「VSCO」</a>" +
         "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -709,19 +716,19 @@ function processReplyWord(key, useId, userJson) {
         "🚂 <b>XiaoMao 【辅助脚本】 合集</b>" +
         "\n" +
         "\n" +
-        "① <a href='https://t.me/XiaoMaoScript/40'>「Spotify歌词翻译」</a>" +
+        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/40'>「Spotify歌词翻译」</a>" +
         "\n" +
-        "② <a href='https://t.me/XiaoMaoScript/41'>「百度贴吧源址捕获」</a>" +
+        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/41'>「百度贴吧源址捕获」</a>" +
         "\n" +
-        "③ <a href='https://t.me/XiaoMaoScript/42'>「酷安源址捕获」</a>" +
+        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/42'>「酷安源址捕获」</a>" +
         "\n" +
-        "④ <a href='https://t.me/xiaomaoJT/16'>「京东比价」</a>" +
+        "𝟘𝟜 <a href='https://t.me/xiaomaoJT/16'>「京东比价」</a>" +
         "\n" +
-        "⑤ <a href='https://t.me/XiaoMaoScript/7'>「彩云天气Token捕获」</a>" +
+        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/7'>「彩云天气Token捕获」</a>" +
         "\n" +
-        "⑥ <a href='https://t.me/XiaoMaoScript/43'>「小小签到Token捕获」</a>" +
+        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/43'>「小小签到Token捕获」</a>" +
         "\n" +
-        "⑦ <a href='https://t.me/XiaoMaoScript/44'>「言橘资源捕获」</a>" +
+        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/44'>「言橘资源捕获」</a>" +
         "\n" +
         "\n" +
         "<b>辅助脚本定义为能力提升与净化，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -734,43 +741,45 @@ function processReplyWord(key, useId, userJson) {
         "🚁 <b>XiaoMao 【自动任务】 脚本合集</b>" +
         "\n" +
         "\n" +
-        "① <a href='https://t.me/XiaoMaoScript/48'>「二次元图片」</a>" +
+        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/48'>「二次元图片」</a>" +
         "\n" +
-        "② <a href='https://t.me/XiaoMaoScript/49'>「每日BING图」</a>" +
+        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/49'>「每日BING图」</a>" +
         "\n" +
-        "③ <a href='https://t.me/XiaoMaoScript/50'>「年度节日」</a>" +
+        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/50'>「年度节日」</a>" +
         "\n" +
-        "④ <a href='https://t.me/XiaoMaoScript/51'>「采精车」</a>" +
+        "𝟘𝟜 <a href='https://t.me/XiaoMaoScript/51'>「采精车」</a>" +
         "\n" +
-        "⑤ <a href='https://t.me/XiaoMaoScript/52'>「每日新闻60s·文字版」</a>" +
+        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/52'>「每日新闻60s·文字版」</a>" +
         "\n" +
-        "⑥ <a href='https://t.me/XiaoMaoScript/53'>「每日油价」</a>" +
+        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/53'>「每日油价」</a>" +
         "\n" +
-        "⑦ <a href='https://t.me/XiaoMaoScript/54'>「实时热榜」</a>" +
+        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/54'>「实时热榜」</a>" +
         "\n" +
-        "⑧ <a href='https://t.me/XiaoMaoScript/55'>「星座运势」</a>" +
+        "𝟘𝟠 <a href='https://t.me/XiaoMaoScript/55'>「星座运势」</a>" +
         "\n" +
-        "⑨ <a href='https://t.me/XiaoMaoScript/56'>「豆瓣电影」</a>" +
+        "𝟘𝟡 <a href='https://t.me/XiaoMaoScript/56'>「豆瓣电影」</a>" +
         "\n" +
-        "⑩ <a href='https://t.me/XiaoMaoScript/57'>「每日新闻60s·图片版」</a>" +
+        "𝟙𝟘 <a href='https://t.me/XiaoMaoScript/57'>「每日新闻60s·图片版」</a>" +
         "\n" +
-        "⑪ <a href='https://t.me/XiaoMaoScript/58'>「摸鱼人日历」</a>" +
+        "𝟙𝟙 <a href='https://t.me/XiaoMaoScript/58'>「摸鱼人日历」</a>" +
         "\n" +
-        "⑫ <a href='https://t.me/XiaoMaoScript/59'>「职场人日历」</a>" +
+        "𝟙𝟚 <a href='https://t.me/XiaoMaoScript/59'>「职场人日历」</a>" +
         "\n" +
-        "⑬ <a href='https://t.me/XiaoMaoScript/60'>「实时线报」</a>" +
+        "𝟙𝟛 <a href='https://t.me/XiaoMaoScript/60'>「实时线报」</a>" +
         "\n" +
-        "⑭ <a href='https://t.me/XiaoMaoScript/61'>「台风监测」</a>" +
+        "𝟙𝟜 <a href='https://t.me/XiaoMaoScript/61'>「台风监测」</a>" +
         "\n" +
-        "⑮ <a href='https://t.me/XiaoMaoScript/43'>「小小签到刷金币」</a>" +
+        "𝟙𝟝 <a href='https://t.me/XiaoMaoScript/43'>「小小签到刷金币」</a>" +
         "\n" +
-        "⑯ <a href='https://t.me/XiaoMaoScript/62'>「全国辐射监测」</a>" +
+        "𝟙𝟞 <a href='https://t.me/XiaoMaoScript/62'>「全国辐射监测」</a>" +
         "\n" +
-        "⑰ <a href='https://t.me/XiaoMaoScript/63'>「福彩查询」</a>" +
+        "𝟙𝟟 <a href='https://t.me/XiaoMaoScript/63'>「福彩查询」</a>" +
         "\n" +
-        "⑱ <a href='https://t.me/XiaoMaoScript/64'>「体彩查询」</a>" +
+        "𝟙𝟠 <a href='https://t.me/XiaoMaoScript/64'>「体彩查询」</a>" +
         "\n" +
-        "⑲ <a href='https://t.me/XiaoMaoScript/65'>「今日金价」</a>" +
+        "𝟙𝟡 <a href='https://t.me/XiaoMaoScript/65'>「今日金价」</a>" +
+        "\n" +
+        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/85'>「每日一言」</a>" +
         "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -783,17 +792,17 @@ function processReplyWord(key, useId, userJson) {
         "🚗 <b>XiaoMao 【快捷指令】 合集</b>" +
         "\n" +
         "\n" +
-        "① <a href='https://t.me/XiaoMaoScript/66'>「XiaoMao充电助手」</a>" +
+        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/66'>「XiaoMao充电助手」</a>" +
         "\n" +
-        "② <a href='https://t.me/XiaoMaoScript/43'>「小小签到刷金币」</a>" +
+        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/43'>「小小签到刷金币」</a>" +
         "\n" +
-        "③ <a href='https://t.me/XiaoMaoScript/67'>「举牌小人生成器」</a>" +
+        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/67'>「举牌小人生成器」</a>" +
         "\n" +
-        "④ <a href='https://t.me/XiaoMaoScript/68'>「OCR截图识屏翻译」</a>" +
+        "𝟘𝟜 <a href='https://t.me/XiaoMaoScript/68'>「OCR截图识屏翻译」</a>" +
         "\n" +
-        "⑤ <a href='https://t.me/XiaoMaoScript/48'>「二次元图片」</a>" +
+        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/48'>「二次元图片」</a>" +
         "\n" +
-        "⑥ <a href='https://t.me/XiaoMaoScript/54'>「全网热榜」</a>" +
+        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/54'>「全网热榜」</a>" +
         "\n" +
         "\n" +
         "<b>🧲<a href='http://s.nfangbian.com/3Gz'>【帽教程】快捷指令脚本制作教程</a></b>" +
@@ -1358,7 +1367,6 @@ function processReplyWord(key, useId, userJson) {
   return returnHtmlReply;
 }
 
-
 /**
  * 解除封禁用户
  * @param userJson
@@ -1472,7 +1480,6 @@ function getUnBanUser(userJson) {
     }
   }
 }
-
 
 /**
  * 封禁用户
@@ -2235,7 +2242,7 @@ function checkSensitiveDFA(content) {
  */
 function getString(key, keyApi) {
   const apiString = key.split(keyApi)[1] || "";
-  return apiString.replace(/\s*/g, "").replace('@Xiao_MaoMao_bot',"");
+  return apiString.replace(/\s*/g, "").replace("@Xiao_MaoMao_bot", "");
 }
 /**
  * 用于api接口参数识别
@@ -2311,9 +2318,9 @@ function getMiSport(step) {
   try {
     responseStep = UrlFetchApp.fetch(
       "https://apis.jxcxin.cn/api/mi?user=" +
-      step +
-      "&times=" +
-      new Date().getTime(),
+        step +
+        "&times=" +
+        new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
@@ -2327,13 +2334,13 @@ function getMiSport(step) {
       (jsonData.code != 200
         ? jsonData.msg
         : jsonData.msg +
-        "\n" +
-        "\n" +
-        "刷步账号：" +
-        jsonData.user +
-        "\n" +
-        "当前步数" +
-        jsonData.step) +
+          "\n" +
+          "\n" +
+          "刷步账号：" +
+          jsonData.user +
+          "\n" +
+          "当前步数" +
+          jsonData.step) +
       "\n";
   } catch (e) {
     return returnText;
@@ -2353,9 +2360,9 @@ function getLanLink(link) {
   try {
     responseLink = UrlFetchApp.fetch(
       "https://apis.jxcxin.cn/api/lanzou?url=" +
-      link +
-      "&times=" +
-      new Date().getTime(),
+        link +
+        "&times=" +
+        new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
@@ -2369,22 +2376,22 @@ function getLanLink(link) {
       (jsonData.code != 200
         ? jsonData.msg
         : jsonData.msg +
-        "\n" +
-        "\n" +
-        "资源名称：" +
-        jsonData.data.name +
-        "\n" +
-        "资源作者：" +
-        jsonData.data.author +
-        "\n" +
-        "资源大小：" +
-        jsonData.data.size +
-        "\n" +
-        "资源描述：" +
-        jsonData.data.describe +
-        "\n" +
-        "资源直链地址：" +
-        jsonData.data.url) +
+          "\n" +
+          "\n" +
+          "资源名称：" +
+          jsonData.data.name +
+          "\n" +
+          "资源作者：" +
+          jsonData.data.author +
+          "\n" +
+          "资源大小：" +
+          jsonData.data.size +
+          "\n" +
+          "资源描述：" +
+          jsonData.data.describe +
+          "\n" +
+          "资源直链地址：" +
+          jsonData.data.url) +
       "\n";
   } catch (e) {
     return returnText;
@@ -2409,9 +2416,9 @@ function getChatBot(word) {
   try {
     responseHelloBot = UrlFetchApp.fetch(
       "https://v1.apigpt.cn/?q=" +
-      word +
-      "&apitype=sql&times=" +
-      new Date().getTime(),
+        word +
+        "&apitype=sql&times=" +
+        new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
@@ -2451,9 +2458,9 @@ function getHelloBot(word) {
   try {
     responseHelloBot = UrlFetchApp.fetch(
       "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" +
-      word +
-      "&times=" +
-      new Date().getTime(),
+        word +
+        "&times=" +
+        new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
@@ -2501,12 +2508,9 @@ function getDuJiTang() {
     "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
 
   try {
-    responseDuJiTang = UrlFetchApp.fetch(
-      "https://api.btstu.cn/yan/api.php",
-      {
-        muteHttpExceptions: true,
-      }
-    );
+    responseDuJiTang = UrlFetchApp.fetch("https://api.btstu.cn/yan/api.php", {
+      muteHttpExceptions: true,
+    });
 
     returnText =
       "<b>以下数据来自博天，由XiaoMao加工：</b>" +
@@ -2558,7 +2562,7 @@ function getYiYan() {
   try {
     responseYiYan = UrlFetchApp.fetch(
       "https://apis.jxcxin.cn/api/yiyan?type=json&times=" +
-      new Date().getTime(),
+        new Date().getTime(),
       {
         muteHttpExceptions: true,
         followRedirects: true,
@@ -2597,10 +2601,10 @@ function getPhoneWhere(phone) {
   try {
     responsePhone = UrlFetchApp.fetch(
       "https://www.mxnzp.com/api/mobile_location/aim_mobile?mobile=" +
-      phone +
-      "&app_id=rgihdrm0kslojqvm&app_secret=WnhrK251TWlUUThqaVFWbG5OeGQwdz09" +
-      "&times=" +
-      new Date().getTime(),
+        phone +
+        "&app_id=rgihdrm0kslojqvm&app_secret=WnhrK251TWlUUThqaVFWbG5OeGQwdz09" +
+        "&times=" +
+        new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
@@ -2733,9 +2737,9 @@ function getWeatherApi(location) {
   try {
     responseWeather = UrlFetchApp.fetch(
       "https://query.asilu.com/weather/baidu/?city=" +
-      location +
-      "&times=" +
-      new Date().getTime(),
+        location +
+        "&times=" +
+        new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
@@ -3015,8 +3019,8 @@ function getHotList(type) {
 
 /**
  * 星座运势
- * @param type 
- * @returns 
+ * @param type
+ * @returns
  */
 function getHoroscopeList(type) {
   let responseText = null;
@@ -3327,7 +3331,6 @@ function getDouBan(params) {
   return returnText;
 }
 
-
 // ------------------------- 核心存储函数 -----------------
 
 /**
@@ -3365,16 +3368,16 @@ function setStorage(MESSAGE, TYPE) {
     let messageInfoType = MESSAGE.message.hasOwnProperty("text")
       ? "[文本消息]"
       : MESSAGE.message.hasOwnProperty("sticker")
-        ? "[表情消息]"
-        : MESSAGE.message.hasOwnProperty("photo")
-          ? "[图片消息]"
-          : MESSAGE.message.hasOwnProperty("video")
-            ? "[视频消息]"
-            : MESSAGE.message.hasOwnProperty("document")
-              ? "[文件消息]"
-              : MESSAGE.message.hasOwnProperty("voice")
-                ? "[音频消息]"
-                : "[未知消息类型]";
+      ? "[表情消息]"
+      : MESSAGE.message.hasOwnProperty("photo")
+      ? "[图片消息]"
+      : MESSAGE.message.hasOwnProperty("video")
+      ? "[视频消息]"
+      : MESSAGE.message.hasOwnProperty("document")
+      ? "[文件消息]"
+      : MESSAGE.message.hasOwnProperty("voice")
+      ? "[音频消息]"
+      : "[未知消息类型]";
 
     messageContent =
       messageInfoType +
@@ -3388,8 +3391,8 @@ function setStorage(MESSAGE, TYPE) {
       (MESSAGE.message.chat.type == "supergroup"
         ? "群聊消息"
         : MESSAGE.message.chat.type == "private"
-          ? "私聊消息"
-          : "未知渠道") +
+        ? "私聊消息"
+        : "未知渠道") +
       ")";
 
     messageSourceID = MESSAGE.message.chat.id.toString();
@@ -3399,8 +3402,8 @@ function setStorage(MESSAGE, TYPE) {
     TYPE == "POSTDATA"
       ? "主动发起"
       : TYPE == "CALLBACK"
-        ? "键盘回调"
-        : "--自动回复";
+      ? "键盘回调"
+      : "--自动回复";
 
   let spreadSheet = SpreadsheetApp.openById(EXECID);
   let Sheet = spreadSheet.getSheetByName(EXECNAME);
@@ -3504,7 +3507,7 @@ function getUnixTime(t = "") {
   // 获取N分钟后的时间
   function getGoneMinutes(params = 0) {
     let date = new Date();
-    let min = date.getMinutes()+1;
+    let min = date.getMinutes() + 1;
     date.setMinutes(min + params);
     let y = date.getFullYear();
     let m =
@@ -3537,4 +3540,3 @@ function getUnixTime(t = "") {
     return Math.floor(new Date(result).getTime() / 1000);
   }
 }
-
