@@ -91,10 +91,25 @@ function doPost(e) {
 
   //回调响应逻辑
   let payload = processData(userMessage);
-  let data = {
-    method: "post",
-    payload: payload,
-  };
+  let data = null;
+  let payloadStatus = payload instanceof Array;
+  if (payloadStatus) {
+    data = [
+      {
+        method: "post",
+        payload: payload[0],
+      },
+      {
+        method: "post",
+        payload: payload[1],
+      },
+    ];
+  } else {
+    data = {
+      method: "post",
+      payload: payload,
+    };
+  }
 
   // 分析文字消息是否包含关键字 未包含将不做匹配
   let htmlReplyState = true;
@@ -115,8 +130,15 @@ function doPost(e) {
     (userMessage.message.hasOwnProperty("entities") &&
       userMessage.message.entities[0].type == "bold")
   ) {
-    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
-    setStorage(data, "MESSAGEBACK");
+    if (payloadStatus) {
+      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data[0]);
+      setStorage(data[0], "MESSAGEBACK");
+      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data[1]);
+      setStorage(data[1], "MESSAGEBACK");
+    } else {
+      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+      setStorage(data, "MESSAGEBACK");
+    }
   }
 }
 
@@ -150,9 +172,10 @@ function processData(userMessage) {
   // 定义底部键盘
   let keyboardParams = {
     keyboard: followKeyboard,
-    resize_keyboard: true,
-    one_time_keyboard: true,
-    selective: false,
+    resize_keyboard: true, //自动调整比例
+    one_time_keyboard: true, // 是否一次性
+    is_persistent: true, // 是否一直存在
+    selective: true, // 是否对特定用户展示
   };
   // 定义在线回复消息键盘选项
   let keyboardFollowParams = {
@@ -183,9 +206,9 @@ function processData(userMessage) {
     chat_id: messageUserID,
     text:
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      "\n" +
-      "🪬 本次响应延迟(/delay)：" +
-      getRelayTime(responseTime) +
+      // "\n" +
+      // "🪬 本次响应延迟(/delay)：" +
+      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>呜呜呜，此类型 " +
@@ -220,9 +243,9 @@ function processData(userMessage) {
 
       let callbackText =
         "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-        "\n" +
-        "🪬 本次响应延迟(/delay)：" +
-        getRelayTime(responseTime) +
+        // "\n" +
+        // "🪬 本次响应延迟(/delay)：" +
+        // getRelayTime(responseTime) +
         "\n" +
         "\n" +
         "<b>✅微信公众号『小帽集团』，欢迎您的关注！记得点赞收藏哟～</b>" +
@@ -236,7 +259,7 @@ function processData(userMessage) {
         chat_id: callbackChatID,
         text: callbackText,
         parse_mode: "HTML",
-        // reply_markup: JSON.stringify(keyboardFollowParams),
+        reply_markup: JSON.stringify(keyboardFollowParams),
       };
     }
     payload = payloadCallback;
@@ -266,9 +289,9 @@ function processData(userMessage) {
 
     let welcomeMessage =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      "\n" +
-      "🪬 本次响应延迟(/delay)：" +
-      getRelayTime(responseTime) +
+      // "\n" +
+      // "🪬 本次响应延迟(/delay)：" +
+      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>👏👏👏 热烈欢迎小伙伴 </b> " +
@@ -277,9 +300,9 @@ function processData(userMessage) {
 
     let leftMessage =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      "\n" +
-      "🪬 本次响应延迟(/delay)：" +
-      getRelayTime(responseTime) +
+      // "\n" +
+      // "🪬 本次响应延迟(/delay)：" +
+      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>😩😩😩 幺儿啊 </b> " +
@@ -307,9 +330,9 @@ function processData(userMessage) {
         let HTML_REPLY =
           dealMessage.htmlReply == "getTgId"
             ? "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-              "\n" +
-              "🪬 本次响应延迟(/delay)：" +
-              getRelayTime(responseTime) +
+              // "\n" +
+              // "🪬 本次响应延迟(/delay)：" +
+              // getRelayTime(responseTime) +
               "\n" +
               "\n" +
               "你的Tg_Chat_ID ： " +
@@ -318,15 +341,38 @@ function processData(userMessage) {
               "</b>"
             : dealMessage.htmlReply;
 
-        payloadPostData = {
-          method: "sendMessage",
-          chat_id: messageUserID,
-          text: HTML_REPLY,
-          reply_to_message_id: messageReplyID,
-          parse_mode: "HTML",
-          // reply_markup: JSON.stringify(keyboardParams),
-          disable_web_page_preview: true,
-        };
+        if (dealMessage.htmlReply2 == null) {
+          payloadPostData = {
+            method: "sendMessage",
+            chat_id: messageUserID,
+            text: HTML_REPLY,
+            reply_to_message_id: messageReplyID,
+            parse_mode: "HTML",
+            reply_markup: JSON.stringify(keyboardParams),
+            disable_web_page_preview: true,
+          };
+        } else {
+          payloadPostData = [
+            {
+              method: "sendMessage",
+              chat_id: messageUserID,
+              text: HTML_REPLY,
+              reply_to_message_id: messageReplyID,
+              parse_mode: "HTML",
+              reply_markup: JSON.stringify(keyboardParams),
+              disable_web_page_preview: true,
+            },
+            {
+              method: "sendMessage",
+              chat_id: messageUserID,
+              text: dealMessage.htmlReply2,
+              // reply_to_message_id: messageReplyID,
+              parse_mode: "HTML",
+              reply_markup: JSON.stringify(keyboardParams),
+              disable_web_page_preview: true,
+            },
+          ];
+        }
       } else {
         payloadPostData = {
           method: "deleteMessage",
@@ -335,9 +381,9 @@ function processData(userMessage) {
         };
         let htmlReply =
           "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-          "\n" +
-          "🪬 本次响应延迟(/delay)：" +
-          getRelayTime(responseTime) +
+          // "\n" +
+          // "🪬 本次响应延迟(/delay)：" +
+          // getRelayTime(responseTime) +
           "\n" +
           "\n" +
           "<b>拦截到</b> " +
@@ -364,11 +410,14 @@ function processData(userMessage) {
       }
 
       if (
-        userMessage.message.text == "微信公众号『小帽集团』" ||
         userMessage.message.text == "资源仓库" ||
         userMessage.message.text.indexOf("Mao") != -1
       ) {
         payloadPostData.reply_markup = JSON.stringify(keyboardFollowParams);
+      }
+
+      if (userMessage.message.text == "微信公众号『小帽集团』") {
+        payloadPostData.reply_markup = JSON.stringify(keyboardParams);
       }
     }
   } catch (error) {
@@ -429,7 +478,16 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "<b>Surge版本 - XiaoMao懒人规则</b>" +
         "\n" +
-        "<a href='https://raw.githubusercontent.com/xiaomaoJT/Surge/main/config/XiaoMao_Surge.conf'>1⃣️ Surge·Mac版</a>" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/Surge/main/config/XiaoMaoSurge_Lite.conf'>1⃣️ Surge·通用版</a>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/Surge/main/config/XiaoMaoSurge.conf'>2⃣️ Surge·测试版</a>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/Surge/main/config/XiaoMaoSurge_Mac.conf'>3⃣️ Surge·Mac版</a>" +
+        "\n" +
+        "\n" +
+        "<b>Loon版本 - XiaoMao懒人规则</b>" +
+        "\n" +
+        "<a href='https://raw.githubusercontent.com/xiaomaoJT/Loon/main/config/XiaoMaoLoon.config'>1⃣️ Loon·测试版</a>" +
         "\n" +
         "\n" +
         "<b><a href='https://t.me/xiaomaoJT/219'>🎏 更多XiaoMao资源汇总</a></b>" +
@@ -438,7 +496,7 @@ function processReplyWord(key, useId, userJson) {
         "<a href='https://github.com/xiaomaoJT/QxScript'>💊 xiaomao懒人规则适用人群及使用教程，更多教程点击菜单 图文教程</a>",
     },
     {
-      keyword: ["网易云", "免费节点"],
+      keyword: ["网易云节点", "免费节点"],
       replyWord:
         "永久节点订阅及网易云节点已内置于XiaoMao懒人规则中" +
         "\n" +
@@ -491,6 +549,9 @@ function processReplyWord(key, useId, userJson) {
         "<a href='https://sub.xeton.dev'>④ 菜市场 转换</a>" +
         "\n" +
         "\n" +
+        "4⃣️ <a href='https://t.me/xiaomaoJT/777'>ScriptHub脚本规则转换 ✅推荐</a>" +
+        "\n" +
+        "\n" +
         "<b>在线订阅转换皆有可能存在泄漏风险，建议在线转换使用机场自带的订阅转换，对SubStore本地转换不熟悉？点击菜单 图文教程</b>",
     },
     {
@@ -527,41 +588,43 @@ function processReplyWord(key, useId, userJson) {
         "💊  <b>QX & Clash & TgBot 图文教程</b>" +
         "\n" +
         "\n" +
-        "🌈 <a href='http://s.nfangbian.com/3wo'><b>XiaoMao推文合集</b></a>" +
+        "🌈 <a href='http://mtw.so/5MH2zy'><b>XiaoMao推文合集</b></a>" +
         "\n" +
         "\n" +
-        "<a href='http://s.nfangbian.com/3wp'><b>⒈ 入门：QX上手</b></a>" +
+        "<a href='http://mtw.so/5MH2Um'><b>⒈ 入门：QX上手</b></a>" +
         "\n" +
         "\n" +
-        "<a href='http://s.nfangbian.com/3wq'><b>⒉ 进阶：QX配置</b></a>" +
+        "<a href='http://mtw.so/5UdfZ3'><b>⒉ 进阶：QX配置</b></a>" +
         "\n" +
         "\n" +
-        "<a href='http://s.nfangbian.com/3wr'><b>⒊ 进阶：QX分流</b></a>" +
+        "<a href='http://mtw.so/69fduD'><b>⒊ 进阶：QX分流</b></a>" +
         "\n" +
         "\n" +
-        "<a href='http://s.nfangbian.com/3ws'><b>⒋ 进阶：QX重写</b></a>" +
+        "<a href='http://mtw.so/6gLqzk'><b>⒋ 进阶：QX重写</b></a>" +
         "\n" +
         "\n" +
-        "<a href='http://s.nfangbian.com/3wt'><b>⒌ 番外：BoxJs和SubStore</b></a>" +
+        "<a href='http://mtw.so/6ohDnT'><b>⒌ 番外：BoxJs和SubStore</b></a>" +
         "\n" +
         "\n" +
         "<a href='https://mp.weixin.qq.com/s/8c-tn6OaSGCVXUo2DIWiww'><b>⒍ 高阶：Task脚本制作</b></a>" +
         "\n" +
         "\n" +
-        "<a href='https://mp.weixin.qq.com/s/B_zMFU6vsAeE_IKyLXddtA'><b>⒎ 高阶：广告拦截</b></a>" +
+        "<a href='https://mp.weixin.qq.com/s/B_zMFU6vsAeE_IKyLXddtA'><b>⒎ 高阶：广告拦截[抓包]</b></a>" +
         "\n" +
         "\n" +
-        "<a href='https://t.me/xiaomaoJT/876'><b>⒏ 高阶：会员恢复购买</b></a>" +
+        "<a href='https://t.me/xiaomaoJT/876'><b>⒏ 高阶：会员解锁[抓包]</b></a>" +
         "\n" +
         "\n" +
         "\n" +
-        "<b>⒐ 其它</b>" +
+        "<b>⒐ 更多</b>" +
         "\n" +
-        "🥎 <a href='http://s.nfangbian.com/2Ru'><b>Clash配置</b></a>" +
+        "🚨 <a href='https://github.com/xiaomaoJT/QxScript/blob/main/COURSE.md#-%E6%9C%AC%E5%9C%B0%E8%84%9A%E6%9C%AC%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95'><b>QX本地脚本使用教程</b></a>" +
         "\n" +
-        "🥎 <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'><b>Tg机器人搭建</b></a>" +
+        "🚨 <a href='https://t.me/xiaomaoJT/951'><b>BoxJS使用教程</b></a>" +
         "\n" +
-        "🥎 <a href='http://s.nfangbian.com/2P8'><b>QX本地脚本使用教程</b></a>" +
+        "🚨 <a href='https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md'><b>Tg机器人搭建</b></a>" +
+        "\n" +
+        "🥎 <a href='https://github.com/xiaomaoJT/clash/raw/main/%E3%80%90%E5%B8%BD%E6%95%99%E7%A8%8B%E3%80%91Clash%E9%85%8D%E7%BD%AE%E6%95%99%E7%A8%8B.png?raw=true'><b>Clash配置</b></a>" +
         "\n" +
         "\n" +
         "<b>欢迎点赞评论，感谢支持！</b>",
@@ -669,7 +732,8 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟛𝟜 <a href='https://t.me/XiaoMaoScript/71'>「和讯财经」</a>" +
         "\n" +
-        "𝟛𝟝 <a href='https://t.me/XiaoMaoScript/72'>「EF Hello」</a>" +
+        "𝟛𝟝 <a href='https://t.me/XiaoMaoScript/72'>「EF Hello」</a>",
+      replyWord2:
         "\n" +
         "𝟛𝟞 <a href='https://t.me/XiaoMaoScript/73'>「Drops」</a>" +
         "\n" +
@@ -704,6 +768,30 @@ function processReplyWord(key, useId, userJson) {
         "𝟝𝟙 <a href='https://t.me/XiaoMaoScript/91'>「我的时间」</a>" +
         "\n" +
         "𝟝𝟚 <a href='https://t.me/XiaoMaoScript/92'>「VSCO」</a>" +
+        "\n" +
+        "𝟝𝟛 <a href='https://t.me/XiaoMaoScript/94'>「Motivation」</a>" +
+        "\n" +
+        "𝟝𝟜 <a href='https://t.me/XiaoMaoScript/95'>「糖豆」</a>" +
+        "\n" +
+        "𝟝𝟝 <a href='https://t.me/XiaoMaoScript/96'>「NASCTL」</a>" +
+        "\n" +
+        "𝟝𝟞 <a href='https://t.me/XiaoMaoScript/97'>「Aisten」</a>" +
+        "\n" +
+        "𝟝𝟟 <a href='https://t.me/XiaoMaoScript/98'>「FilmNoir」</a>" +
+        "\n" +
+        "𝟝𝟠 <a href='https://t.me/XiaoMaoScript/101'>「ProCamera」</a>" +
+        "\n" +
+        "𝟝𝟡 <a href='https://t.me/XiaoMaoScript/103'>「StressWatch」</a>" +
+        "\n" +
+        "𝟞𝟘 <a href='https://t.me/XiaoMaoScript/104'>「NightVision」</a>" +
+        "\n" +
+        "𝟞𝟙 <a href='https://t.me/XiaoMaoScript/105'>「中医通」</a>" +
+        "\n" +
+        "𝟞𝟚 <a href='https://t.me/XiaoMaoScript/106'>「intoLive」</a>" +
+        "\n" +
+        "𝟞𝟛 <a href='https://t.me/XiaoMaoScript/107'>「VDIT」</a>" +
+        "\n" +
+        "𝟞𝟜 <a href='https://t.me/XiaoMaoScript/108'>「ImgPlay」</a>" +
         "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -781,6 +869,12 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/85'>「每日一言」</a>" +
         "\n" +
+        "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/93'>「喜加一」</a>" +
+        "\n" +
+        "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/99'>「打工人进度」</a>" +
+        "\n" +
+        "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/100'>「和包银联红包查询」</a>" +
+        "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -805,7 +899,7 @@ function processReplyWord(key, useId, userJson) {
         "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/54'>「全网热榜」</a>" +
         "\n" +
         "\n" +
-        "<b>🧲<a href='http://s.nfangbian.com/3Gz'>【帽教程】快捷指令脚本制作教程</a></b>" +
+        "<b>🧲<a href='http://mtw.so/5Fan5S'>【帽教程】快捷指令脚本制作教程</a></b>" +
         "\n" +
         "\n" +
         "更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。",
@@ -991,9 +1085,9 @@ function processReplyWord(key, useId, userJson) {
   //未匹配的关键字回复
   let htmlReply =
     "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-    "\n" +
-    "🪬 本次响应延迟(/delay)：" +
-    getRelayTime(responseTime) +
+    // "\n" +
+    // "🪬 本次响应延迟(/delay)：" +
+    // getRelayTime(responseTime) +
     "\n" +
     "\n" +
     "<b>呜呜呜，关键字</b> " +
@@ -1003,6 +1097,7 @@ function processReplyWord(key, useId, userJson) {
   // 自动回复关键字判断
   let returnHtmlReply = {
     htmlReply: "",
+    htmlReply2: null,
     state: false,
     dfa: {},
   };
@@ -1037,9 +1132,9 @@ function processReplyWord(key, useId, userJson) {
   if (outsideWord.findIndex((i) => key == i) != -1) {
     htmlReply =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      "\n" +
-      "🪬 本次响应延迟(/delay)：" +
-      getRelayTime(responseTime) +
+      // "\n" +
+      // "🪬 本次响应延迟(/delay)：" +
+      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>✅微信公众号『小帽集团』，欢迎您的关注！记得点赞收藏哟～</b>" +
@@ -1062,9 +1157,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getWeatherApi(getString(key, isApi(commandWord, key).api));
@@ -1074,9 +1169,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getLinkShort(getString(key, isApi(commandWord, key).api));
@@ -1086,9 +1181,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getMusic();
@@ -1098,9 +1193,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getPhoneWhere(getString(key, isApi(commandWord, key).api));
@@ -1110,9 +1205,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getTianGou(getString(key, isApi(commandWord, key).api));
@@ -1122,9 +1217,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getDuJiTang(getString(key, isApi(commandWord, key).api));
@@ -1134,9 +1229,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getVideo(getString(key, isApi(commandWord, key).api));
@@ -1147,9 +1242,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getYiYan();
@@ -1159,9 +1254,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getHelloBot(getString(key, isApi(commandWord, key).api));
@@ -1171,9 +1266,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getChatBot(getString(key, isApi(commandWord, key).api));
@@ -1187,9 +1282,9 @@ function processReplyWord(key, useId, userJson) {
         case 11:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             "Hello,我是 XiaoMao机器人,很高兴认识您！我能较出色的完成以下功能：" +
@@ -1220,9 +1315,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getLanLink(getString(key, isApi(commandWord, key).api));
@@ -1232,9 +1327,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getMiSport(getString(key, isApi(commandWord, key).api));
@@ -1243,9 +1338,9 @@ function processReplyWord(key, useId, userJson) {
         case 14:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getReply(userJson);
@@ -1254,9 +1349,9 @@ function processReplyWord(key, useId, userJson) {
         case 15:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getBanUser(userJson);
@@ -1265,9 +1360,9 @@ function processReplyWord(key, useId, userJson) {
         case 16:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getUnBanUser(userJson);
@@ -1276,9 +1371,9 @@ function processReplyWord(key, useId, userJson) {
         case 17:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getRestrictUser(userJson);
@@ -1288,9 +1383,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getHotList(getString(key, isApi(commandWord, key).api));
@@ -1300,9 +1395,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getDouBan(getString(key, isApi(commandWord, key).api));
@@ -1312,9 +1407,9 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getHoroscopeList(getString(key, isApi(commandWord, key).api));
@@ -1332,12 +1427,16 @@ function processReplyWord(key, useId, userJson) {
             if (key.indexOf(element) != -1) {
               htmlReply =
                 "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-                "\n" +
-                "🪬 本次响应延迟(/delay)：" +
-                getRelayTime(responseTime) +
+                // "\n" +
+                // "🪬 本次响应延迟(/delay)：" +
+                // getRelayTime(responseTime) +
                 "\n" +
                 "\n" +
                 item.replyWord;
+
+              item.hasOwnProperty("replyWord2")
+                ? (returnHtmlReply.htmlReply2 = item.replyWord2)
+                : (returnHtmlReply.htmlReply2 = null);
               returnHtmlReply.state = true;
               throw new Error("匹配成功");
             }
@@ -1350,9 +1449,9 @@ function processReplyWord(key, useId, userJson) {
         ) {
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            "\n" +
-            "🪬 本次响应延迟(/delay)：" +
-            getRelayTime(responseTime) +
+            // "\n" +
+            // "🪬 本次响应延迟(/delay)：" +
+            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getHelloBot(key);
@@ -1383,7 +1482,7 @@ function getUnBanUser(userJson) {
   } else {
     if (!userJson.hasOwnProperty("reply_to_message")) {
       returnText =
-        "未找到引用消息内容，Bot用户封禁功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
+        "未找到引用消息内容，Bot用户封禁功能需要开启私人消息推送服务，请于 <a href='https://github.com/xiaomaoJT/TgBot'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
       return returnText;
     } else {
       if (
@@ -1498,7 +1597,7 @@ function getBanUser(userJson) {
   } else {
     if (!userJson.hasOwnProperty("reply_to_message")) {
       returnText =
-        "未找到引用消息内容，Bot用户封禁功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
+        "未找到引用消息内容，Bot用户封禁功能需要开启私人消息推送服务，请于 <a href='https://github.com/xiaomaoJT/TgBot'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
       return returnText;
     } else {
       if (
@@ -1615,7 +1714,7 @@ function getRestrictUser(userJson) {
   } else {
     if (!userJson.hasOwnProperty("reply_to_message")) {
       returnText =
-        "未找到引用消息内容，Bot用户限制功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
+        "未找到引用消息内容，Bot用户限制功能需要开启私人消息推送服务，请于 <a href='https://github.com/xiaomaoJT/TgBot'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
       return returnText;
     } else {
       if (
@@ -1759,7 +1858,7 @@ function getReply(userJson) {
   } else {
     if (!userJson.hasOwnProperty("reply_to_message")) {
       returnText =
-        "未找到引用消息内容，Bot消息私聊功能需要开启私人消息推送服务，请于 <a href='http://s.nfangbian.com/3mo'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
+        "未找到引用消息内容，Bot消息私聊功能需要开启私人消息推送服务，请于 <a href='https://github.com/xiaomaoJT/TgBot'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
       return returnText;
     } else {
       if (
@@ -2016,6 +2115,8 @@ function checkSensitiveDFA(content) {
   // 敏感词库
   // 内容已作加密处理base64
   let sensitiveEncodeList = [
+    "6aKE5LuY",
+    "5pW055CG5pWw5o2u",
     "5qOL54mM",
     "5b2p56Wo",
     "55yf5Lq6",
@@ -2287,9 +2388,9 @@ function apiReply(id, useJson) {
     chat_id: id,
     text:
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      "\n" +
-      "🪬 本次响应延迟(/delay)：" +
-      getRelayTime(responseTime) +
+      // "\n" +
+      // "🪬 本次响应延迟(/delay)：" +
+      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>您的查询指令已成功发送，本次查询过程中将受到运营商网络管制，若200s内无响应则此次通信将被异常终止，请稍后再试～</b>",
