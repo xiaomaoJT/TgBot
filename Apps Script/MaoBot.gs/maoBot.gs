@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.5-504
+ * @4.5-569
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -1472,6 +1472,16 @@ function processReplyWord(key, useId, userJson) {
  * @returns
  */
 function getUnBanUser(userJson) {
+  let followMessageKeyboard = [
+    [
+      { text: "✚ XiaoMao频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+    ],
+    [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
+  ];
+  let keyboardFollowParams = {
+    inline_keyboard: followMessageKeyboard,
+  };
   if (
     userJson.hasOwnProperty("chat") &&
     userJson.chat.id.toString() != KingId
@@ -1521,18 +1531,26 @@ function getUnBanUser(userJson) {
             payloadPostData.user_id = sub2_user_Text.toString();
             payloadPostData.chat_id = sub2_Text.toString();
 
-            let data = {
-              method: "post",
-              payload: payloadPostData,
-            };
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              data
-            );
+            try {
+              let data = {
+                method: "post",
+                payload: payloadPostData,
+              };
+              UrlFetchApp.fetch(
+                "https://api.telegram.org/bot" + BOTID + "/",
+                data
+              );
+            } catch (e) {}
+
+            let sub__1 = textReply.indexOf("chat");
+            let sub__Text = textReply.substring(sub__1 + 6, sub__1 + 30);
+            let sub__2 = sub__Text.indexOf(":");
+            let sub__3 = sub__Text.indexOf(",");
+            let sub2__Text = sub__Text.substring(sub__2 + 1, sub__3);
 
             let payloadPostData2 = {
               method: "sendMessage",
-              chat_id: payloadPostData.user_id,
+              chat_id: sub2__Text.toString(),
               text:
                 "<b>📣来自XiaoMaoBot管理员的操作提醒</b>" +
                 "\n" +
@@ -1541,7 +1559,9 @@ function getUnBanUser(userJson) {
                 "<b>===========================</b>" +
                 "\n" +
                 "\n" +
-                "<b>您已被XiaoMao管理员解除封禁，注意不要再次违规哟，" +
+                "<b>" +
+                payloadPostData.user_id +
+                "您已被XiaoMao管理员解除封禁，注意不要再次违规哟，" +
                 "<a href='https://t.me/hSuMjrQppKE5MWU9'> XiaoMao群聊 点击加入 </a>" +
                 "</b>" +
                 "\n" +
@@ -1549,6 +1569,7 @@ function getUnBanUser(userJson) {
                 "<b>===========================</b>" +
                 "\n",
               parse_mode: "HTML",
+              reply_markup: JSON.stringify(keyboardFollowParams),
               disable_web_page_preview: true,
             };
             let data2 = {
@@ -1586,6 +1607,16 @@ function getUnBanUser(userJson) {
  * @returns
  */
 function getBanUser(userJson) {
+  let followMessageKeyboard = [
+    [
+      { text: "✚ XiaoMao频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+    ],
+    [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
+  ];
+  let keyboardFollowParams = {
+    inline_keyboard: followMessageKeyboard,
+  };
   let timeFrame = userJson.text.replace("/ban", "") || "";
   if (
     userJson.hasOwnProperty("chat") &&
@@ -1637,18 +1668,26 @@ function getBanUser(userJson) {
             payloadPostData.user_id = sub2_user_Text.toString();
             payloadPostData.chat_id = sub2_Text.toString();
 
-            let data = {
-              method: "post",
-              payload: payloadPostData,
-            };
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              data
-            );
+            try {
+              let data = {
+                method: "post",
+                payload: payloadPostData,
+              };
+              UrlFetchApp.fetch(
+                "https://api.telegram.org/bot" + BOTID + "/",
+                data
+              );
+            } catch (e) {}
+
+            let sub__1 = textReply.indexOf("chat");
+            let sub__Text = textReply.substring(sub__1 + 6, sub__1 + 30);
+            let sub__2 = sub__Text.indexOf(":");
+            let sub__3 = sub__Text.indexOf(",");
+            let sub2__Text = sub__Text.substring(sub__2 + 1, sub__3);
 
             let payloadPostData2 = {
               method: "sendMessage",
-              chat_id: payloadPostData.user_id,
+              chat_id: sub2__Text.toString(),
               text:
                 "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
                 "\n" +
@@ -1657,7 +1696,9 @@ function getBanUser(userJson) {
                 "<b>===========================</b>" +
                 "\n" +
                 "\n" +
-                "<b>因存在违规行为，您已被管理员封禁（封禁时长：" +
+                "<b>" +
+                payloadPostData.user_id +
+                " 因存在违规行为，您已被管理员封禁（封禁时长：" +
                 (timeFrame ? timeFrame : "永久") +
                 "），申诉请私聊" +
                 "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
@@ -1667,6 +1708,7 @@ function getBanUser(userJson) {
                 "<b>===========================</b>" +
                 "\n",
               parse_mode: "HTML",
+              reply_markup: JSON.stringify(keyboardFollowParams),
               disable_web_page_preview: true,
             };
             let data2 = {
@@ -1703,6 +1745,16 @@ function getBanUser(userJson) {
  * @returns
  */
 function getRestrictUser(userJson) {
+  let followMessageKeyboard = [
+    [
+      { text: "✚ XiaoMao频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+    ],
+    [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
+  ];
+  let keyboardFollowParams = {
+    inline_keyboard: followMessageKeyboard,
+  };
   let timeFrame = userJson.text.replace("/restrict", "") || "";
   if (
     userJson.hasOwnProperty("chat") &&
@@ -1771,18 +1823,26 @@ function getRestrictUser(userJson) {
             payloadPostData.user_id = sub2_user_Text.toString();
             payloadPostData.chat_id = sub2_Text.toString();
 
-            let data = {
-              method: "post",
-              payload: payloadPostData,
-            };
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              data
-            );
+            try {
+              let data = {
+                method: "post",
+                payload: payloadPostData,
+              };
+              UrlFetchApp.fetch(
+                "https://api.telegram.org/bot" + BOTID + "/",
+                data
+              );
+            } catch (e) {}
+
+            let sub__1 = textReply.indexOf("chat");
+            let sub__Text = textReply.substring(sub__1 + 6, sub__1 + 30);
+            let sub__2 = sub__Text.indexOf(":");
+            let sub__3 = sub__Text.indexOf(",");
+            let sub2__Text = sub__Text.substring(sub__2 + 1, sub__3);
 
             let payloadPostData2 = {
               method: "sendMessage",
-              chat_id: payloadPostData.user_id,
+              chat_id: sub2__Text.toString(),
               text:
                 "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
                 "\n" +
@@ -1791,7 +1851,9 @@ function getRestrictUser(userJson) {
                 "<b>===========================</b>" +
                 "\n" +
                 "\n" +
-                "<b>因存在违规行为，您已被管理员限制聊天（限制时长：" +
+                "<b>" +
+                payloadPostData.user_id +
+                " 因存在违规行为，您已被管理员限制聊天（限制时长：" +
                 (timeFrame ? timeFrame : "永久") +
                 "），申诉请私聊" +
                 "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
@@ -1801,6 +1863,7 @@ function getRestrictUser(userJson) {
                 "<b>===========================</b>" +
                 "\n",
               parse_mode: "HTML",
+              reply_markup: JSON.stringify(keyboardFollowParams),
               disable_web_page_preview: true,
             };
             let data2 = {
