@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.5-569
+ * @4.5-577
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -42,6 +42,10 @@ var botIdAlone = "";
 // 用于过滤需要排除捕捉的群组信息
 // 请填入群组id,多个用,间隔 如 ['22222','11111]
 var forGotList = [];
+// 权限释放 - 用于开放操作权限给管理员
+var PermissionRelease = true;
+// 管理员ID列表 如 ['11111','22222',KingId]
+var PermissionReleaseList = [KingId];
 
 // ------------------------- 默认通用参数·无需改动 -----------------
 // 用于判断消息类型 - inlinekey board回调 or 主动消息
@@ -53,6 +57,7 @@ var MESSAGETYPE = 0;
 var responseTime = "";
 // 用于承接返回数据
 var dealMessage = {};
+
 
 // ------------------------- 核心调用函数 -----------------
 
@@ -1482,14 +1487,61 @@ function getUnBanUser(userJson) {
   let keyboardFollowParams = {
     inline_keyboard: followMessageKeyboard,
   };
-  if (
-    userJson.hasOwnProperty("chat") &&
-    userJson.chat.id.toString() != KingId
-  ) {
+  if (PermissionReleaseList.indexOf(userJson.from.id.toString()) == -1) {
     returnText =
-      "Bot用户封禁功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
+      "Bot用户封禁功能仅开放于Bot管理者，请拉取最新版XiaoMaoBot代码部署后再试吧！";
     return returnText;
-  } else {
+  } else if (PermissionRelease && userJson.chat.type == "supergroup") {
+    if (!userJson.hasOwnProperty("reply_to_message")) {
+      returnText = "操作失败！未找到指定用户，请引用对方消息再进行操作。";
+      return returnText;
+    }
+    let payloadPostData = {
+      method: "unbanChatMember",
+      only_if_banned: true,
+      chat_id: userJson.reply_to_message.chat.id.toString(),
+      user_id: userJson.reply_to_message.from.id.toString(),
+    };
+    try {
+      let data = {
+        method: "post",
+        payload: payloadPostData,
+      };
+      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+    } catch (e) {}
+
+    let payloadPostData2 = {
+      method: "sendMessage",
+      chat_id: userJson.reply_to_message.chat.id.toString(),
+      text:
+        "<b>📣来自XiaoMaoBot管理员的操作提醒</b>" +
+        "\n" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n" +
+        "\n" +
+        "<b>" +
+        payloadPostData.user_id +
+        "您已被XiaoMao管理员解除封禁，注意不要再次违规哟，" +
+        "<a href='https://t.me/hSuMjrQppKE5MWU9'> XiaoMao群聊 点击加入 </a>" +
+        "</b>" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n",
+      parse_mode: "HTML",
+      reply_markup: JSON.stringify(keyboardFollowParams),
+      disable_web_page_preview: true,
+    };
+    let data2 = {
+      method: "post",
+      payload: payloadPostData2,
+    };
+    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data2);
+
+    return "操作成功！";
+  } else if (userJson.chat.type == "private") {
     if (!userJson.hasOwnProperty("reply_to_message")) {
       returnText =
         "未找到引用消息内容，Bot用户封禁功能需要开启私人消息推送服务，请于 <a href='https://github.com/xiaomaoJT/TgBot'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
@@ -1506,6 +1558,7 @@ function getUnBanUser(userJson) {
         try {
           let payloadPostData = {
             method: "unbanChatMember",
+            only_if_banned: true,
             chat_id: "",
             user_id: "",
           };
@@ -1618,14 +1671,63 @@ function getBanUser(userJson) {
     inline_keyboard: followMessageKeyboard,
   };
   let timeFrame = userJson.text.replace("/ban", "") || "";
-  if (
-    userJson.hasOwnProperty("chat") &&
-    userJson.chat.id.toString() != KingId
-  ) {
+  if (PermissionReleaseList.indexOf(userJson.from.id.toString()) == -1) {
     returnText =
-      "Bot用户封禁功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
+      "Bot用户封禁功能仅开放于Bot管理者，请拉取最新版XiaoMaoBot代码部署后再试吧！";
     return returnText;
-  } else {
+  } else if (PermissionRelease && userJson.chat.type == "supergroup") {
+    if (!userJson.hasOwnProperty("reply_to_message")) {
+      returnText = "操作失败！未找到指定用户，请引用对方消息再进行操作。";
+      return returnText;
+    }
+    let payloadPostData = {
+      method: "banChatMember",
+      chat_id: userJson.reply_to_message.chat.id.toString(),
+      user_id: userJson.reply_to_message.from.id.toString(),
+      until_date: getUnixTime(timeFrame).toString(),
+    };
+    try {
+      let data = {
+        method: "post",
+        payload: payloadPostData,
+      };
+      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+    } catch (e) {}
+
+    let payloadPostData2 = {
+      method: "sendMessage",
+      chat_id: userJson.reply_to_message.chat.id.toString(),
+      text:
+        "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
+        "\n" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n" +
+        "\n" +
+        "<b>" +
+        payloadPostData.user_id +
+        " 因存在违规行为，您已被管理员封禁（封禁时长：" +
+        (timeFrame ? timeFrame : "永久") +
+        "），申诉请私聊" +
+        "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+        "</b>" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n",
+      parse_mode: "HTML",
+      reply_markup: JSON.stringify(keyboardFollowParams),
+      disable_web_page_preview: true,
+    };
+    let data2 = {
+      method: "post",
+      payload: payloadPostData2,
+    };
+    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data2);
+
+    return "操作成功！";
+  } else if (userJson.chat.type == "private") {
     if (!userJson.hasOwnProperty("reply_to_message")) {
       returnText =
         "未找到引用消息内容，Bot用户封禁功能需要开启私人消息推送服务，请于 <a href='https://github.com/xiaomaoJT/TgBot'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
@@ -1755,15 +1857,81 @@ function getRestrictUser(userJson) {
   let keyboardFollowParams = {
     inline_keyboard: followMessageKeyboard,
   };
+  let permission = {
+    can_send_messages: false,
+    can_send_audios: false,
+    can_send_documents: false,
+    can_send_photos: false,
+    can_send_videos: false,
+    can_send_video_notes: false,
+    can_send_voice_notes: false,
+    can_send_polls: false,
+    can_send_other_messages: false,
+    can_add_web_page_previews: false,
+    can_change_info: false,
+    can_invite_users: false,
+    can_pin_messages: false,
+    can_manage_topics: false,
+  };
   let timeFrame = userJson.text.replace("/restrict", "") || "";
-  if (
-    userJson.hasOwnProperty("chat") &&
-    userJson.chat.id.toString() != KingId
-  ) {
+  if (PermissionReleaseList.indexOf(userJson.from.id.toString()) == -1) {
     returnText =
-      "Bot用户限制功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
+      "Bot用户限制功能仅开放于Bot管理者，请拉取最新版XiaoMaoBot代码部署后再试吧！";
     return returnText;
-  } else {
+  } else if (PermissionRelease && userJson.chat.type == "supergroup") {
+    if (!userJson.hasOwnProperty("reply_to_message")) {
+      returnText = "操作失败！未找到指定用户，请引用对方消息再进行操作。";
+      return returnText;
+    }
+    let payloadPostData = {
+      method: "restrictChatMember",
+      chat_id: userJson.reply_to_message.chat.id.toString(),
+      user_id: userJson.reply_to_message.from.id.toString(),
+      until_date: getUnixTime(timeFrame).toString(),
+      permissions: JSON.stringify(permission),
+    };
+    try {
+      let data = {
+        method: "post",
+        payload: payloadPostData,
+      };
+      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+    } catch (e) {}
+
+    let payloadPostData2 = {
+      method: "sendMessage",
+      chat_id: userJson.reply_to_message.chat.id.toString(),
+      text:
+        "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
+        "\n" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n" +
+        "\n" +
+        "<b>" +
+        payloadPostData.user_id +
+        " 因存在违规行为，您已被管理员限制聊天（限制时长：" +
+        (timeFrame ? timeFrame : "永久") +
+        "），申诉请私聊" +
+        "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+        "</b>" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n",
+      parse_mode: "HTML",
+      reply_markup: JSON.stringify(keyboardFollowParams),
+      disable_web_page_preview: true,
+    };
+    let data2 = {
+      method: "post",
+      payload: payloadPostData2,
+    };
+    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data2);
+
+    return "操作成功！";
+  } else if (userJson.chat.type == "private") {
     if (!userJson.hasOwnProperty("reply_to_message")) {
       returnText =
         "未找到引用消息内容，Bot用户限制功能需要开启私人消息推送服务，请于 <a href='https://github.com/xiaomaoJT/TgBot'><b>XiaoMao_TgBot仓库 👈</b></a> 中查看开启及使用方式。";
@@ -1778,22 +1946,6 @@ function getRestrictUser(userJson) {
         return returnText;
       } else {
         try {
-          let permission = {
-            can_send_messages: false,
-            can_send_audios: false,
-            can_send_documents: false,
-            can_send_photos: false,
-            can_send_videos: false,
-            can_send_video_notes: false,
-            can_send_voice_notes: false,
-            can_send_polls: false,
-            can_send_other_messages: false,
-            can_add_web_page_previews: false,
-            can_change_info: false,
-            can_invite_users: false,
-            can_pin_messages: false,
-            can_manage_topics: false,
-          };
           let payloadPostData = {
             method: "restrictChatMember",
             chat_id: "",
@@ -1913,7 +2065,7 @@ function getReply(userJson) {
   let returnText = userJson.text.replace("/reply", "") || "";
   if (
     userJson.hasOwnProperty("chat") &&
-    userJson.chat.id.toString() != KingId
+    userJson.from.id.toString() != KingId
   ) {
     returnText =
       "Bot消息私聊功能仅开放于Bot主人，请拉取最新版XiaoMaoBot代码部署后再试吧！";
