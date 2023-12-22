@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.5-577
+ * @4.5-587
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -57,7 +57,6 @@ var MESSAGETYPE = 0;
 var responseTime = "";
 // 用于承接返回数据
 var dealMessage = {};
-
 
 // ------------------------- 核心调用函数 -----------------
 
@@ -166,11 +165,11 @@ function processData(userMessage) {
     [
       { text: "QX仓库", url: "https://github.com/xiaomaoJT/QxScript" },
       { text: "Bot仓库", url: "https://github.com/xiaomaoJT/TgBot" },
-      { text: "Clash仓库", url: "https://github.com/xiaomaoJT/clash" },
     ],
     [
-      { text: "XiaoMao频道", url: "https://t.me/xiaomaoJT" },
-      { text: "XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ 群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 脚本", url: "https://t.me/XiaoMaoScript" },
     ],
     [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
   ];
@@ -274,23 +273,26 @@ function processData(userMessage) {
 
   if (MESSAGETYPE == 2 || MESSAGETYPE == 3) {
     let newMemberChatId = userMessage.message.chat.id.toString();
-    let memberList = "";
+    let memberList = "「未知」";
 
-    if (MESSAGETYPE == 2) {
-      userMessage.message["new_chat_members"].forEach((name, index) => {
+    try {
+      if (MESSAGETYPE == 2) {
+        memberList = "";
+        userMessage.message["new_chat_members"].forEach((name, index) => {
+          memberList =
+            memberList +
+            (name.first_name || "") +
+            (name.last_name || "") +
+            (index < userMessage.message["new_chat_members"].length - 1
+              ? " 、 "
+              : " ");
+        });
+      } else {
         memberList =
-          memberList +
-          (name.first_name || "") +
-          (name.last_name || "") +
-          (index < userMessage.message["new_chat_members"].length - 1
-            ? " 、 "
-            : " ");
-      });
-    } else {
-      memberList =
-        (userMessage.message["left_chat_member"].first_name || "") +
-        (userMessage.message["left_chat_member"].last_name || "");
-    }
+          (userMessage.message["left_chat_member"].first_name || "") +
+          (userMessage.message["left_chat_member"].last_name || "");
+      }
+    } catch (e) {}
 
     let welcomeMessage =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
@@ -393,10 +395,11 @@ function processData(userMessage) {
           "\n" +
           "<b>拦截到</b> " +
           " @" +
-          userMessage.message.from.username +
-          " 消息中含" +
+          userMessage.message.from.first_name +
+          userMessage.message.from.last_name +
+          "<b> 消息中含</b>" +
           dealMessage.dfa.wordLength +
-          "<b>处敏感词，XiaoMao已自动删除消息，请文明聊天喔！</b>";
+          "处<b> 敏感词，XiaoMao已自动删除消息，请文明聊天喔！</b>";
         let payload = {
           method: "sendMessage",
           chat_id: messageUserID,
@@ -412,6 +415,68 @@ function processData(userMessage) {
           payload: payload,
         };
         UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+
+        //强杀广告 - 直接ban
+        let banKeyword_one = Utilities.newBlob(
+          Utilities.base64Decode("6aKE5LuY")
+        ).getDataAsString();
+        let banKeyword_two = Utilities.newBlob(
+          Utilities.base64Decode("6ZyA6KaB5bel5L2c")
+        ).getDataAsString();
+        if (
+          userMessage.message.text.indexOf(banKeyword_one) != -1 ||
+          userMessage.message.text.indexOf(banKeyword_two) != -1
+        ) {
+          let banPostData = {
+            method: "banChatMember",
+            chat_id: userMessage.message.chat.id.toString(),
+            user_id: userMessage.message.from.id.toString(),
+            until_date: getUnixTime("").toString(),
+          };
+          try {
+            let data = {
+              method: "post",
+              payload: banPostData,
+            };
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              data
+            );
+
+            let payloadPostData2 = {
+              method: "sendMessage",
+              chat_id: userMessage.message.chat.id.toString(),
+              text:
+                "<b>📣来自XiaoMaoBot管理员的操作提醒</b>" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "<b>===========================</b>" +
+                "\n" +
+                "\n" +
+                "<b>" +
+                userMessage.message.from.id.toString() +
+                " 触发终极禁忌‼️ ，您已被永久封禁，申诉请私聊" +
+                "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+                "</b>" +
+                "\n" +
+                "\n" +
+                "<b>===========================</b>" +
+                "\n",
+              parse_mode: "HTML",
+              reply_markup: JSON.stringify(keyboardParams),
+              disable_web_page_preview: true,
+            };
+            let data2 = {
+              method: "post",
+              payload: payloadPostData2,
+            };
+            UrlFetchApp.fetch(
+              "https://api.telegram.org/bot" + BOTID + "/",
+              data2
+            );
+          } catch (e) {}
+        }
       }
 
       if (
@@ -797,6 +862,10 @@ function processReplyWord(key, useId, userJson) {
         "𝟞𝟛 <a href='https://t.me/XiaoMaoScript/107'>「VDIT」</a>" +
         "\n" +
         "𝟞𝟜 <a href='https://t.me/XiaoMaoScript/108'>「ImgPlay」</a>" +
+        "\n" +
+        "𝟞𝟝 <a href='https://t.me/XiaoMaoScript/109'>「SimuFlight」</a>" +
+        "\n" +
+        "𝟞𝟞 <a href='https://t.me/XiaoMaoScript/110'>「Money-Wise」</a>" +
         "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -1479,8 +1548,9 @@ function processReplyWord(key, useId, userJson) {
 function getUnBanUser(userJson) {
   let followMessageKeyboard = [
     [
-      { text: "✚ XiaoMao频道", url: "https://t.me/xiaomaoJT" },
-      { text: "✚ XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ 群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 脚本", url: "https://t.me/XiaoMaoScript" },
     ],
     [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
   ];
@@ -1662,8 +1732,9 @@ function getUnBanUser(userJson) {
 function getBanUser(userJson) {
   let followMessageKeyboard = [
     [
-      { text: "✚ XiaoMao频道", url: "https://t.me/xiaomaoJT" },
-      { text: "✚ XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ 群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 脚本", url: "https://t.me/XiaoMaoScript" },
     ],
     [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
   ];
@@ -1849,8 +1920,9 @@ function getBanUser(userJson) {
 function getRestrictUser(userJson) {
   let followMessageKeyboard = [
     [
-      { text: "✚ XiaoMao频道", url: "https://t.me/xiaomaoJT" },
-      { text: "✚ XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ 群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 脚本", url: "https://t.me/XiaoMaoScript" },
     ],
     [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
   ];
@@ -2054,8 +2126,9 @@ function getRestrictUser(userJson) {
 function getReply(userJson) {
   let followMessageKeyboard = [
     [
-      { text: "✚ XiaoMao频道", url: "https://t.me/xiaomaoJT" },
-      { text: "✚ XiaoMao群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ 群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 脚本", url: "https://t.me/XiaoMaoScript" },
     ],
     [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
   ];
@@ -2331,6 +2404,7 @@ function checkSensitiveDFA(content) {
   // 内容已作加密处理base64
   let sensitiveEncodeList = [
     "6aKE5LuY",
+    "6ZyA6KaB5bel5L2c",
     "5pW055CG5pWw5o2u",
     "5qOL54mM",
     "5b2p56Wo",
@@ -2591,7 +2665,11 @@ function apiReply(id, useJson) {
     [
       { text: "QX仓库", url: "https://github.com/xiaomaoJT/QxScript" },
       { text: "Bot仓库", url: "https://github.com/xiaomaoJT/TgBot" },
-      { text: "Clash仓库", url: "https://github.com/xiaomaoJT/clash" },
+    ],
+    [
+      { text: "✚ 频道", url: "https://t.me/xiaomaoJT" },
+      { text: "✚ 群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+      { text: "✚ 脚本", url: "https://t.me/XiaoMaoScript" },
     ],
     [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
   ];
