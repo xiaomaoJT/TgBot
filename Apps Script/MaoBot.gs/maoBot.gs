@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.5-587
+ * @4.5-592
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -53,8 +53,7 @@ var PermissionReleaseList = [KingId];
 // 2 new member
 // 3 left member
 var MESSAGETYPE = 0;
-//接入时间戳
-var responseTime = "";
+//接入时间戳 - 已移除
 // 用于承接返回数据
 var dealMessage = {};
 
@@ -65,17 +64,17 @@ var dealMessage = {};
  * @param {*} e
  */
 function doPost(e) {
+  // 获取响应数据 必传
   let userMessage = JSON.parse(e.postData.contents);
-  responseTime = new Date().getTime();
-
-  if (userMessage.callback_query) {
+  // 判断消息类型
+  if (userMessage.hasOwnProperty("callback_query")) {
     MESSAGETYPE = 1;
     userMessage = JSON.parse(e.postData.contents).callback_query;
   }
-  if (userMessage.message.left_chat_participant) {
+  if (userMessage.message.hasOwnProperty("left_chat_participant")) {
     MESSAGETYPE = 3;
   }
-  if (userMessage.message.new_chat_participant) {
+  if (userMessage.message.hasOwnProperty("new_chat_participant")) {
     MESSAGETYPE = 2;
   }
 
@@ -135,12 +134,12 @@ function doPost(e) {
       userMessage.message.entities[0].type == "bold")
   ) {
     if (payloadStatus) {
-      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data[0]);
+      linkBot(data[0]);
       setStorage(data[0], "MESSAGEBACK");
-      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data[1]);
+      linkBot(data[1]);
       setStorage(data[1], "MESSAGEBACK");
     } else {
-      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+      linkBot(data);
       setStorage(data, "MESSAGEBACK");
     }
   }
@@ -210,9 +209,6 @@ function processData(userMessage) {
     chat_id: messageUserID,
     text:
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      // "\n" +
-      // "🪬 本次响应延迟(/delay)：" +
-      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>呜呜呜，此类型 " +
@@ -230,7 +226,7 @@ function processData(userMessage) {
     let payloadCallback;
 
     if (userMessage.data == "WXGROUP") {
-      let dataPhoto = {
+      linkBot({
         method: "post",
         payload: {
           method: "sendPhoto",
@@ -238,18 +234,10 @@ function processData(userMessage) {
           photo:
             "https://mmbiz.qpic.cn/mmbiz_jpg/RzNtrrcUJxlEcDQkiasYkNhwN60JMqGhZyvzM6ZUIODsvAXaaohmySWuPfFic2FK7Q8SRdUvIHAgbzp0yBLagGqg/640?wx_fmt=jpeg&wxfrom=5&wx_lazy=1&wx_co=1",
         },
-      };
-      //   Google 请求域建立连接
-      UrlFetchApp.fetch(
-        "https://api.telegram.org/bot" + BOTID + "/",
-        dataPhoto
-      );
+      });
 
       let callbackText =
         "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-        // "\n" +
-        // "🪬 本次响应延迟(/delay)：" +
-        // getRelayTime(responseTime) +
         "\n" +
         "\n" +
         "<b>✅微信公众号『小帽集团』，欢迎您的关注！记得点赞收藏哟～</b>" +
@@ -296,9 +284,6 @@ function processData(userMessage) {
 
     let welcomeMessage =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      // "\n" +
-      // "🪬 本次响应延迟(/delay)：" +
-      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>👏👏👏 热烈欢迎小伙伴 </b> " +
@@ -307,9 +292,6 @@ function processData(userMessage) {
 
     let leftMessage =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      // "\n" +
-      // "🪬 本次响应延迟(/delay)：" +
-      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>😩😩😩 幺儿啊 </b> " +
@@ -337,9 +319,6 @@ function processData(userMessage) {
         let HTML_REPLY =
           dealMessage.htmlReply == "getTgId"
             ? "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-              // "\n" +
-              // "🪬 本次响应延迟(/delay)：" +
-              // getRelayTime(responseTime) +
               "\n" +
               "\n" +
               "你的Tg_Chat_ID ： " +
@@ -388,13 +367,10 @@ function processData(userMessage) {
         };
         let htmlReply =
           "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-          // "\n" +
-          // "🪬 本次响应延迟(/delay)：" +
-          // getRelayTime(responseTime) +
           "\n" +
           "\n" +
           "<b>拦截到</b> " +
-          " @" +
+          " " +
           userMessage.message.from.first_name +
           userMessage.message.from.last_name +
           "<b> 消息中含</b>" +
@@ -410,11 +386,10 @@ function processData(userMessage) {
           disable_web_page_preview: true,
         };
 
-        let data = {
+        linkBot({
           method: "post",
           payload: payload,
-        };
-        UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+        });
 
         //强杀广告 - 直接ban
         let banKeyword_one = Utilities.newBlob(
@@ -434,20 +409,16 @@ function processData(userMessage) {
             until_date: getUnixTime("").toString(),
           };
           try {
-            let data = {
+            linkBot({
               method: "post",
               payload: banPostData,
-            };
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              data
-            );
+            });
 
             let payloadPostData2 = {
               method: "sendMessage",
               chat_id: userMessage.message.chat.id.toString(),
               text:
-                "<b>📣来自XiaoMaoBot管理员的操作提醒</b>" +
+                "<b>🚨XiaoMao绝杀通知</b>" +
                 "\n" +
                 "\n" +
                 "\n" +
@@ -456,8 +427,7 @@ function processData(userMessage) {
                 "\n" +
                 "<b>" +
                 userMessage.message.from.id.toString() +
-                " 触发终极禁忌‼️ ，您已被永久封禁，申诉请私聊" +
-                "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+                " 触发终极禁忌‼️ ，已被永久封禁，领盒饭吧狗子～" +
                 "</b>" +
                 "\n" +
                 "\n" +
@@ -467,14 +437,10 @@ function processData(userMessage) {
               reply_markup: JSON.stringify(keyboardParams),
               disable_web_page_preview: true,
             };
-            let data2 = {
+            linkBot({
               method: "post",
               payload: payloadPostData2,
-            };
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              data2
-            );
+            });
           } catch (e) {}
         }
       }
@@ -492,11 +458,10 @@ function processData(userMessage) {
     }
   } catch (error) {
     if (userMessage.message.chat.type == "private") {
-      let data = {
+      linkBot({
         method: "post",
         payload: payloadPostData,
-      };
-      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+      });
     }
   }
 
@@ -802,8 +767,7 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟛𝟜 <a href='https://t.me/XiaoMaoScript/71'>「和讯财经」</a>" +
         "\n" +
-        "𝟛𝟝 <a href='https://t.me/XiaoMaoScript/72'>「EF Hello」</a>",
-      replyWord2:
+        "𝟛𝟝 <a href='https://t.me/XiaoMaoScript/72'>「EF Hello」</a>" +
         "\n" +
         "𝟛𝟞 <a href='https://t.me/XiaoMaoScript/73'>「Drops」</a>" +
         "\n" +
@@ -813,7 +777,8 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟛𝟡 <a href='https://t.me/XiaoMaoScript/78'>「MoneyThings」</a>" +
         "\n" +
-        "𝟜𝟘 <a href='https://t.me/XiaoMaoScript/79'>「Noted」</a>" +
+        "𝟜𝟘 <a href='https://t.me/XiaoMaoScript/79'>「Noted」</a>",
+      replyWord2:
         "\n" +
         "𝟜𝟙 <a href='https://t.me/XiaoMaoScript/80'>「Pandora」</a>" +
         "\n" +
@@ -866,6 +831,16 @@ function processReplyWord(key, useId, userJson) {
         "𝟞𝟝 <a href='https://t.me/XiaoMaoScript/109'>「SimuFlight」</a>" +
         "\n" +
         "𝟞𝟞 <a href='https://t.me/XiaoMaoScript/110'>「Money-Wise」</a>" +
+        "\n" +
+        "𝟞𝟟 <a href='https://t.me/XiaoMaoScript/111'>「小鱼短信」</a>" +
+        "\n" +
+        "𝟞𝟠 <a href='https://t.me/XiaoMaoScript/112'>「洋葱学园」</a>" +
+        "\n" +
+        "𝟞𝟡 <a href='https://t.me/XiaoMaoScript/113'>「CapyMood」</a>" +
+        "\n" +
+        "𝟟𝟘 <a href='https://t.me/XiaoMaoScript/114'>「MusicMate」</a>" +
+        "\n" +
+        "𝟟𝟙 <a href='https://t.me/XiaoMaoScript/116'>「PhotoRoute」</a>" +
         "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -948,6 +923,8 @@ function processReplyWord(key, useId, userJson) {
         "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/99'>「打工人进度」</a>" +
         "\n" +
         "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/100'>「和包银联红包查询」</a>" +
+        "\n" +
+        "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/117'>「每日语录」</a>" +
         "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -1159,9 +1136,6 @@ function processReplyWord(key, useId, userJson) {
   //未匹配的关键字回复
   let htmlReply =
     "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-    // "\n" +
-    // "🪬 本次响应延迟(/delay)：" +
-    // getRelayTime(responseTime) +
     "\n" +
     "\n" +
     "<b>呜呜呜，关键字</b> " +
@@ -1206,9 +1180,6 @@ function processReplyWord(key, useId, userJson) {
   if (outsideWord.findIndex((i) => key == i) != -1) {
     htmlReply =
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      // "\n" +
-      // "🪬 本次响应延迟(/delay)：" +
-      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>✅微信公众号『小帽集团』，欢迎您的关注！记得点赞收藏哟～</b>" +
@@ -1231,9 +1202,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getWeatherApi(getString(key, isApi(commandWord, key).api));
@@ -1243,9 +1211,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getLinkShort(getString(key, isApi(commandWord, key).api));
@@ -1254,22 +1219,13 @@ function processReplyWord(key, useId, userJson) {
         case 2:
           apiReply(useId, userJson);
           htmlReply =
-            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
-            "\n" +
-            "\n" +
-            getMusic();
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getMusic();
           returnHtmlReply.state = true;
           break;
         case 3:
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getPhoneWhere(getString(key, isApi(commandWord, key).api));
@@ -1279,9 +1235,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getTianGou(getString(key, isApi(commandWord, key).api));
@@ -1291,9 +1244,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getDuJiTang(getString(key, isApi(commandWord, key).api));
@@ -1303,9 +1253,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getVideo(getString(key, isApi(commandWord, key).api));
@@ -1315,22 +1262,13 @@ function processReplyWord(key, useId, userJson) {
         case 7:
           apiReply(useId, userJson);
           htmlReply =
-            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
-            "\n" +
-            "\n" +
-            getYiYan();
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getYiYan();
           returnHtmlReply.state = true;
           break;
         case 8:
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getHelloBot(getString(key, isApi(commandWord, key).api));
@@ -1340,25 +1278,18 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getChatBot(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
         case 10:
-          // apiReply(useId, userJson);
           htmlReply = "getTgId";
           returnHtmlReply.state = true;
           break;
         case 11:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             "Hello,我是 XiaoMao机器人,很高兴认识您！我能较出色的完成以下功能：" +
@@ -1389,9 +1320,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getLanLink(getString(key, isApi(commandWord, key).api));
@@ -1401,9 +1329,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getMiSport(getString(key, isApi(commandWord, key).api));
@@ -1412,9 +1337,6 @@ function processReplyWord(key, useId, userJson) {
         case 14:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getReply(userJson);
@@ -1423,9 +1345,6 @@ function processReplyWord(key, useId, userJson) {
         case 15:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getBanUser(userJson);
@@ -1434,9 +1353,6 @@ function processReplyWord(key, useId, userJson) {
         case 16:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getUnBanUser(userJson);
@@ -1445,9 +1361,6 @@ function processReplyWord(key, useId, userJson) {
         case 17:
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getRestrictUser(userJson);
@@ -1457,9 +1370,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getHotList(getString(key, isApi(commandWord, key).api));
@@ -1469,9 +1379,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getDouBan(getString(key, isApi(commandWord, key).api));
@@ -1481,9 +1388,6 @@ function processReplyWord(key, useId, userJson) {
           apiReply(useId, userJson);
           htmlReply =
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
             "\n" +
             "\n" +
             getHoroscopeList(getString(key, isApi(commandWord, key).api));
@@ -1501,9 +1405,6 @@ function processReplyWord(key, useId, userJson) {
             if (key.indexOf(element) != -1) {
               htmlReply =
                 "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-                // "\n" +
-                // "🪬 本次响应延迟(/delay)：" +
-                // getRelayTime(responseTime) +
                 "\n" +
                 "\n" +
                 item.replyWord;
@@ -1522,13 +1423,7 @@ function processReplyWord(key, useId, userJson) {
           userJson.reply_to_message.from.id == botIdAlone
         ) {
           htmlReply =
-            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-            // "\n" +
-            // "🪬 本次响应延迟(/delay)：" +
-            // getRelayTime(responseTime) +
-            "\n" +
-            "\n" +
-            getHelloBot(key);
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" + "\n" + "\n" + getHelloBot(key);
           returnHtmlReply.state = true;
         }
       } catch (e) {}
@@ -1573,11 +1468,10 @@ function getUnBanUser(userJson) {
       user_id: userJson.reply_to_message.from.id.toString(),
     };
     try {
-      let data = {
+      linkBot({
         method: "post",
         payload: payloadPostData,
-      };
-      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+      });
     } catch (e) {}
 
     let payloadPostData2 = {
@@ -1604,11 +1498,10 @@ function getUnBanUser(userJson) {
       reply_markup: JSON.stringify(keyboardFollowParams),
       disable_web_page_preview: true,
     };
-    let data2 = {
+    linkBot({
       method: "post",
       payload: payloadPostData2,
-    };
-    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data2);
+    });
 
     return "操作成功！";
   } else if (userJson.chat.type == "private") {
@@ -1655,14 +1548,10 @@ function getUnBanUser(userJson) {
             payloadPostData.chat_id = sub2_Text.toString();
 
             try {
-              let data = {
+              linkBot({
                 method: "post",
                 payload: payloadPostData,
-              };
-              UrlFetchApp.fetch(
-                "https://api.telegram.org/bot" + BOTID + "/",
-                data
-              );
+              });
             } catch (e) {}
 
             let sub__1 = textReply.indexOf("chat");
@@ -1695,14 +1584,10 @@ function getUnBanUser(userJson) {
               reply_markup: JSON.stringify(keyboardFollowParams),
               disable_web_page_preview: true,
             };
-            let data2 = {
+            linkBot({
               method: "post",
               payload: payloadPostData2,
-            };
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              data2
-            );
+            });
           } else {
             returnText = "出错了，封禁功能仅限来自群聊类型消息喔！";
             return returnText;
@@ -1758,11 +1643,10 @@ function getBanUser(userJson) {
       until_date: getUnixTime(timeFrame).toString(),
     };
     try {
-      let data = {
+      linkBot({
         method: "post",
         payload: payloadPostData,
-      };
-      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+      });
     } catch (e) {}
 
     let payloadPostData2 = {
@@ -1791,11 +1675,10 @@ function getBanUser(userJson) {
       reply_markup: JSON.stringify(keyboardFollowParams),
       disable_web_page_preview: true,
     };
-    let data2 = {
+    linkBot({
       method: "post",
       payload: payloadPostData2,
-    };
-    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data2);
+    });
 
     return "操作成功！";
   } else if (userJson.chat.type == "private") {
@@ -1842,14 +1725,10 @@ function getBanUser(userJson) {
             payloadPostData.chat_id = sub2_Text.toString();
 
             try {
-              let data = {
+              linkBot({
                 method: "post",
                 payload: payloadPostData,
-              };
-              UrlFetchApp.fetch(
-                "https://api.telegram.org/bot" + BOTID + "/",
-                data
-              );
+              });
             } catch (e) {}
 
             let sub__1 = textReply.indexOf("chat");
@@ -1884,14 +1763,10 @@ function getBanUser(userJson) {
               reply_markup: JSON.stringify(keyboardFollowParams),
               disable_web_page_preview: true,
             };
-            let data2 = {
+            linkBot({
               method: "post",
               payload: payloadPostData2,
-            };
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              data2
-            );
+            });
           } else {
             returnText = "出错了，用户封禁功能仅支持来自群聊类型消息喔！";
             return returnText;
@@ -1963,11 +1838,10 @@ function getRestrictUser(userJson) {
       permissions: JSON.stringify(permission),
     };
     try {
-      let data = {
+      linkBot({
         method: "post",
         payload: payloadPostData,
-      };
-      UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+      });
     } catch (e) {}
 
     let payloadPostData2 = {
@@ -1996,11 +1870,10 @@ function getRestrictUser(userJson) {
       reply_markup: JSON.stringify(keyboardFollowParams),
       disable_web_page_preview: true,
     };
-    let data2 = {
+    linkBot({
       method: "post",
       payload: payloadPostData2,
-    };
-    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data2);
+    });
 
     return "操作成功！";
   } else if (userJson.chat.type == "private") {
@@ -2048,14 +1921,10 @@ function getRestrictUser(userJson) {
             payloadPostData.chat_id = sub2_Text.toString();
 
             try {
-              let data = {
+              linkBot({
                 method: "post",
                 payload: payloadPostData,
-              };
-              UrlFetchApp.fetch(
-                "https://api.telegram.org/bot" + BOTID + "/",
-                data
-              );
+              });
             } catch (e) {}
 
             let sub__1 = textReply.indexOf("chat");
@@ -2090,14 +1959,10 @@ function getRestrictUser(userJson) {
               reply_markup: JSON.stringify(keyboardFollowParams),
               disable_web_page_preview: true,
             };
-            let data2 = {
+            linkBot({
               method: "post",
               payload: payloadPostData2,
-            };
-            UrlFetchApp.fetch(
-              "https://api.telegram.org/bot" + BOTID + "/",
-              data2
-            );
+            });
           } else {
             returnText = "出错了，用户限制功能仅支持来自群聊类型消息喔！";
             return returnText;
@@ -2196,11 +2061,11 @@ function getReply(userJson) {
             payloadPostData.chat_id = sub2_Text.toString();
             payloadPostData.reply_to_message_id = sub2Text.toString();
           }
-          let data = {
+
+          linkBot({
             method: "post",
             payload: payloadPostData,
-          };
-          UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+          });
 
           return "<b>✅ 私聊信息已发送成功</b>";
         } catch (e) {
@@ -2340,7 +2205,8 @@ function pushDataToKing(key) {
     parse_mode: "HTML",
     disable_web_page_preview: true,
   };
-  UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", dataKing);
+
+  linkBot(dataKing);
 
   if (KingInfo) {
     let dataKingInfo = {
@@ -2372,32 +2238,16 @@ function pushDataToKing(key) {
       return;
     }
 
-    UrlFetchApp.fetch(
-      "https://api.telegram.org/bot" + BOTID + "/",
-      dataKingInfo
-    );
+    linkBot(dataKingInfo);
   }
 }
 
 // ------------------------- 核心逻辑函数 -----------------
 
 /**
- * 响应延迟计算
- */
-function getRelayTime(responseTime) {
-  let time = new Date().getTime() - responseTime;
-  if (time > 1000) {
-    time = (time / 1000).toFixed(2);
-    return time + "s";
-  }
-
-  return time + "ms";
-}
-
-/**
  *
  * 敏感词过滤算法
- * 因gas性能有限，暂只收录122条常用敏感词
+ * 因gas性能有限，暂只收录124条常用敏感词
  */
 function checkSensitiveDFA(content) {
   // 敏感词库
@@ -2657,6 +2507,10 @@ function isApi(commandList, key) {
 }
 
 // ------------------------- 核心api函数 -----------------
+function linkBot(data) {
+  UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+}
+
 /**
  * 用于接口前的回复
  */
@@ -2681,9 +2535,6 @@ function apiReply(id, useJson) {
     chat_id: id,
     text:
       "<b>🕹 来自XiaoMaoBot的消息：</b>" +
-      // "\n" +
-      // "🪬 本次响应延迟(/delay)：" +
-      // getRelayTime(responseTime) +
       "\n" +
       "\n" +
       "<b>您的查询指令已成功发送，本次查询过程中将受到运营商网络管制，若200s内无响应则此次通信将被异常终止，请稍后再试～</b>",
@@ -2692,11 +2543,10 @@ function apiReply(id, useJson) {
     reply_markup: JSON.stringify(keyboardFollowParams),
     disable_web_page_preview: true,
   };
-  let data = {
+  linkBot({
     method: "post",
     payload: payloadPostData,
-  };
-  UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+  });
 }
 
 /**
