@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.5-592
+ * @4.5-594
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -64,6 +64,27 @@ var dealMessage = {};
  * @param {*} e
  */
 function doPost(e) {
+  // ！！！！！仅用于数据结构展示，此段代码无效！！！！！
+  if (e == undefined) {
+    let testParams = {
+      postData: {
+        contents:
+          '{"update_id":12345678,"message":{"message_id":12345678,"from":{"id":12345678,"is_bot":false,"first_name":"Name","username":"Name","language_code":"zh-hans"},"chat":{"id":12345678,"first_name":"Name","username":"Name","type":"private"},"date":1703580034,"text":"/start","entities":[{"offset":0,"length":6,"type":"bot_command"}]}}',
+      },
+    };
+    console.log(
+      "e参数示例：",
+      testParams,
+      "该示例仅用于数据结构展示，请勿用于实力生产！！！"
+    );
+    console.error(
+      "【无法通过GAS直接执行问题】机器人通过检测到TG消息方才会响应，直接运行将使得入口函数doPost缺失关键参数而导致失败，若需直接执行，请于本地补全参数e，可作于调试运行。参数e的获取建议于部署完成后，通过私人推送服务获取原始数据。"
+    );
+    return;
+    e = testParams;
+  }
+  // ！！！！！仅用于数据结构展示，此段代码无效！！！！！
+
   // 获取响应数据 必传
   let userMessage = JSON.parse(e.postData.contents);
   // 判断消息类型
@@ -688,6 +709,8 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "🚗【快捷指令】 /js_st" +
         "\n" +
+        "🐒【油猴脚本】 /js_yh" +
+        "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -842,6 +865,10 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟟𝟙 <a href='https://t.me/XiaoMaoScript/116'>「PhotoRoute」</a>" +
         "\n" +
+        "𝟟𝟚 <a href='https://t.me/XiaoMaoScript/118'>「白云天气」</a>" +
+        "\n" +
+        "𝟟𝟛 <a href='https://t.me/XiaoMaoScript/119'>「每日凯格尔」</a>" +
+        "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -951,6 +978,19 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "\n" +
         "<b>🧲<a href='http://mtw.so/5Fan5S'>【帽教程】快捷指令脚本制作教程</a></b>" +
+        "\n" +
+        "\n" +
+        "更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。",
+    },
+    {
+      keyword: ["/js_yh", "油猴脚本"],
+      replyWord:
+        "🐒 <b>XiaoMao 【油猴脚本】 合集</b>" +
+        "\n" +
+        "\n" +
+        "𝟘𝟙 <a href='https://t.me/xiaomaoJT/973'>「网页版有道翻译净化」</a>" +
+        "\n" +
+        "𝟘𝟚 <a href='https://t.me/xiaomaoJT/1012'>「网页版百度翻译净化」</a>" +
         "\n" +
         "\n" +
         "更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。",
@@ -3126,7 +3166,7 @@ function getHotList(type) {
       },
       {
         name: "抖音热榜",
-        type: "gy",
+        type: "dy",
         params: "douyinHot",
       },
       {
