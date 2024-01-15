@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.5-594
+ * @4.5-599
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -204,6 +204,26 @@ function processData(userMessage) {
   // 定义在线回复消息键盘选项
   let keyboardFollowParams = {
     inline_keyboard: followMessageKeyboard,
+  };
+  let resourceWarehouseKeyboardFollowParams = {
+    inline_keyboard: [
+      [
+        { text: "QX仓库", url: "https://github.com/xiaomaoJT/QxScript" },
+        { text: "Bot仓库", url: "https://github.com/xiaomaoJT/TgBot" },
+      ],
+      [
+        { text: "Surge仓库", url: "https://github.com/xiaomaoJT/Surge" },
+        { text: "Loon仓库", url: "https://github.com/xiaomaoJT/Loon" },
+        { text: "Stash仓库", url: "https://github.com/xiaomaoJT/stash" },
+        { text: "Clash仓库", url: "https://github.com/xiaomaoJT/clash" },
+      ],
+      [
+        { text: "✚ 频道", url: "https://t.me/xiaomaoJT" },
+        { text: "✚ 群聊", url: "https://t.me/hSuMjrQppKE5MWU9" },
+        { text: "✚ 脚本", url: "https://t.me/XiaoMaoScript" },
+      ],
+      [{ text: "✚ 微信公众号『小帽集团』 ✚", callback_data: "WXGROUP" }],
+    ],
   };
   // 判断消息类型 - 进行私聊或群聊回复
   let messageUserID =
@@ -419,9 +439,13 @@ function processData(userMessage) {
         let banKeyword_two = Utilities.newBlob(
           Utilities.base64Decode("6ZyA6KaB5bel5L2c")
         ).getDataAsString();
+        let banKeyword_three = Utilities.newBlob(
+          Utilities.base64Decode("5aSE55CG6LWE5paZ")
+        ).getDataAsString();
         if (
           userMessage.message.text.indexOf(banKeyword_one) != -1 ||
-          userMessage.message.text.indexOf(banKeyword_two) != -1
+          userMessage.message.text.indexOf(banKeyword_two) != -1 ||
+          userMessage.message.text.indexOf(banKeyword_three) != -1
         ) {
           let banPostData = {
             method: "banChatMember",
@@ -470,7 +494,7 @@ function processData(userMessage) {
         userMessage.message.text == "资源仓库" ||
         userMessage.message.text.indexOf("Mao") != -1
       ) {
-        payloadPostData.reply_markup = JSON.stringify(keyboardFollowParams);
+        payloadPostData.reply_markup = JSON.stringify(resourceWarehouseKeyboardFollowParams);
       }
 
       if (userMessage.message.text == "微信公众号『小帽集团』") {
@@ -868,6 +892,10 @@ function processReplyWord(key, useId, userJson) {
         "𝟟𝟚 <a href='https://t.me/XiaoMaoScript/118'>「白云天气」</a>" +
         "\n" +
         "𝟟𝟛 <a href='https://t.me/XiaoMaoScript/119'>「每日凯格尔」</a>" +
+        "\n" +
+        "𝟟𝟜 <a href='https://t.me/XiaoMaoScript/120'>「手机硬件管家」</a>" +
+        "\n" +
+        "𝟟𝟝 <a href='https://t.me/XiaoMaoScript/121'>「落格输入法」</a>" +
         "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
