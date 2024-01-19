@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.5-599
+ * @4.6-605
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -118,16 +118,15 @@ function doPost(e) {
   let data = null;
   let payloadStatus = payload instanceof Array;
   if (payloadStatus) {
-    data = [
-      {
-        method: "post",
-        payload: payload[0],
-      },
-      {
-        method: "post",
-        payload: payload[1],
-      },
-    ];
+    data = [];
+    payload.length
+      ? payload.map((e) => {
+          return data.push({
+            method: "post",
+            payload: e,
+          });
+        })
+      : "";
   } else {
     data = {
       method: "post",
@@ -155,10 +154,12 @@ function doPost(e) {
       userMessage.message.entities[0].type == "bold")
   ) {
     if (payloadStatus) {
-      linkBot(data[0]);
-      setStorage(data[0], "MESSAGEBACK");
-      linkBot(data[1]);
-      setStorage(data[1], "MESSAGEBACK");
+      data.length
+        ? data.map(async (e) => {
+            await linkBot(e);
+            await setStorage(e, "MESSAGEBACK");
+          })
+        : "";
     } else {
       linkBot(data);
       setStorage(data, "MESSAGEBACK");
@@ -389,16 +390,19 @@ function processData(userMessage) {
               reply_markup: JSON.stringify(keyboardParams),
               disable_web_page_preview: true,
             },
-            {
-              method: "sendMessage",
-              chat_id: messageUserID,
-              text: dealMessage.htmlReply2,
-              // reply_to_message_id: messageReplyID,
-              parse_mode: "HTML",
-              reply_markup: JSON.stringify(keyboardParams),
-              disable_web_page_preview: true,
-            },
           ];
+          dealMessage.htmlReply2.length
+            ? dealMessage.htmlReply2.map((e) => {
+                return payloadPostData.push({
+                  method: "sendMessage",
+                  chat_id: messageUserID,
+                  text: e,
+                  parse_mode: "HTML",
+                  reply_markup: JSON.stringify(keyboardParams),
+                  disable_web_page_preview: true,
+                });
+              })
+            : "";
         }
       } else {
         payloadPostData = {
@@ -494,7 +498,9 @@ function processData(userMessage) {
         userMessage.message.text == "资源仓库" ||
         userMessage.message.text.indexOf("Mao") != -1
       ) {
-        payloadPostData.reply_markup = JSON.stringify(resourceWarehouseKeyboardFollowParams);
+        payloadPostData.reply_markup = JSON.stringify(
+          resourceWarehouseKeyboardFollowParams
+        );
       }
 
       if (userMessage.message.text == "微信公众号『小帽集团』") {
@@ -784,123 +790,134 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟙𝟡 <a href='https://t.me/XiaoMaoScript/25'>「解剖大师」</a>" +
         "\n" +
-        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/26'>「Instapaper」</a>" +
+        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/26'>「Instapaper」</a>",
+      replyWordMore: [
         "\n" +
-        "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/27'>「日杂相机」</a>" +
+          "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/27'>「日杂相机」</a>" +
+          "\n" +
+          "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/28'>「谜底时钟」</a>" +
+          "\n" +
+          "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/29'>「BHPro」</a>" +
+          "\n" +
+          "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/30'>「目标地图」</a>" +
+          "\n" +
+          "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/31'>「Agenda」</a>" +
+          "\n" +
+          "𝟚𝟞 <a href='https://t.me/XiaoMaoScript/32'>「Fin」</a>" +
+          "\n" +
+          "𝟚𝟟 <a href='https://t.me/XiaoMaoScript/33'>「快对」</a>" +
+          "\n" +
+          "𝟚𝟠 <a href='https://t.me/XiaoMaoScript/34'>「DailyArt」</a>" +
+          "\n" +
+          "𝟚𝟡 <a href='https://t.me/XiaoMaoScript/35'>「Alarmy」</a>" +
+          "\n" +
+          "𝟛𝟘 <a href='https://t.me/XiaoMaoScript/36'>「1Blocker」</a>" +
+          "\n" +
+          "𝟛𝟙 <a href='https://t.me/XiaoMaoScript/37'>「SleepCycle」</a>" +
+          "\n" +
+          "𝟛𝟚 <a href='https://t.me/XiaoMaoScript/38'>「幻休」</a>" +
+          "\n" +
+          "𝟛𝟛 <a href='https://t.me/XiaoMaoScript/39'>「小睡眠」</a>" +
+          "\n" +
+          "𝟛𝟜 <a href='https://t.me/XiaoMaoScript/71'>「和讯财经」</a>" +
+          "\n" +
+          "𝟛𝟝 <a href='https://t.me/XiaoMaoScript/72'>「EF Hello」</a>" +
+          "\n" +
+          "𝟛𝟞 <a href='https://t.me/XiaoMaoScript/73'>「Drops」</a>" +
+          "\n" +
+          "𝟛𝟟 <a href='https://t.me/XiaoMaoScript/75'>「Mix」</a>" +
+          "\n" +
+          "𝟛𝟠 <a href='https://t.me/XiaoMaoScript/77'>「海豚记账本」</a>" +
+          "\n" +
+          "𝟛𝟡 <a href='https://t.me/XiaoMaoScript/78'>「MoneyThings」</a>" +
+          "\n" +
+          "𝟜𝟘 <a href='https://t.me/XiaoMaoScript/79'>「Noted」</a>",
         "\n" +
-        "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/28'>「谜底时钟」</a>" +
+          "𝟜𝟙 <a href='https://t.me/XiaoMaoScript/80'>「Pandora」</a>" +
+          "\n" +
+          "𝟜𝟚 <a href='https://t.me/XiaoMaoScript/81'>「Aphrodite」</a>" +
+          "\n" +
+          "𝟜𝟛 <a href='https://t.me/XiaoMaoScript/82'>「Apollo」</a>" +
+          "\n" +
+          "𝟜𝟜 <a href='https://t.me/XiaoMaoScript/83'>「WidgetArt」</a>" +
+          "\n" +
+          "𝟜𝟝 <a href='https://t.me/XiaoMaoScript/83'>「Hermes」</a>" +
+          "\n" +
+          "𝟜𝟞 <a href='https://t.me/XiaoMaoScript/86'>「PureLibro」</a>" +
+          "\n" +
+          "𝟜𝟟 <a href='https://t.me/XiaoMaoScript/87'>「Pure记账」</a>" +
+          "\n" +
+          "𝟜𝟠 <a href='https://t.me/XiaoMaoScript/88'>「ProKnockOut」</a>" +
+          "\n" +
+          "𝟜𝟡 <a href='https://t.me/XiaoMaoScript/89'>「ChatAI」</a>" +
+          "\n" +
+          "𝟝𝟘 <a href='https://t.me/XiaoMaoScript/90'>「Not Boring系列」</a>" +
+          "\n" +
+          "𝟝𝟙 <a href='https://t.me/XiaoMaoScript/91'>「我的时间」</a>" +
+          "\n" +
+          "𝟝𝟚 <a href='https://t.me/XiaoMaoScript/92'>「VSCO」</a>" +
+          "\n" +
+          "𝟝𝟛 <a href='https://t.me/XiaoMaoScript/94'>「Motivation」</a>" +
+          "\n" +
+          "𝟝𝟜 <a href='https://t.me/XiaoMaoScript/95'>「糖豆」</a>" +
+          "\n" +
+          "𝟝𝟝 <a href='https://t.me/XiaoMaoScript/96'>「NASCTL」</a>" +
+          "\n" +
+          "𝟝𝟞 <a href='https://t.me/XiaoMaoScript/97'>「Aisten」</a>" +
+          "\n" +
+          "𝟝𝟟 <a href='https://t.me/XiaoMaoScript/98'>「FilmNoir」</a>" +
+          "\n" +
+          "𝟝𝟠 <a href='https://t.me/XiaoMaoScript/101'>「ProCamera」</a>" +
+          "\n" +
+          "𝟝𝟡 <a href='https://t.me/XiaoMaoScript/103'>「StressWatch」</a>" +
+          "\n" +
+          "𝟞𝟘 <a href='https://t.me/XiaoMaoScript/104'>「NightVision」</a>",
         "\n" +
-        "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/29'>「BHPro」</a>" +
-        "\n" +
-        "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/30'>「目标地图」</a>" +
-        "\n" +
-        "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/31'>「Agenda」</a>" +
-        "\n" +
-        "𝟚𝟞 <a href='https://t.me/XiaoMaoScript/32'>「Fin」</a>" +
-        "\n" +
-        "𝟚𝟟 <a href='https://t.me/XiaoMaoScript/33'>「快对」</a>" +
-        "\n" +
-        "𝟚𝟠 <a href='https://t.me/XiaoMaoScript/34'>「DailyArt」</a>" +
-        "\n" +
-        "𝟚𝟡 <a href='https://t.me/XiaoMaoScript/35'>「Alarmy」</a>" +
-        "\n" +
-        "𝟛𝟘 <a href='https://t.me/XiaoMaoScript/36'>「1Blocker」</a>" +
-        "\n" +
-        "𝟛𝟙 <a href='https://t.me/XiaoMaoScript/37'>「SleepCycle」</a>" +
-        "\n" +
-        "𝟛𝟚 <a href='https://t.me/XiaoMaoScript/38'>「幻休」</a>" +
-        "\n" +
-        "𝟛𝟛 <a href='https://t.me/XiaoMaoScript/39'>「小睡眠」</a>" +
-        "\n" +
-        "𝟛𝟜 <a href='https://t.me/XiaoMaoScript/71'>「和讯财经」</a>" +
-        "\n" +
-        "𝟛𝟝 <a href='https://t.me/XiaoMaoScript/72'>「EF Hello」</a>" +
-        "\n" +
-        "𝟛𝟞 <a href='https://t.me/XiaoMaoScript/73'>「Drops」</a>" +
-        "\n" +
-        "𝟛𝟟 <a href='https://t.me/XiaoMaoScript/75'>「Mix」</a>" +
-        "\n" +
-        "𝟛𝟠 <a href='https://t.me/XiaoMaoScript/77'>「海豚记账本」</a>" +
-        "\n" +
-        "𝟛𝟡 <a href='https://t.me/XiaoMaoScript/78'>「MoneyThings」</a>" +
-        "\n" +
-        "𝟜𝟘 <a href='https://t.me/XiaoMaoScript/79'>「Noted」</a>",
-      replyWord2:
-        "\n" +
-        "𝟜𝟙 <a href='https://t.me/XiaoMaoScript/80'>「Pandora」</a>" +
-        "\n" +
-        "𝟜𝟚 <a href='https://t.me/XiaoMaoScript/81'>「Aphrodite」</a>" +
-        "\n" +
-        "𝟜𝟛 <a href='https://t.me/XiaoMaoScript/82'>「Apollo」</a>" +
-        "\n" +
-        "𝟜𝟜 <a href='https://t.me/XiaoMaoScript/83'>「WidgetArt」</a>" +
-        "\n" +
-        "𝟜𝟝 <a href='https://t.me/XiaoMaoScript/83'>「Hermes」</a>" +
-        "\n" +
-        "𝟜𝟞 <a href='https://t.me/XiaoMaoScript/86'>「PureLibro」</a>" +
-        "\n" +
-        "𝟜𝟟 <a href='https://t.me/XiaoMaoScript/87'>「Pure记账」</a>" +
-        "\n" +
-        "𝟜𝟠 <a href='https://t.me/XiaoMaoScript/88'>「ProKnockOut」</a>" +
-        "\n" +
-        "𝟜𝟡 <a href='https://t.me/XiaoMaoScript/89'>「ChatAI」</a>" +
-        "\n" +
-        "𝟝𝟘 <a href='https://t.me/XiaoMaoScript/90'>「Not Boring系列」</a>" +
-        "\n" +
-        "𝟝𝟙 <a href='https://t.me/XiaoMaoScript/91'>「我的时间」</a>" +
-        "\n" +
-        "𝟝𝟚 <a href='https://t.me/XiaoMaoScript/92'>「VSCO」</a>" +
-        "\n" +
-        "𝟝𝟛 <a href='https://t.me/XiaoMaoScript/94'>「Motivation」</a>" +
-        "\n" +
-        "𝟝𝟜 <a href='https://t.me/XiaoMaoScript/95'>「糖豆」</a>" +
-        "\n" +
-        "𝟝𝟝 <a href='https://t.me/XiaoMaoScript/96'>「NASCTL」</a>" +
-        "\n" +
-        "𝟝𝟞 <a href='https://t.me/XiaoMaoScript/97'>「Aisten」</a>" +
-        "\n" +
-        "𝟝𝟟 <a href='https://t.me/XiaoMaoScript/98'>「FilmNoir」</a>" +
-        "\n" +
-        "𝟝𝟠 <a href='https://t.me/XiaoMaoScript/101'>「ProCamera」</a>" +
-        "\n" +
-        "𝟝𝟡 <a href='https://t.me/XiaoMaoScript/103'>「StressWatch」</a>" +
-        "\n" +
-        "𝟞𝟘 <a href='https://t.me/XiaoMaoScript/104'>「NightVision」</a>" +
-        "\n" +
-        "𝟞𝟙 <a href='https://t.me/XiaoMaoScript/105'>「中医通」</a>" +
-        "\n" +
-        "𝟞𝟚 <a href='https://t.me/XiaoMaoScript/106'>「intoLive」</a>" +
-        "\n" +
-        "𝟞𝟛 <a href='https://t.me/XiaoMaoScript/107'>「VDIT」</a>" +
-        "\n" +
-        "𝟞𝟜 <a href='https://t.me/XiaoMaoScript/108'>「ImgPlay」</a>" +
-        "\n" +
-        "𝟞𝟝 <a href='https://t.me/XiaoMaoScript/109'>「SimuFlight」</a>" +
-        "\n" +
-        "𝟞𝟞 <a href='https://t.me/XiaoMaoScript/110'>「Money-Wise」</a>" +
-        "\n" +
-        "𝟞𝟟 <a href='https://t.me/XiaoMaoScript/111'>「小鱼短信」</a>" +
-        "\n" +
-        "𝟞𝟠 <a href='https://t.me/XiaoMaoScript/112'>「洋葱学园」</a>" +
-        "\n" +
-        "𝟞𝟡 <a href='https://t.me/XiaoMaoScript/113'>「CapyMood」</a>" +
-        "\n" +
-        "𝟟𝟘 <a href='https://t.me/XiaoMaoScript/114'>「MusicMate」</a>" +
-        "\n" +
-        "𝟟𝟙 <a href='https://t.me/XiaoMaoScript/116'>「PhotoRoute」</a>" +
-        "\n" +
-        "𝟟𝟚 <a href='https://t.me/XiaoMaoScript/118'>「白云天气」</a>" +
-        "\n" +
-        "𝟟𝟛 <a href='https://t.me/XiaoMaoScript/119'>「每日凯格尔」</a>" +
-        "\n" +
-        "𝟟𝟜 <a href='https://t.me/XiaoMaoScript/120'>「手机硬件管家」</a>" +
-        "\n" +
-        "𝟟𝟝 <a href='https://t.me/XiaoMaoScript/121'>「落格输入法」</a>" +
-        "\n" +
-        "\n" +
-        "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
-        "\n" +
-        "更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。",
+          "𝟞𝟙 <a href='https://t.me/XiaoMaoScript/105'>「中医通」</a>" +
+          "\n" +
+          "𝟞𝟚 <a href='https://t.me/XiaoMaoScript/106'>「intoLive」</a>" +
+          "\n" +
+          "𝟞𝟛 <a href='https://t.me/XiaoMaoScript/107'>「VDIT」</a>" +
+          "\n" +
+          "𝟞𝟜 <a href='https://t.me/XiaoMaoScript/108'>「ImgPlay」</a>" +
+          "\n" +
+          "𝟞𝟝 <a href='https://t.me/XiaoMaoScript/109'>「SimuFlight」</a>" +
+          "\n" +
+          "𝟞𝟞 <a href='https://t.me/XiaoMaoScript/110'>「Money-Wise」</a>" +
+          "\n" +
+          "𝟞𝟟 <a href='https://t.me/XiaoMaoScript/111'>「小鱼短信」</a>" +
+          "\n" +
+          "𝟞𝟠 <a href='https://t.me/XiaoMaoScript/112'>「洋葱学园」</a>" +
+          "\n" +
+          "𝟞𝟡 <a href='https://t.me/XiaoMaoScript/113'>「CapyMood」</a>" +
+          "\n" +
+          "𝟟𝟘 <a href='https://t.me/XiaoMaoScript/114'>「MusicMate」</a>" +
+          "\n" +
+          "𝟟𝟙 <a href='https://t.me/XiaoMaoScript/116'>「PhotoRoute」</a>" +
+          "\n" +
+          "𝟟𝟚 <a href='https://t.me/XiaoMaoScript/118'>「白云天气」</a>" +
+          "\n" +
+          "𝟟𝟛 <a href='https://t.me/XiaoMaoScript/119'>「每日凯格尔」</a>" +
+          "\n" +
+          "𝟟𝟜 <a href='https://t.me/XiaoMaoScript/120'>「手机硬件管家」</a>" +
+          "\n" +
+          "𝟟𝟝 <a href='https://t.me/XiaoMaoScript/121'>「落格输入法」</a>" +
+          "\n" +
+          "𝟟𝟞 <a href='https://t.me/XiaoMaoScript/122'>「AdBlocker」</a>" +
+          "\n" +
+          "𝟟𝟟 <a href='https://t.me/XiaoMaoScript/123'>「CryptoPro」</a>" +
+          "\n" +
+          "𝟟𝟠 <a href='https://t.me/XiaoMaoScript/126'>「剪画」</a>" +
+          "\n" +
+          "𝟟𝟡 <a href='https://t.me/XiaoMaoScript/130'>「币安」</a>" +
+          "\n" +
+          "𝟠𝟘 <a href='https://t.me/XiaoMaoScript/131'>「Percento」</a>" +
+          "\n" +
+          "\n" +
+          "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
+          "\n" +
+          "更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。",
+      ],
     },
     {
       keyword: ["/js_ass", "辅助脚本"],
@@ -980,6 +997,8 @@ function processReplyWord(key, useId, userJson) {
         "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/100'>「和包银联红包查询」</a>" +
         "\n" +
         "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/117'>「每日语录」</a>" +
+        "\n" +
+        "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/129'>「阿里云盘自动签到」</a>" +
         "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -1477,8 +1496,8 @@ function processReplyWord(key, useId, userJson) {
                 "\n" +
                 item.replyWord;
 
-              item.hasOwnProperty("replyWord2")
-                ? (returnHtmlReply.htmlReply2 = item.replyWord2)
+              item.hasOwnProperty("replyWordMore")
+                ? (returnHtmlReply.htmlReply2 = item.replyWordMore)
                 : (returnHtmlReply.htmlReply2 = null);
               returnHtmlReply.state = true;
               throw new Error("匹配成功");
