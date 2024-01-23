@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.6-605
+ * @4.6-615
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -797,7 +797,7 @@ function processReplyWord(key, useId, userJson) {
           "\n" +
           "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/28'>「谜底时钟」</a>" +
           "\n" +
-          "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/29'>「BHPro」</a>" +
+          "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/29'>「边界调研」</a>" +
           "\n" +
           "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/30'>「目标地图」</a>" +
           "\n" +
@@ -1697,6 +1697,41 @@ function getUnBanUser(userJson) {
 }
 
 /**
+ * 删除信息
+ * @param params
+ * @param type
+ */
+function deleteUserMessage(params, type = 1) {
+  let payloadDeletePostData = {
+    method: "deleteMessage",
+    chat_id: "",
+    message_id: "",
+  };
+  if (type == 1) {
+    // 删除信息
+    let userJsonText = params.reply_to_message.text;
+    let startIndex = userJsonText.indexOf('message_id":');
+    let endIndex = userJsonText.indexOf(',"from');
+    let message_id = userJsonText.substring(startIndex + 12, endIndex);
+    let firstIndex = userJsonText.indexOf('chat":{"id":');
+    let lastIndex = userJsonText.indexOf(',"title');
+    let chat_id = userJsonText.substring(firstIndex + 12, lastIndex);
+    payloadDeletePostData.chat_id = chat_id;
+    payloadDeletePostData.message_id = message_id;
+  } else {
+    payloadDeletePostData.chat_id = params.reply_to_message.chat.id.toString();
+    payloadDeletePostData.message_id = params.reply_to_message.message_id.toString();
+  }
+
+  try {
+    linkBot({
+      method: "post",
+      payload: payloadDeletePostData,
+    });
+  } catch (e) {}
+}
+
+/**
  * 封禁用户
  * @param userJson
  * @returns
@@ -1729,6 +1764,7 @@ function getBanUser(userJson) {
       user_id: userJson.reply_to_message.from.id.toString(),
       until_date: getUnixTime(timeFrame).toString(),
     };
+
     try {
       linkBot({
         method: "post",
@@ -1741,7 +1777,6 @@ function getBanUser(userJson) {
       chat_id: userJson.reply_to_message.chat.id.toString(),
       text:
         "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
-        "\n" +
         "\n" +
         "\n" +
         "<b>===========================</b>" +
@@ -1766,6 +1801,7 @@ function getBanUser(userJson) {
       method: "post",
       payload: payloadPostData2,
     });
+    deleteUserMessage(userJson, 2);
 
     return "操作成功！";
   } else if (userJson.chat.type == "private") {
@@ -1831,7 +1867,6 @@ function getBanUser(userJson) {
                 "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
                 "\n" +
                 "\n" +
-                "\n" +
                 "<b>===========================</b>" +
                 "\n" +
                 "\n" +
@@ -1854,6 +1889,8 @@ function getBanUser(userJson) {
               method: "post",
               payload: payloadPostData2,
             });
+
+            deleteUserMessage(userJson);
           } else {
             returnText = "出错了，用户封禁功能仅支持来自群聊类型消息喔！";
             return returnText;
@@ -1938,7 +1975,6 @@ function getRestrictUser(userJson) {
         "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
         "\n" +
         "\n" +
-        "\n" +
         "<b>===========================</b>" +
         "\n" +
         "\n" +
@@ -1961,6 +1997,7 @@ function getRestrictUser(userJson) {
       method: "post",
       payload: payloadPostData2,
     });
+    deleteUserMessage(userJson, 2);
 
     return "操作成功！";
   } else if (userJson.chat.type == "private") {
@@ -2027,7 +2064,6 @@ function getRestrictUser(userJson) {
                 "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
                 "\n" +
                 "\n" +
-                "\n" +
                 "<b>===========================</b>" +
                 "\n" +
                 "\n" +
@@ -2050,6 +2086,7 @@ function getRestrictUser(userJson) {
               method: "post",
               payload: payloadPostData2,
             });
+            deleteUserMessage(userJson);
           } else {
             returnText = "出错了，用户限制功能仅支持来自群聊类型消息喔！";
             return returnText;
@@ -2115,7 +2152,6 @@ function getReply(userJson) {
             chat_id: userJson.from.id.toString(),
             text:
               "<b>📣来自XiaoMaoBot管理员的主动回复</b>" +
-              "\n" +
               "\n" +
               "\n" +
               "<b>===========================</b>" +
@@ -2595,7 +2631,9 @@ function isApi(commandList, key) {
 
 // ------------------------- 核心api函数 -----------------
 function linkBot(data) {
-  UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+  try {
+    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+  } catch (error) {}
 }
 
 /**
