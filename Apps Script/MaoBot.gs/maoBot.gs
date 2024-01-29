@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.6-615
+ * @4.6-619
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -58,6 +58,147 @@ var MESSAGETYPE = 0;
 var dealMessage = {};
 
 // ------------------------- 核心调用函数 -----------------
+
+// 内容已作加密处理base64
+var sensitiveEncodeList = [
+  "6aKE5LuY",
+  "6ZyA6KaB5bel5L2c",
+  "5pW055CG5pWw5o2u",
+  "5aSE55CG6LWE5paZ",
+  "5oOz5YGa55qE6IGU57O7",
+  "5pyJ5rKh5pyJ5Lq65bmy5rS7",
+  "5Yuk5b+r55qE5p2l",
+  "5qOL54mM",
+  "5b2p56Wo",
+  "55yf5Lq6",
+  "5pON5aWz",
+  "5pON5aW5",
+  "5pON5LuW",
+  "5Yqg5b6u",
+  "5YqgVg==",
+  "5Yqgdg==",
+  "5Lq65YW9",
+  "5Lmx5Lym",
+  "5Lmz5rKf",
+  "5YW95Lqk",
+  "5Y2W5q+U",
+  "5Y2W6YC8",
+  "5Y+X5a2V",
+  "5bCE57K+",
+  "5aW45rer",
+  "5aaI6YC8",
+  "5aaT5aWz",
+  "5aiH5ZaY",
+  "5amK5a2Q",
+  "5aqa5aaZ",
+  "5byA6Iue",
+  "5oCn5Lqk",
+  "5oCn5aW0",
+  "5oCn5qyy",
+  "5oCn54ix",
+  "5oCn6JmQ5b6F",
+  "5oOF6Imy",
+  "5aupYg==",
+  "5aupQg==",
+  "5rer5Lmx",
+  "5rer5aaH",
+  "6I2h5aaH",
+  "6IKb5Lqk",
+  "57K+5ray",
+  "54OC5q+U",
+  "54OC6YC8",
+  "6IKJ5qOS",
+  "6IKJ57yd",
+  "6IKP",
+  "5aSn6bih5be0",
+  "5aSn6Zue5be0",
+  "57qm54Ku",
+  "5pON5q+U",
+  "5pON6YC8",
+  "6Zi06IyO",
+  "6Zi06JKC",
+  "6Zi06YGT",
+  "5Lic5Lqs54Ot",
+  "5p2x5Lqs54ax",
+  "5q+b5rO95Lic",
+  "55aG542o",
+  "5Lmg6L+R5bmz",
+  "6YKT5bCP5bmz",
+  "5rGf5rO95rCR",
+  "6IOh6ZSm5rab",
+  "5Lmg6L+b5bmz",
+  "5b2t5Li95aqb",
+  "6YSn5bCP5bmz",
+  "5YWa5ZCO6JCO",
+  "5aSp5a6J6Zeo5bGg5p2A",
+  "6KKr5Lit5YWx",
+  "5YWx54uX",
+  "5Lic5YyX54us56uL",
+  "5YWx5Lqn5YWa",
+  "5YWa5Lit5aSu",
+  "6JeP54us",
+  "5Lmx5aW4",
+  "5Lmx5Lym57G7",
+  "5Lmx5Lym5bCP",
+  "5LqC5YCr",
+  "5o+S5bGB5bGB",
+  "5aeQ5YyF5aSc",
+  "6bih5be0",
+  "5YW86IGM5LiK6Zeo",
+  "6aqa5aaH",
+  "6aqa56m0",
+  "6K+x5aW4",
+  "5o2i5aa7",
+  "5rex5ZaJ",
+  "5ZC56JCn",
+  "6L2u5aW4",
+  "5bCP56m0",
+  "6bKN6bG8",
+  "5aSr5aa75Lqk5o2i",
+  "6Zmw5ZSH",
+  "6Zmw6YGT",
+  "5ZCD57K+",
+  "5ZCe57K+",
+  "5YaF5bCE",
+  "54ix5ray",
+  "5rC15Y67",
+  "5rC15Y676L2m5LuR5bel5Yqb",
+  "5rOVKuWKnw==",
+  "5rOVbHVu5Yqf",
+  "5pON5LuW",
+  "5pON5L2g",
+  "5pON5L2g5aaI",
+  "5pON6JuL",
+  "5pel5L2g5aaI",
+  "5pel5q275L2g",
+  "5Y675L2g5aaI55qE",
+  "5YK76YC8",
+  "6Im5",
+  "6I2J5rOl6ams",
+  "5L2g5aaI55qE",
+  "5bmy5L2g5aiY",
+  "5oiR5pON5L2g",
+  "6Z2g5L2g5aaI",
+  "5p2C56eN",
+  "5pel6LWa",
+  "5Yqe6K+B",
+  "5b2p56Wo",
+  "5YKs55yg5rC0",
+  "5YKs5oOF57KJ",
+  "5YKs5oOF6I2v",
+  "5YKs5oOF6Jel",
+  "5Y+R56Wo5Ye6",
+  "5Y+R56Wo5Luj",
+  "5Y+R56Wo6ZSA",
+  "55m856Wo",
+  "6L+35aW46I2v",
+  "6L+35oOF5rC0",
+  "6L+35oOF6I2v",
+  "6L+36Jel",
+  "5Luj5Yqe",
+];
+
+// ------------------------- 敏感词库 -------------------------
 
 /**
  * 用于接收用户传来的讯息JSON
@@ -437,20 +578,23 @@ function processData(userMessage) {
         });
 
         //强杀广告 - 直接ban
-        let banKeyword_one = Utilities.newBlob(
-          Utilities.base64Decode("6aKE5LuY")
-        ).getDataAsString();
-        let banKeyword_two = Utilities.newBlob(
-          Utilities.base64Decode("6ZyA6KaB5bel5L2c")
-        ).getDataAsString();
-        let banKeyword_three = Utilities.newBlob(
-          Utilities.base64Decode("5aSE55CG6LWE5paZ")
-        ).getDataAsString();
-        if (
-          userMessage.message.text.indexOf(banKeyword_one) != -1 ||
-          userMessage.message.text.indexOf(banKeyword_two) != -1 ||
-          userMessage.message.text.indexOf(banKeyword_three) != -1
-        ) {
+        let banKeyWords =
+          sensitiveEncodeList
+            .slice(0, 7)
+            .map((word) =>
+              Utilities.newBlob(Utilities.base64Decode(word)).getDataAsString()
+            ) || [];
+        function judgeBanStatus(banStauts = false) {
+          for (i in banKeyWords) {
+            if (userMessage.message.text.includes(banKeyWords[i])) {
+              banStauts = true;
+              break;
+            }
+          }
+          return banStauts;
+        }
+
+        if (judgeBanStatus()) {
           let banPostData = {
             method: "banChatMember",
             chat_id: userMessage.message.chat.id.toString(),
@@ -476,7 +620,7 @@ function processData(userMessage) {
                 "\n" +
                 "<b>" +
                 userMessage.message.from.id.toString() +
-                " 触发终极禁忌‼️ ，已被永久封禁，领盒饭吧狗子～" +
+                " 触发终极禁忌‼️ ，已被永久封禁，领盒饭吧狗子🐶～" +
                 "</b>" +
                 "\n" +
                 "\n" +
@@ -912,6 +1056,12 @@ function processReplyWord(key, useId, userJson) {
           "𝟟𝟡 <a href='https://t.me/XiaoMaoScript/130'>「币安」</a>" +
           "\n" +
           "𝟠𝟘 <a href='https://t.me/XiaoMaoScript/131'>「Percento」</a>" +
+          "\n" +
+          "𝟠𝟙 <a href='https://t.me/XiaoMaoScript/132'>「今日解忧」</a>" +
+          "\n" +
+          "𝟠𝟚 <a href='https://t.me/XiaoMaoScript/133'>「Budget Flow」</a>" +
+          "\n" +
+          "𝟠𝟛 <a href='https://t.me/XiaoMaoScript/134'>「Days Since」</a>" +
           "\n" +
           "\n" +
           "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -1720,7 +1870,8 @@ function deleteUserMessage(params, type = 1) {
     payloadDeletePostData.message_id = message_id;
   } else {
     payloadDeletePostData.chat_id = params.reply_to_message.chat.id.toString();
-    payloadDeletePostData.message_id = params.reply_to_message.message_id.toString();
+    payloadDeletePostData.message_id =
+      params.reply_to_message.message_id.toString();
   }
 
   try {
@@ -2370,145 +2521,10 @@ function pushDataToKing(key) {
 /**
  *
  * 敏感词过滤算法
+ * 敏感词已放置于代码前置
  * 因gas性能有限，暂只收录124条常用敏感词
  */
 function checkSensitiveDFA(content) {
-  // 敏感词库
-  // 内容已作加密处理base64
-  let sensitiveEncodeList = [
-    "6aKE5LuY",
-    "6ZyA6KaB5bel5L2c",
-    "5pW055CG5pWw5o2u",
-    "5qOL54mM",
-    "5b2p56Wo",
-    "55yf5Lq6",
-    "5pON5aWz",
-    "5pON5aW5",
-    "5pON5LuW",
-    "5Yqg5b6u",
-    "5YqgVg==",
-    "5Yqgdg==",
-    "5Lq65YW9",
-    "5Lmx5Lym",
-    "5Lmz5rKf",
-    "5YW95Lqk",
-    "5Y2W5q+U",
-    "5Y2W6YC8",
-    "5Y+X5a2V",
-    "5bCE57K+",
-    "5aW45rer",
-    "5aaI6YC8",
-    "5aaT5aWz",
-    "5aiH5ZaY",
-    "5amK5a2Q",
-    "5aqa5aaZ",
-    "5byA6Iue",
-    "5oCn5Lqk",
-    "5oCn5aW0",
-    "5oCn5qyy",
-    "5oCn54ix",
-    "5oCn6JmQ5b6F",
-    "5oOF6Imy",
-    "5aupYg==",
-    "5aupQg==",
-    "5rer5Lmx",
-    "5rer5aaH",
-    "6I2h5aaH",
-    "6IKb5Lqk",
-    "57K+5ray",
-    "54OC5q+U",
-    "54OC6YC8",
-    "6IKJ5qOS",
-    "6IKJ57yd",
-    "6IKP",
-    "5aSn6bih5be0",
-    "5aSn6Zue5be0",
-    "57qm54Ku",
-    "5pON5q+U",
-    "5pON6YC8",
-    "6Zi06IyO",
-    "6Zi06JKC",
-    "6Zi06YGT",
-    "5Lic5Lqs54Ot",
-    "5p2x5Lqs54ax",
-    "5q+b5rO95Lic",
-    "55aG542o",
-    "5Lmg6L+R5bmz",
-    "6YKT5bCP5bmz",
-    "5rGf5rO95rCR",
-    "6IOh6ZSm5rab",
-    "5Lmg6L+b5bmz",
-    "5b2t5Li95aqb",
-    "6YSn5bCP5bmz",
-    "5YWa5ZCO6JCO",
-    "5aSp5a6J6Zeo5bGg5p2A",
-    "6KKr5Lit5YWx",
-    "5YWx54uX",
-    "5Lic5YyX54us56uL",
-    "5YWx5Lqn5YWa",
-    "5YWa5Lit5aSu",
-    "6JeP54us",
-    "5Lmx5aW4",
-    "5Lmx5Lym57G7",
-    "5Lmx5Lym5bCP",
-    "5LqC5YCr",
-    "5o+S5bGB5bGB",
-    "5aeQ5YyF5aSc",
-    "6bih5be0",
-    "5YW86IGM5LiK6Zeo",
-    "6aqa5aaH",
-    "6aqa56m0",
-    "6K+x5aW4",
-    "5o2i5aa7",
-    "5rex5ZaJ",
-    "5ZC56JCn",
-    "6L2u5aW4",
-    "5bCP56m0",
-    "6bKN6bG8",
-    "5aSr5aa75Lqk5o2i",
-    "6Zmw5ZSH",
-    "6Zmw6YGT",
-    "5ZCD57K+",
-    "5ZCe57K+",
-    "5YaF5bCE",
-    "54ix5ray",
-    "5rC15Y67",
-    "5rC15Y676L2m5LuR5bel5Yqb",
-    "5rOVKuWKnw==",
-    "5rOVbHVu5Yqf",
-    "5pON5LuW",
-    "5pON5L2g",
-    "5pON5L2g5aaI",
-    "5pON6JuL",
-    "5pel5L2g5aaI",
-    "5pel5q275L2g",
-    "5Y675L2g5aaI55qE",
-    "5YK76YC8",
-    "6Im5",
-    "6I2J5rOl6ams",
-    "5L2g5aaI55qE",
-    "5bmy5L2g5aiY",
-    "5oiR5pON5L2g",
-    "6Z2g5L2g5aaI",
-    "5p2C56eN",
-    "5pel6LWa",
-    "5Yqe6K+B",
-    "5b2p56Wo",
-    "5YKs55yg5rC0",
-    "5YKs5oOF57KJ",
-    "5YKs5oOF6I2v",
-    "5YKs5oOF6Jel",
-    "5Y+R56Wo5Ye6",
-    "5Y+R56Wo5Luj",
-    "5Y+R56Wo6ZSA",
-    "55m856Wo",
-    "6L+35aW46I2v",
-    "6L+35oOF5rC0",
-    "6L+35oOF6I2v",
-    "6L+36Jel",
-    "5Luj5Yqe",
-  ];
-
   // 特殊符号过滤逻辑
   let ignoreChars =
     " \t\r\n~!@#$%^&*()_+-=【】、{}|;':\"，。、《》？αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ。，、；：？！…—·ˉ¨‘’“”々～‖∶＂＇｀｜〃〔〕〈〉《》「」『』．〖〗【】（）［］｛｝ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅫ⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑⒒⒓⒔⒕⒖⒗⒘⒙⒚⒛㈠㈡㈢㈣㈤㈥㈦㈧㈨㈩①②③④⑤⑥⑦⑧⑨⑩⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽⑾⑿⒀⒁⒂⒃⒄⒅⒆⒇≈≡≠＝≤≥＜＞≮≯∷±＋－×÷／∫∮∝∞∧∨∑∏∪∩∈∵∴⊥∥∠⌒⊙≌∽√§№☆★○●◎◇◆□℃‰€■△▲※→←↑↓〓¤°＃＆＠＼︿＿￣―♂♀┌┍┎┐┑┒┓─┄┈├┝┞┟┠┡┢┣│┆┊┬┭┮┯┰┱┲┳┼┽┾┿╀╁╂╃└┕┖┗┘┙┚┛━┅┉┤┥┦┧┨┩┪┫┃┇┋┴┵┶┷┸┹┺┻╋╊╉╈╇╆╅╄";
