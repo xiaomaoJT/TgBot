@@ -95,6 +95,10 @@ var MESSAGETYPE = 0;
 //var responseTime = "";
 // 用于承接返回数据
 var dealMessage = {};
+
+// ------------------------- 敏感词库 -------------------------
+// 见下文checkSensitiveDFA方法介绍
+var sensitiveEncodeList = [...]
 ```
 
 ---
@@ -296,6 +300,10 @@ __underline__
 > 基于 dfa 算法的关键字过滤，用于过滤敏感词
 >
 > 敏感词**sensitiveEncodeList**使用 base64 加密
+>
+> ⚠️sensitiveEncodeList列表自{@Beta4.6-619}版本后提前至函数顶部位置
+>
+> 默认取sensitiveEncodeList前七位作为绝杀关键字，即触发立即拉黑、封禁、踢群、删消息。
 
 ------
 
