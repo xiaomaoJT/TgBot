@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.6-619
+ * @4.6-628
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -59,8 +59,11 @@ var dealMessage = {};
 
 // ------------------------- 核心调用函数 -----------------
 
+// 强ban关键字截止位
+var banKeyLastIndex = 8;
 // 内容已作加密处理base64
 var sensitiveEncodeList = [
+  "6ZW/5pyf5oub5Lq6",
   "6aKE5LuY",
   "6ZyA6KaB5bel5L2c",
   "5pW055CG5pWw5o2u",
@@ -580,7 +583,7 @@ function processData(userMessage) {
         //强杀广告 - 直接ban
         let banKeyWords =
           sensitiveEncodeList
-            .slice(0, 7)
+            .slice(0, banKeyLastIndex)
             .map((word) =>
               Utilities.newBlob(Utilities.base64Decode(word)).getDataAsString()
             ) || [];
@@ -896,172 +899,222 @@ function processReplyWord(key, useId, userJson) {
         "🚇<b>XiaoMao 【会员脚本】 合集</b>" +
         "\n" +
         "\n" +
-        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/7'>「彩云天气/彩云天气Pro」</a>" +
+        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/7'> 彩云天气/彩云天气Pro</a>" +
         "\n" +
-        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/8'>「百度网盘」</a>" +
+        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/8'> 百度网盘</a>" +
         "\n" +
-        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/9'>「黄油相机」</a>" +
+        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/9'> 黄油相机</a>" +
         "\n" +
-        "𝟘𝟜 <a href='https://t.me/XiaoMaoScript/10'>「B612咔叽」</a>" +
+        "𝟘𝟜 <a href='https://t.me/XiaoMaoScript/10'> B612咔叽</a>" +
         "\n" +
-        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/11'>「WPS」</a>" +
+        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/11'> WPS</a>" +
         "\n" +
-        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/12'>「扫描全能王」</a>" +
+        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/12'> 扫描全能王</a>" +
         "\n" +
-        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/13'>「Xmind」</a>" +
+        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/13'> Xmind</a>" +
         "\n" +
-        "𝟘𝟠 <a href='https://t.me/XiaoMaoScript/14'>「今日热榜」</a>" +
+        "𝟘𝟠 <a href='https://t.me/XiaoMaoScript/14'> 今日热榜</a>" +
         "\n" +
-        "𝟘𝟡 <a href='https://t.me/XiaoMaoScript/15'>「阿里云盘」</a>" +
+        "𝟘𝟡 <a href='https://t.me/XiaoMaoScript/15'> 阿里云盘</a>" +
         "\n" +
-        "𝟙𝟘 <a href='https://t.me/XiaoMaoScript/16'>「NYMF」</a>" +
+        "𝟙𝟘 <a href='https://t.me/XiaoMaoScript/16'> NYMF</a>" +
         "\n" +
-        "𝟙𝟙 <a href='https://t.me/XiaoMaoScript/17'>「微博/微博轻享版」</a>" +
+        "𝟙𝟙 <a href='https://t.me/XiaoMaoScript/17'> 微博/微博轻享版</a>" +
         "\n" +
-        "𝟙𝟚 <a href='https://t.me/XiaoMaoScript/18'>「AllMyBatteries」</a>" +
+        "𝟙𝟚 <a href='https://t.me/XiaoMaoScript/18'> AllMyBatteries</a>" +
         "\n" +
-        "𝟙𝟛 <a href='https://t.me/XiaoMaoScript/19'>「Picsew专业版」</a>" +
+        "𝟙𝟛 <a href='https://t.me/XiaoMaoScript/19'> Picsew专业版</a>" +
         "\n" +
-        "𝟙𝟜 <a href='https://t.me/XiaoMaoScript/20'>「公考雷达」</a>" +
+        "𝟙𝟜 <a href='https://t.me/XiaoMaoScript/20'> 公考雷达</a>" +
         "\n" +
-        "𝟙𝟝 <a href='https://t.me/XiaoMaoScript/21'>「堆糖」</a>" +
+        "𝟙𝟝 <a href='https://t.me/XiaoMaoScript/21'> 堆糖</a>" +
         "\n" +
-        "𝟙𝟞 <a href='https://t.me/XiaoMaoScript/22'>「MyJumpLab」</a>" +
+        "𝟙𝟞 <a href='https://t.me/XiaoMaoScript/22'> MyJumpLab</a>" +
         "\n" +
-        "𝟙𝟟 <a href='https://t.me/XiaoMaoScript/23'>「Pillow」</a>" +
+        "𝟙𝟟 <a href='https://t.me/XiaoMaoScript/23'> Pillow</a>" +
         "\n" +
-        "𝟙𝟠 <a href='https://t.me/XiaoMaoScript/24'>「问真八字」</a>" +
+        "𝟙𝟠 <a href='https://t.me/XiaoMaoScript/24'> 问真八字</a>" +
         "\n" +
-        "𝟙𝟡 <a href='https://t.me/XiaoMaoScript/25'>「解剖大师」</a>" +
+        "𝟙𝟡 <a href='https://t.me/XiaoMaoScript/25'> 解剖大师</a>" +
         "\n" +
-        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/26'>「Instapaper」</a>",
+        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/26'> Instapaper</a>",
       replyWordMore: [
         "\n" +
-          "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/27'>「日杂相机」</a>" +
+          "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/27'> 日杂相机</a>" +
           "\n" +
-          "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/28'>「谜底时钟」</a>" +
+          "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/28'> 谜底时钟</a>" +
           "\n" +
-          "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/29'>「边界调研」</a>" +
+          "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/29'> 边界调研</a>" +
           "\n" +
-          "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/30'>「目标地图」</a>" +
+          "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/30'> 目标地图</a>" +
           "\n" +
-          "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/31'>「Agenda」</a>" +
+          "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/31'> Agenda</a>" +
           "\n" +
-          "𝟚𝟞 <a href='https://t.me/XiaoMaoScript/32'>「Fin」</a>" +
+          "𝟚𝟞 <a href='https://t.me/XiaoMaoScript/32'> Fin</a>" +
           "\n" +
-          "𝟚𝟟 <a href='https://t.me/XiaoMaoScript/33'>「快对」</a>" +
+          "𝟚𝟟 <a href='https://t.me/XiaoMaoScript/33'> 快对</a>" +
           "\n" +
-          "𝟚𝟠 <a href='https://t.me/XiaoMaoScript/34'>「DailyArt」</a>" +
+          "𝟚𝟠 <a href='https://t.me/XiaoMaoScript/34'> DailyArt</a>" +
           "\n" +
-          "𝟚𝟡 <a href='https://t.me/XiaoMaoScript/35'>「Alarmy」</a>" +
+          "𝟚𝟡 <a href='https://t.me/XiaoMaoScript/35'> Alarmy</a>" +
           "\n" +
-          "𝟛𝟘 <a href='https://t.me/XiaoMaoScript/36'>「1Blocker」</a>" +
+          "𝟛𝟘 <a href='https://t.me/XiaoMaoScript/36'> 1Blocker</a>" +
           "\n" +
-          "𝟛𝟙 <a href='https://t.me/XiaoMaoScript/37'>「SleepCycle」</a>" +
+          "𝟛𝟙 <a href='https://t.me/XiaoMaoScript/37'> SleepCycle</a>" +
           "\n" +
-          "𝟛𝟚 <a href='https://t.me/XiaoMaoScript/38'>「幻休」</a>" +
+          "𝟛𝟚 <a href='https://t.me/XiaoMaoScript/38'> 幻休</a>" +
           "\n" +
-          "𝟛𝟛 <a href='https://t.me/XiaoMaoScript/39'>「小睡眠」</a>" +
+          "𝟛𝟛 <a href='https://t.me/XiaoMaoScript/39'> 小睡眠</a>" +
           "\n" +
-          "𝟛𝟜 <a href='https://t.me/XiaoMaoScript/71'>「和讯财经」</a>" +
+          "𝟛𝟜 <a href='https://t.me/XiaoMaoScript/71'> 和讯财经</a>" +
           "\n" +
-          "𝟛𝟝 <a href='https://t.me/XiaoMaoScript/72'>「EF Hello」</a>" +
+          "𝟛𝟝 <a href='https://t.me/XiaoMaoScript/72'> EF Hello</a>" +
           "\n" +
-          "𝟛𝟞 <a href='https://t.me/XiaoMaoScript/73'>「Drops」</a>" +
+          "𝟛𝟞 <a href='https://t.me/XiaoMaoScript/73'> Drops</a>" +
           "\n" +
-          "𝟛𝟟 <a href='https://t.me/XiaoMaoScript/75'>「Mix」</a>" +
+          "𝟛𝟟 <a href='https://t.me/XiaoMaoScript/75'> Mix</a>" +
           "\n" +
-          "𝟛𝟠 <a href='https://t.me/XiaoMaoScript/77'>「海豚记账本」</a>" +
+          "𝟛𝟠 <a href='https://t.me/XiaoMaoScript/77'> 海豚记账本</a>" +
           "\n" +
-          "𝟛𝟡 <a href='https://t.me/XiaoMaoScript/78'>「MoneyThings」</a>" +
+          "𝟛𝟡 <a href='https://t.me/XiaoMaoScript/78'> MoneyThings</a>" +
           "\n" +
-          "𝟜𝟘 <a href='https://t.me/XiaoMaoScript/79'>「Noted」</a>",
+          "𝟜𝟘 <a href='https://t.me/XiaoMaoScript/79'> Noted</a>",
         "\n" +
-          "𝟜𝟙 <a href='https://t.me/XiaoMaoScript/80'>「Pandora」</a>" +
+          "𝟜𝟙 <a href='https://t.me/XiaoMaoScript/80'> Pandora</a>" +
           "\n" +
-          "𝟜𝟚 <a href='https://t.me/XiaoMaoScript/81'>「Aphrodite」</a>" +
+          "𝟜𝟚 <a href='https://t.me/XiaoMaoScript/81'> Aphrodite</a>" +
           "\n" +
-          "𝟜𝟛 <a href='https://t.me/XiaoMaoScript/82'>「Apollo」</a>" +
+          "𝟜𝟛 <a href='https://t.me/XiaoMaoScript/82'> Apollo</a>" +
           "\n" +
-          "𝟜𝟜 <a href='https://t.me/XiaoMaoScript/83'>「WidgetArt」</a>" +
+          "𝟜𝟜 <a href='https://t.me/XiaoMaoScript/83'> WidgetArt</a>" +
           "\n" +
-          "𝟜𝟝 <a href='https://t.me/XiaoMaoScript/83'>「Hermes」</a>" +
+          "𝟜𝟝 <a href='https://t.me/XiaoMaoScript/83'> Hermes</a>" +
           "\n" +
-          "𝟜𝟞 <a href='https://t.me/XiaoMaoScript/86'>「PureLibro」</a>" +
+          "𝟜𝟞 <a href='https://t.me/XiaoMaoScript/86'> PureLibro</a>" +
           "\n" +
-          "𝟜𝟟 <a href='https://t.me/XiaoMaoScript/87'>「Pure记账」</a>" +
+          "𝟜𝟟 <a href='https://t.me/XiaoMaoScript/87'> Pure记账</a>" +
           "\n" +
-          "𝟜𝟠 <a href='https://t.me/XiaoMaoScript/88'>「ProKnockOut」</a>" +
+          "𝟜𝟠 <a href='https://t.me/XiaoMaoScript/88'> ProKnockOut</a>" +
           "\n" +
-          "𝟜𝟡 <a href='https://t.me/XiaoMaoScript/89'>「ChatAI」</a>" +
+          "𝟜𝟡 <a href='https://t.me/XiaoMaoScript/89'> ChatAI</a>" +
           "\n" +
-          "𝟝𝟘 <a href='https://t.me/XiaoMaoScript/90'>「Not Boring系列」</a>" +
+          "𝟝𝟘 <a href='https://t.me/XiaoMaoScript/90'> Not Boring系列</a>" +
           "\n" +
-          "𝟝𝟙 <a href='https://t.me/XiaoMaoScript/91'>「我的时间」</a>" +
+          "𝟝𝟙 <a href='https://t.me/XiaoMaoScript/91'> 我的时间</a>" +
           "\n" +
-          "𝟝𝟚 <a href='https://t.me/XiaoMaoScript/92'>「VSCO」</a>" +
+          "𝟝𝟚 <a href='https://t.me/XiaoMaoScript/92'> VSCO</a>" +
           "\n" +
-          "𝟝𝟛 <a href='https://t.me/XiaoMaoScript/94'>「Motivation」</a>" +
+          "𝟝𝟛 <a href='https://t.me/XiaoMaoScript/94'> Motivation</a>" +
           "\n" +
-          "𝟝𝟜 <a href='https://t.me/XiaoMaoScript/95'>「糖豆」</a>" +
+          "𝟝𝟜 <a href='https://t.me/XiaoMaoScript/95'> 糖豆</a>" +
           "\n" +
-          "𝟝𝟝 <a href='https://t.me/XiaoMaoScript/96'>「NASCTL」</a>" +
+          "𝟝𝟝 <a href='https://t.me/XiaoMaoScript/96'> NASCTL</a>" +
           "\n" +
-          "𝟝𝟞 <a href='https://t.me/XiaoMaoScript/97'>「Aisten」</a>" +
+          "𝟝𝟞 <a href='https://t.me/XiaoMaoScript/97'> Aisten</a>" +
           "\n" +
-          "𝟝𝟟 <a href='https://t.me/XiaoMaoScript/98'>「FilmNoir」</a>" +
+          "𝟝𝟟 <a href='https://t.me/XiaoMaoScript/98'> FilmNoir</a>" +
           "\n" +
-          "𝟝𝟠 <a href='https://t.me/XiaoMaoScript/101'>「ProCamera」</a>" +
+          "𝟝𝟠 <a href='https://t.me/XiaoMaoScript/101'> ProCamera</a>" +
           "\n" +
-          "𝟝𝟡 <a href='https://t.me/XiaoMaoScript/103'>「StressWatch」</a>" +
+          "𝟝𝟡 <a href='https://t.me/XiaoMaoScript/103'> StressWatch</a>" +
           "\n" +
-          "𝟞𝟘 <a href='https://t.me/XiaoMaoScript/104'>「NightVision」</a>",
+          "𝟞𝟘 <a href='https://t.me/XiaoMaoScript/104'> NightVision</a>",
         "\n" +
-          "𝟞𝟙 <a href='https://t.me/XiaoMaoScript/105'>「中医通」</a>" +
+          "𝟞𝟙 <a href='https://t.me/XiaoMaoScript/105'> 中医通</a>" +
           "\n" +
-          "𝟞𝟚 <a href='https://t.me/XiaoMaoScript/106'>「intoLive」</a>" +
+          "𝟞𝟚 <a href='https://t.me/XiaoMaoScript/106'> intoLive</a>" +
           "\n" +
-          "𝟞𝟛 <a href='https://t.me/XiaoMaoScript/107'>「VDIT」</a>" +
+          "𝟞𝟛 <a href='https://t.me/XiaoMaoScript/107'> VDIT</a>" +
           "\n" +
-          "𝟞𝟜 <a href='https://t.me/XiaoMaoScript/108'>「ImgPlay」</a>" +
+          "𝟞𝟜 <a href='https://t.me/XiaoMaoScript/108'> ImgPlay</a>" +
           "\n" +
-          "𝟞𝟝 <a href='https://t.me/XiaoMaoScript/109'>「SimuFlight」</a>" +
+          "𝟞𝟝 <a href='https://t.me/XiaoMaoScript/109'> SimuFlight</a>" +
           "\n" +
-          "𝟞𝟞 <a href='https://t.me/XiaoMaoScript/110'>「Money-Wise」</a>" +
+          "𝟞𝟞 <a href='https://t.me/XiaoMaoScript/110'> Money-Wise</a>" +
           "\n" +
-          "𝟞𝟟 <a href='https://t.me/XiaoMaoScript/111'>「小鱼短信」</a>" +
+          "𝟞𝟟 <a href='https://t.me/XiaoMaoScript/111'> 小鱼短信</a>" +
           "\n" +
-          "𝟞𝟠 <a href='https://t.me/XiaoMaoScript/112'>「洋葱学园」</a>" +
+          "𝟞𝟠 <a href='https://t.me/XiaoMaoScript/112'> 洋葱学园</a>" +
           "\n" +
-          "𝟞𝟡 <a href='https://t.me/XiaoMaoScript/113'>「CapyMood」</a>" +
+          "𝟞𝟡 <a href='https://t.me/XiaoMaoScript/113'> CapyMood</a>" +
           "\n" +
-          "𝟟𝟘 <a href='https://t.me/XiaoMaoScript/114'>「MusicMate」</a>" +
+          "𝟟𝟘 <a href='https://t.me/XiaoMaoScript/114'> MusicMate</a>" +
           "\n" +
-          "𝟟𝟙 <a href='https://t.me/XiaoMaoScript/116'>「PhotoRoute」</a>" +
+          "𝟟𝟙 <a href='https://t.me/XiaoMaoScript/116'> PhotoRoute</a>" +
           "\n" +
-          "𝟟𝟚 <a href='https://t.me/XiaoMaoScript/118'>「白云天气」</a>" +
+          "𝟟𝟚 <a href='https://t.me/XiaoMaoScript/118'> 白云天气</a>" +
           "\n" +
-          "𝟟𝟛 <a href='https://t.me/XiaoMaoScript/119'>「每日凯格尔」</a>" +
+          "𝟟𝟛 <a href='https://t.me/XiaoMaoScript/119'> 每日凯格尔</a>" +
           "\n" +
-          "𝟟𝟜 <a href='https://t.me/XiaoMaoScript/120'>「手机硬件管家」</a>" +
+          "𝟟𝟜 <a href='https://t.me/XiaoMaoScript/120'> 手机硬件管家</a>" +
           "\n" +
-          "𝟟𝟝 <a href='https://t.me/XiaoMaoScript/121'>「落格输入法」</a>" +
+          "𝟟𝟝 <a href='https://t.me/XiaoMaoScript/121'> 落格输入法</a>" +
           "\n" +
-          "𝟟𝟞 <a href='https://t.me/XiaoMaoScript/122'>「AdBlocker」</a>" +
+          "𝟟𝟞 <a href='https://t.me/XiaoMaoScript/122'> AdBlocker</a>" +
           "\n" +
-          "𝟟𝟟 <a href='https://t.me/XiaoMaoScript/123'>「CryptoPro」</a>" +
+          "𝟟𝟟 <a href='https://t.me/XiaoMaoScript/123'> CryptoPro</a>" +
           "\n" +
-          "𝟟𝟠 <a href='https://t.me/XiaoMaoScript/126'>「剪画」</a>" +
+          "𝟟𝟠 <a href='https://t.me/XiaoMaoScript/126'> 剪画</a>" +
           "\n" +
-          "𝟟𝟡 <a href='https://t.me/XiaoMaoScript/130'>「币安」</a>" +
+          "𝟟𝟡 <a href='https://t.me/XiaoMaoScript/130'> 币安</a>" +
           "\n" +
-          "𝟠𝟘 <a href='https://t.me/XiaoMaoScript/131'>「Percento」</a>" +
+          "𝟠𝟘 <a href='https://t.me/XiaoMaoScript/131'> Percento</a>" +
           "\n" +
-          "𝟠𝟙 <a href='https://t.me/XiaoMaoScript/132'>「今日解忧」</a>" +
+          "𝟠𝟙 <a href='https://t.me/XiaoMaoScript/132'> 今日解忧</a>" +
           "\n" +
-          "𝟠𝟚 <a href='https://t.me/XiaoMaoScript/133'>「Budget Flow」</a>" +
+          "𝟠𝟚 <a href='https://t.me/XiaoMaoScript/133'> Budget Flow</a>" +
           "\n" +
-          "𝟠𝟛 <a href='https://t.me/XiaoMaoScript/134'>「Days Since」</a>" +
+          "𝟠𝟛 <a href='https://t.me/XiaoMaoScript/134'> Days Since</a>" +
+          "\n" +
+          "𝟠𝟜 <a href='https://t.me/XiaoMaoScript/138'> Yosum</a>" +
+          "\n" +
+          "𝟠𝟝 <a href='https://t.me/XiaoMaoScript/139'> Appspree</a>" +
+          "\n" +
+          "𝟠𝟞 <a href='https://t.me/XiaoMaoScript/140'> StorageCleaner</a>" +
+          "\n" +
+          "𝟠𝟟 <a href='https://t.me/XiaoMaoScript/142'> AppRaven</a>" +
+          "\n" +
+          "𝟠𝟠 <a href='https://t.me/XiaoMaoScript/143'> 中国房价行情</a>" +
+          "\n" +
+          "𝟠𝟡 <a href='https://t.me/XiaoMaoScript/144'> Visus</a>" +
+          "\n" +
+          "𝟡𝟘 <a href='https://t.me/XiaoMaoScript/145'> Blackout</a>",
+        "\n" +
+          "𝟡𝟙 <a href='https://t.me/XiaoMaoScript/146'> FitnessPocketPrep</a>" +
+          "\n" +
+          "𝟡𝟚 <a href='https://t.me/XiaoMaoScript/147'> 学科网</a>" +
+          "\n" +
+          "𝟡𝟛 <a href='https://t.me/XiaoMaoScript/148'> 考试宝</a>" +
+          "\n" +
+          "𝟡𝟜 <a href='https://t.me/XiaoMaoScript/149'> MP3转换器</a>" +
+          "\n" +
+          "𝟡𝟝 <a href='https://t.me/XiaoMaoScript/150'> PhotoQR</a>" +
+          "\n" +
+          "𝟡𝟞 <a href='https://t.me/XiaoMaoScript/151'> Amiibo Guide</a>" +
+          "\n" +
+          "𝟡𝟟 <a href='https://t.me/XiaoMaoScript/152'> Stardew Valley Guide</a>" +
+          "\n" +
+          "𝟡𝟠 <a href='https://t.me/XiaoMaoScript/153'> Budgetify</a>" +
+          "\n" +
+          "𝟡𝟡 <a href='https://t.me/XiaoMaoScript/154'> SpamOff</a>" +
+          "\n" +
+          "𝟙𝟘𝟘 <a href='https://t.me/XiaoMaoScript/155'> Documa</a>" +
+          "\n" +
+          "𝟙𝟘𝟙 <a href='https://t.me/XiaoMaoScript/156'> 薄荷健康</a>" +
+          "\n" +
+          "𝟙𝟘𝟚 <a href='https://t.me/XiaoMaoScript/157'> PDF转换器</a>" +
+          "\n" +
+          "𝟙𝟘𝟛 <a href='https://t.me/XiaoMaoScript/158'> CVMaker</a>" +
+          "\n" +
+          "𝟙𝟘𝟜 <a href='https://t.me/XiaoMaoScript/160'> Locknload</a>" +
+          "\n" +
+          "𝟙𝟘𝟝 <a href='https://t.me/XiaoMaoScript/161'> MindBreath</a>" +
+          "\n" +
+          "𝟙𝟘𝟞 <a href='https://t.me/XiaoMaoScript/162'> OpenLove</a>" +
+          "\n" +
+          "𝟙𝟘𝟟 <a href='https://t.me/XiaoMaoScript/164'> AirEarbuds</a>" +
+          "\n" +
+          "𝟙𝟘𝟠 <a href='https://t.me/XiaoMaoScript/165'> WeatherRadar</a>" +
           "\n" +
           "\n" +
           "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -1075,19 +1128,21 @@ function processReplyWord(key, useId, userJson) {
         "🚂 <b>XiaoMao 【辅助脚本】 合集</b>" +
         "\n" +
         "\n" +
-        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/40'>「Spotify歌词翻译」</a>" +
+        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/40'> Spotify歌词翻译</a>" +
         "\n" +
-        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/41'>「百度贴吧源址捕获」</a>" +
+        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/41'> 百度贴吧源址捕获</a>" +
         "\n" +
-        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/42'>「酷安源址捕获」</a>" +
+        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/42'> 酷安源址捕获</a>" +
         "\n" +
-        "𝟘𝟜 <a href='https://t.me/xiaomaoJT/16'>「京东比价」</a>" +
+        "𝟘𝟜 <a href='https://t.me/xiaomaoJT/16'> 京东比价</a>" +
         "\n" +
-        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/7'>「彩云天气Token捕获」</a>" +
+        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/7'> 彩云天气授权捕获</a>" +
         "\n" +
-        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/43'>「小小签到Token捕获」</a>" +
+        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/43'> 小小签到授权捕获</a>" +
         "\n" +
-        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/44'>「言橘资源捕获」</a>" +
+        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/44'> 言橘资源捕获</a>" +
+        "\n" +
+        "𝟘𝟠 <a href='https://t.me/XiaoMaoScript/163'> 火火兔授权捕获</a>" +
         "\n" +
         "\n" +
         "<b>辅助脚本定义为能力提升与净化，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -1100,55 +1155,61 @@ function processReplyWord(key, useId, userJson) {
         "🚁 <b>XiaoMao 【自动任务】 脚本合集</b>" +
         "\n" +
         "\n" +
-        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/48'>「二次元图片」</a>" +
+        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/48'> 二次元图片</a>" +
         "\n" +
-        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/49'>「每日BING图」</a>" +
+        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/49'> 每日BING图</a>" +
         "\n" +
-        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/50'>「年度节日」</a>" +
+        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/50'> 年度节日</a>" +
         "\n" +
-        "𝟘𝟜 <a href='https://t.me/XiaoMaoScript/51'>「采精车」</a>" +
+        "𝟘𝟜 <a href='https://t.me/XiaoMaoScript/51'> 采精车</a>" +
         "\n" +
-        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/52'>「每日新闻60s·文字版」</a>" +
+        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/52'> 每日新闻60s·文字版</a>" +
         "\n" +
-        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/53'>「每日油价」</a>" +
+        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/53'> 每日油价</a>" +
         "\n" +
-        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/54'>「实时热榜」</a>" +
+        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/54'> 实时热榜</a>" +
         "\n" +
-        "𝟘𝟠 <a href='https://t.me/XiaoMaoScript/55'>「星座运势」</a>" +
+        "𝟘𝟠 <a href='https://t.me/XiaoMaoScript/55'> 星座运势</a>" +
         "\n" +
-        "𝟘𝟡 <a href='https://t.me/XiaoMaoScript/56'>「豆瓣电影」</a>" +
+        "𝟘𝟡 <a href='https://t.me/XiaoMaoScript/56'> 豆瓣电影</a>" +
         "\n" +
-        "𝟙𝟘 <a href='https://t.me/XiaoMaoScript/57'>「每日新闻60s·图片版」</a>" +
+        "𝟙𝟘 <a href='https://t.me/XiaoMaoScript/57'> 每日新闻60s·图片版</a>" +
         "\n" +
-        "𝟙𝟙 <a href='https://t.me/XiaoMaoScript/58'>「摸鱼人日历」</a>" +
+        "𝟙𝟙 <a href='https://t.me/XiaoMaoScript/58'> 摸鱼人日历</a>" +
         "\n" +
-        "𝟙𝟚 <a href='https://t.me/XiaoMaoScript/59'>「职场人日历」</a>" +
+        "𝟙𝟚 <a href='https://t.me/XiaoMaoScript/59'> 职场人日历</a>" +
         "\n" +
-        "𝟙𝟛 <a href='https://t.me/XiaoMaoScript/60'>「实时线报」</a>" +
+        "𝟙𝟛 <a href='https://t.me/XiaoMaoScript/60'> 实时线报</a>" +
         "\n" +
-        "𝟙𝟜 <a href='https://t.me/XiaoMaoScript/61'>「台风监测」</a>" +
+        "𝟙𝟜 <a href='https://t.me/XiaoMaoScript/61'> 台风监测</a>" +
         "\n" +
-        "𝟙𝟝 <a href='https://t.me/XiaoMaoScript/43'>「小小签到刷金币」</a>" +
+        "𝟙𝟝 <a href='https://t.me/XiaoMaoScript/43'> 小小签到刷金币</a>" +
         "\n" +
-        "𝟙𝟞 <a href='https://t.me/XiaoMaoScript/62'>「全国辐射监测」</a>" +
+        "𝟙𝟞 <a href='https://t.me/XiaoMaoScript/62'> 全国辐射监测</a>" +
         "\n" +
-        "𝟙𝟟 <a href='https://t.me/XiaoMaoScript/63'>「福彩查询」</a>" +
+        "𝟙𝟟 <a href='https://t.me/XiaoMaoScript/63'> 福彩查询</a>" +
         "\n" +
-        "𝟙𝟠 <a href='https://t.me/XiaoMaoScript/64'>「体彩查询」</a>" +
+        "𝟙𝟠 <a href='https://t.me/XiaoMaoScript/64'> 体彩查询</a>" +
         "\n" +
-        "𝟙𝟡 <a href='https://t.me/XiaoMaoScript/65'>「今日金价」</a>" +
+        "𝟙𝟡 <a href='https://t.me/XiaoMaoScript/65'> 今日金价</a>" +
         "\n" +
-        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/85'>「每日一言」</a>" +
+        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/85'> 每日一言</a>" +
         "\n" +
-        "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/93'>「喜加一」</a>" +
+        "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/93'> 喜加一</a>" +
         "\n" +
-        "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/99'>「打工人进度」</a>" +
+        "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/99'> 打工人进度</a>" +
         "\n" +
-        "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/100'>「和包银联红包查询」</a>" +
+        "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/100'> 和包银联红包查询</a>" +
         "\n" +
-        "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/117'>「每日语录」</a>" +
+        "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/117'> 每日语录</a>" +
         "\n" +
-        "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/129'>「阿里云盘自动签到」</a>" +
+        "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/129'> 阿里云盘自动签到</a>" +
+        "\n" +
+        "𝟚𝟞 <a href='https://t.me/XiaoMaoScript/137'> 广州地铁实时信息查询</a>" +
+        "\n" +
+        "𝟚𝟟 <a href='https://t.me/XiaoMaoScript/141'> 上海地铁实时信息查询</a>" +
+        "\n" +
+        "𝟚𝟠 <a href='https://t.me/XiaoMaoScript/163'> 火火兔刷广告激励</a>" +
         "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -1161,17 +1222,17 @@ function processReplyWord(key, useId, userJson) {
         "🚗 <b>XiaoMao 【快捷指令】 合集</b>" +
         "\n" +
         "\n" +
-        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/66'>「XiaoMao充电助手」</a>" +
+        "𝟘𝟙 <a href='https://t.me/XiaoMaoScript/66'> XiaoMao充电助手</a>" +
         "\n" +
-        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/43'>「小小签到刷金币」</a>" +
+        "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/43'> 小小签到刷金币</a>" +
         "\n" +
-        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/67'>「举牌小人生成器」</a>" +
+        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/67'> 举牌小人生成器</a>" +
         "\n" +
-        "𝟘𝟜 <a href='https://t.me/XiaoMaoScript/68'>「OCR截图识屏翻译」</a>" +
+        "𝟘𝟜 <a href='https://t.me/XiaoMaoScript/68'> OCR截图识屏翻译</a>" +
         "\n" +
-        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/48'>「二次元图片」</a>" +
+        "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/48'> 二次元图片</a>" +
         "\n" +
-        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/54'>「全网热榜」</a>" +
+        "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/54'> 全网热榜</a>" +
         "\n" +
         "\n" +
         "<b>🧲<a href='http://mtw.so/5Fan5S'>【帽教程】快捷指令脚本制作教程</a></b>" +
@@ -1185,9 +1246,9 @@ function processReplyWord(key, useId, userJson) {
         "🐒 <b>XiaoMao 【油猴脚本】 合集</b>" +
         "\n" +
         "\n" +
-        "𝟘𝟙 <a href='https://t.me/xiaomaoJT/973'>「网页版有道翻译净化」</a>" +
+        "𝟘𝟙 <a href='https://t.me/xiaomaoJT/973'> 网页版有道翻译净化</a>" +
         "\n" +
-        "𝟘𝟚 <a href='https://t.me/xiaomaoJT/1012'>「网页版百度翻译净化」</a>" +
+        "𝟘𝟚 <a href='https://t.me/xiaomaoJT/1012'> 网页版百度翻译净化</a>" +
         "\n" +
         "\n" +
         "更多超级脚本，请见<a href='https://t.me/xiaomaoJT'>XiaoMao频道</a>内话题标签 #优质脚本 。",
