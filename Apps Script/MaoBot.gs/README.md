@@ -97,6 +97,9 @@ var MESSAGETYPE = 0;
 var dealMessage = {};
 
 // ------------------------- 敏感词库 -------------------------
+
+// 强ban关键字截止位 - 即取前八个，触发即ban
+var banKeyLastIndex = 8;
 // 见下文checkSensitiveDFA方法介绍
 var sensitiveEncodeList = [...]
 ```
