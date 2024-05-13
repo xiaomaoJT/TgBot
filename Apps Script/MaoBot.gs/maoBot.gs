@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.6-628
+ * @4.6-634
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -25,7 +25,7 @@ var EXECNAME = "";
 // Telegram BOT ID key - tg机器人Token
 var BOTID = "";
 
-// ------------------------- 自定义参数·请按需修改参数·引号内留空此功能失效 -----------------
+// ------------------------- 自定义参数·请按需修改参数·引号内留空此功能失效 · 为保证完整体验或奇怪的BUG，建议补全KingId/botIdAlone -----------------
 // 用于推送主人消息 取主人tg id - 私人消息主动功能必须填写此项
 var KingId = "";
 // 1 全部类型
@@ -60,9 +60,10 @@ var dealMessage = {};
 // ------------------------- 核心调用函数 -----------------
 
 // 强ban关键字截止位
-var banKeyLastIndex = 8;
+var banKeyLastIndex = 9;
 // 内容已作加密处理base64
 var sensitiveEncodeList = [
+  "5aSE55CG5aSn6YeP5pWw5o2u",
   "6ZW/5pyf5oub5Lq6",
   "6aKE5LuY",
   "6ZyA6KaB5bel5L2c",
@@ -220,6 +221,9 @@ function doPost(e) {
       "e参数示例：",
       testParams,
       "该示例仅用于数据结构展示，请勿用于实力生产！！！"
+    );
+    console.error(
+      "若正式环境执行此内容，则证明数据尚未接入成功，请核对教程第四步，https://api.telegram.org/bot『你的tg机器人Token』/setWebhook?url=『你的web应用网址』"
     );
     console.error(
       "【无法通过GAS直接执行问题】机器人通过检测到TG消息方才会响应，直接运行将使得入口函数doPost缺失关键参数而导致失败，若需直接执行，请于本地补全参数e，可作于调试运行。参数e的获取建议于部署完成后，通过私人推送服务获取原始数据。"
@@ -560,8 +564,8 @@ function processData(userMessage) {
           "\n" +
           "<b>拦截到</b> " +
           " " +
-          userMessage.message.from.first_name +
-          userMessage.message.from.last_name +
+          (userMessage.message.from.first_name || "") +
+          (userMessage.message.from.last_name || "") +
           "<b> 消息中含</b>" +
           dealMessage.dfa.wordLength +
           "处<b> 敏感词，XiaoMao已自动删除消息，请文明聊天喔！</b>";
@@ -863,7 +867,7 @@ function processReplyWord(key, useId, userJson) {
         "<b>欢迎点赞评论，感谢支持！</b>",
     },
     {
-      keyword: ["脚本合集"],
+      keyword: ["脚本合集","脚本"],
       replyWord:
         "💊 <b>XiaoMao脚本合集</b>" +
         "\n" +
@@ -937,29 +941,29 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟙𝟡 <a href='https://t.me/XiaoMaoScript/25'> 解剖大师</a>" +
         "\n" +
-        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/26'> Instapaper</a>",
+        "𝟚𝟘 <a href='https://t.me/XiaoMaoScript/26'> Instapaper</a>" +
+        "\n" +
+        "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/27'> 日杂相机</a>" +
+        "\n" +
+        "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/28'> 谜底时钟</a>" +
+        "\n" +
+        "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/29'> 边界调研</a>" +
+        "\n" +
+        "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/30'> 目标地图</a>" +
+        "\n" +
+        "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/31'> Agenda</a>" +
+        "\n" +
+        "𝟚𝟞 <a href='https://t.me/XiaoMaoScript/32'> Fin</a>" +
+        "\n" +
+        "𝟚𝟟 <a href='https://t.me/XiaoMaoScript/33'> 快对</a>" +
+        "\n" +
+        "𝟚𝟠 <a href='https://t.me/XiaoMaoScript/34'> DailyArt</a>" +
+        "\n" +
+        "𝟚𝟡 <a href='https://t.me/XiaoMaoScript/35'> Alarmy</a>" +
+        "\n" +
+        "𝟛𝟘 <a href='https://t.me/XiaoMaoScript/36'> 1Blocker</a>",
       replyWordMore: [
         "\n" +
-          "𝟚𝟙 <a href='https://t.me/XiaoMaoScript/27'> 日杂相机</a>" +
-          "\n" +
-          "𝟚𝟚 <a href='https://t.me/XiaoMaoScript/28'> 谜底时钟</a>" +
-          "\n" +
-          "𝟚𝟛 <a href='https://t.me/XiaoMaoScript/29'> 边界调研</a>" +
-          "\n" +
-          "𝟚𝟜 <a href='https://t.me/XiaoMaoScript/30'> 目标地图</a>" +
-          "\n" +
-          "𝟚𝟝 <a href='https://t.me/XiaoMaoScript/31'> Agenda</a>" +
-          "\n" +
-          "𝟚𝟞 <a href='https://t.me/XiaoMaoScript/32'> Fin</a>" +
-          "\n" +
-          "𝟚𝟟 <a href='https://t.me/XiaoMaoScript/33'> 快对</a>" +
-          "\n" +
-          "𝟚𝟠 <a href='https://t.me/XiaoMaoScript/34'> DailyArt</a>" +
-          "\n" +
-          "𝟚𝟡 <a href='https://t.me/XiaoMaoScript/35'> Alarmy</a>" +
-          "\n" +
-          "𝟛𝟘 <a href='https://t.me/XiaoMaoScript/36'> 1Blocker</a>" +
-          "\n" +
           "𝟛𝟙 <a href='https://t.me/XiaoMaoScript/37'> SleepCycle</a>" +
           "\n" +
           "𝟛𝟚 <a href='https://t.me/XiaoMaoScript/38'> 幻休</a>" +
@@ -978,8 +982,8 @@ function processReplyWord(key, useId, userJson) {
           "\n" +
           "𝟛𝟡 <a href='https://t.me/XiaoMaoScript/78'> MoneyThings</a>" +
           "\n" +
-          "𝟜𝟘 <a href='https://t.me/XiaoMaoScript/79'> Noted</a>",
-        "\n" +
+          "𝟜𝟘 <a href='https://t.me/XiaoMaoScript/79'> Noted</a>" +
+          "\n" +
           "𝟜𝟙 <a href='https://t.me/XiaoMaoScript/80'> Pandora</a>" +
           "\n" +
           "𝟜𝟚 <a href='https://t.me/XiaoMaoScript/81'> Aphrodite</a>" +
@@ -1115,6 +1119,44 @@ function processReplyWord(key, useId, userJson) {
           "𝟙𝟘𝟟 <a href='https://t.me/XiaoMaoScript/164'> AirEarbuds</a>" +
           "\n" +
           "𝟙𝟘𝟠 <a href='https://t.me/XiaoMaoScript/165'> WeatherRadar</a>" +
+          "\n" +
+          "𝟙𝟘𝟡 <a href='https://t.me/XiaoMaoScript/166'> 小白学习打印</a>" +
+          "\n" +
+          "𝟙𝟙𝟘 <a href='https://t.me/XiaoMaoScript/167'> YzyFIT</a>" +
+          "\n" +
+          "𝟙𝟙𝟙 <a href='https://t.me/XiaoMaoScript/168'> 标志照片</a>" +
+          "\n" +
+          "𝟙𝟙𝟚 <a href='https://t.me/XiaoMaoScript/170'> Filmix</a>" +
+          "\n" +
+          "𝟙𝟙𝟛 <a href='https://t.me/XiaoMaoScript/171'> PhotoSwiper</a>" +
+          "\n" +
+          "𝟙𝟙𝟜 <a href='https://t.me/XiaoMaoScript/172'> ChatPDF</a>" +
+          "\n" +
+          "𝟙𝟙𝟝 <a href='https://t.me/XiaoMaoScript/173'> LimiCam</a>" +
+          "\n" +
+          "𝟙𝟙𝟞 <a href='https://t.me/XiaoMaoScript/174'> HabitDone</a>" +
+          "\n" +
+          "𝟙𝟙𝟟 <a href='https://t.me/XiaoMaoScript/175'> GIF表情包动图制作</a>" +
+          "\n" +
+          "𝟙𝟙𝟠 <a href='https://t.me/XiaoMaoScript/176'> Exif Metadata Editor</a>" +
+          "\n" +
+          "𝟙𝟙𝟡 <a href='https://t.me/XiaoMaoScript/177'> VideotoMP3</a>" +
+          "\n" +
+          "𝟙𝟚𝟘 <a href='https://t.me/XiaoMaoScript/178'> JpegtoPng</a>",
+        "\n" +
+          "𝟙𝟚𝟙 <a href='https://t.me/XiaoMaoScript/179'> HeictoJpg</a>" +
+          "\n" +
+          "𝟙𝟚𝟚 <a href='https://t.me/XiaoMaoScript/180'> Currency</a>" +
+          "\n" +
+          "𝟙𝟚𝟛 <a href='https://t.me/XiaoMaoScript/181'> Adapt</a>" +
+          "\n" +
+          "𝟙𝟚𝟜 <a href='https://t.me/XiaoMaoScript/182'> 图凌</a>" +
+          "\n" +
+          "𝟙𝟚𝟝 <a href='https://t.me/XiaoMaoScript/183'> SleepMaster</a>" +
+          "\n" +
+          "𝟙𝟚𝟞 <a href='https://t.me/XiaoMaoScript/184'> ReDo</a>" +
+          "\n" +
+          "𝟙𝟚𝟟 <a href='https://t.me/XiaoMaoScript/185'> 记一杯</a>" +
           "\n" +
           "\n" +
           "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -1274,7 +1316,7 @@ function processReplyWord(key, useId, userJson) {
         "GAS及接口皆来源于公共服务器，高峰期可能出现较高延迟状态。",
     },
     {
-      keyword: ["/manage", "私有指令", "隐藏指令"],
+      keyword: ["/manage", "指令", "隐藏指令", "关键字", "菜单"],
       replyWord:
         "💊 <b>XiaoMao机器人超级群管功能说明</b>" +
         "\n" +
@@ -1423,9 +1465,9 @@ function processReplyWord(key, useId, userJson) {
         "🈯️➡️ /lan⁺蓝奏云链接&pwd=密码" +
         "\n" +
         "\n" +
-        "🚶‍♂️ 微信运动刷步(Zeep Life账号)" +
+        "🚶‍♂️ 骚话大全" +
         "\n" +
-        "🈯️➡️ /step⁺账号&password=密码&step=步数" +
+        "🈯️➡️ /sao" +
         "\n" +
         "\n" +
         "<b>接口数据来源于网络，可能存在查询拥挤情况，可稍后再试～</b>",
@@ -1465,7 +1507,7 @@ function processReplyWord(key, useId, userJson) {
     { api: "/start", apiId: 11 },
     { api: "/help", apiId: 11 },
     { api: "/lan", apiId: 12 },
-    { api: "/step", apiId: 13 },
+    { api: "/sao", apiId: 13 },
     { api: "/reply", apiId: 14 },
     { api: "/ban", apiId: 15 },
     { api: "/unban", apiId: 16 },
@@ -1629,7 +1671,7 @@ function processReplyWord(key, useId, userJson) {
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
-            getMiSport(getString(key, isApi(commandWord, key).api));
+            getSao(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
         case 14:
@@ -2752,42 +2794,27 @@ function apiReply(id, useJson) {
 }
 
 /**
- * 小米运动刷步 ✅
- * @param step
+ * 骚话大全 ✅
+ * @param
  * @returns
  */
-function getMiSport(step) {
-  let responseStep = null;
+function getSao() {
+  let responseSao = null;
   let returnText =
     "查询结果受运营商网络管制，本次通信被异常终止，此管控行为非人为可控，请稍后再试～";
 
   try {
-    responseStep = UrlFetchApp.fetch(
-      "https://apis.jxcxin.cn/api/mi?user=" +
-        step +
-        "&times=" +
-        new Date().getTime(),
+    responseSao = UrlFetchApp.fetch(
+      "https://api.vvhan.com/api/text/sexy" + "&times=" + new Date().getTime(),
       {
         muteHttpExceptions: true,
       }
     );
-    let jsonData = JSON.parse(responseStep.getContentText());
     returnText =
-      "<b>以下数据来自API Store，由XiaoMao加工：</b>" +
+      "<b>以下数据来自韩小韩，由XiaoMao加工：</b>" +
       "\n" +
       "\n" +
-      "刷步结果：" +
-      (jsonData.code != 200
-        ? jsonData.msg
-        : jsonData.msg +
-          "\n" +
-          "\n" +
-          "刷步账号：" +
-          jsonData.user +
-          "\n" +
-          "当前步数" +
-          jsonData.step) +
-      "\n";
+      responseSao.getContentText();
   } catch (e) {
     return returnText;
   }
