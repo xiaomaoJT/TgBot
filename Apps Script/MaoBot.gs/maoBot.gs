@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * @4.6-634
+ * @4.6-636
  *
  * Google App Script
  * 用于执行tg机器人功能
@@ -60,9 +60,11 @@ var dealMessage = {};
 // ------------------------- 核心调用函数 -----------------
 
 // 强ban关键字截止位
-var banKeyLastIndex = 9;
+var banKeyLastIndex = 11;
 // 内容已作加密处理base64
 var sensitiveEncodeList = [
+  "5pel5YWl6L+H5LiH",
+  "6Z2g6LCx6aG555uu",
   "5aSE55CG5aSn6YeP5pWw5o2u",
   "6ZW/5pyf5oub5Lq6",
   "6aKE5LuY",
@@ -223,10 +225,11 @@ function doPost(e) {
       "该示例仅用于数据结构展示，请勿用于实力生产！！！"
     );
     console.error(
-      "若正式环境执行此内容，则证明数据尚未接入成功，请核对教程第四步，https://api.telegram.org/bot『你的tg机器人Token』/setWebhook?url=『你的web应用网址』"
+      "⚠️⚠️⚠️若正式环境执行出现此内容，则证明数据尚未接入成功，请核对教程第四步，https://api.telegram.org/bot『你的tg机器人Token』/setWebhook?url=『你的web应用网址』，注意删除过于空格！！"
     );
-    console.error(
-      "【无法通过GAS直接执行问题】机器人通过检测到TG消息方才会响应，直接运行将使得入口函数doPost缺失关键参数而导致失败，若需直接执行，请于本地补全参数e，可作于调试运行。参数e的获取建议于部署完成后，通过私人推送服务获取原始数据。"
+    console.log(
+      "%c【无法通过GAS直接执行问题】机器人通过检测到TG消息方才会响应，直接运行将使得入口函数doPost缺失关键参数而导致失败，若需直接执行，请于本地补全参数e，可作于调试运行。参数e的获取建议于部署完成后，通过私人推送服务获取原始数据。",
+      "color: yellow;"
     );
     return;
     e = testParams;
@@ -867,7 +870,7 @@ function processReplyWord(key, useId, userJson) {
         "<b>欢迎点赞评论，感谢支持！</b>",
     },
     {
-      keyword: ["脚本合集","脚本"],
+      keyword: ["脚本合集", "脚本"],
       replyWord:
         "💊 <b>XiaoMao脚本合集</b>" +
         "\n" +
@@ -1158,6 +1161,20 @@ function processReplyWord(key, useId, userJson) {
           "\n" +
           "𝟙𝟚𝟟 <a href='https://t.me/XiaoMaoScript/185'> 记一杯</a>" +
           "\n" +
+          "𝟙𝟚𝟠 <a href='https://t.me/XiaoMaoScript/186'> 拿捏驾考</a>" +
+          "\n" +
+          "𝟙𝟚𝟡 <a href='https://t.me/XiaoMaoScript/188'> Authenticator</a>" +
+          "\n" +
+          "𝟙𝟛𝟘 <a href='https://t.me/XiaoMaoScript/189'> IntervalFlow</a>" +
+          "\n" +
+          "𝟙𝟛𝟙 <a href='https://t.me/XiaoMaoScript/190'> Drainn</a>" +
+          "\n" +
+          "𝟙𝟛𝟚 <a href='https://t.me/XiaoMaoScript/191'> CleanCut</a>" +
+          "\n" +
+          "𝟙𝟛𝟛 <a href='https://t.me/XiaoMaoScript/192'> PixImagine</a>" +
+          "\n" +
+          "𝟙𝟛𝟜 <a href='https://t.me/XiaoMaoScript/193'> LingoPic</a>" +
+          "\n" +
           "\n" +
           "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
           "\n" +
@@ -1174,7 +1191,7 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟘𝟚 <a href='https://t.me/XiaoMaoScript/41'> 百度贴吧源址捕获</a>" +
         "\n" +
-        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/42'> 酷安源址捕获</a>" +
+        "𝟘𝟛 <a href='https://t.me/XiaoMaoScript/42'> 酷安提链净化</a>" +
         "\n" +
         "𝟘𝟜 <a href='https://t.me/xiaomaoJT/16'> 京东比价</a>" +
         "\n" +
@@ -1253,6 +1270,8 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟚𝟠 <a href='https://t.me/XiaoMaoScript/163'> 火火兔刷广告激励</a>" +
         "\n" +
+        "𝟚𝟡 <a href='https://t.me/XiaoMaoScript/194'> 限制文学</a>" +
+        "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -1275,6 +1294,10 @@ function processReplyWord(key, useId, userJson) {
         "𝟘𝟝 <a href='https://t.me/XiaoMaoScript/48'> 二次元图片</a>" +
         "\n" +
         "𝟘𝟞 <a href='https://t.me/XiaoMaoScript/54'> 全网热榜</a>" +
+        "\n" +
+        "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/187'> AI大杂烩</a>" +
+        "\n" +
+        "𝟘𝟠 <a href='https://t.me/XiaoMaoScript/195'> 蜂窝快捷操作</a>" +
         "\n" +
         "\n" +
         "<b>🧲<a href='http://mtw.so/5Fan5S'>【帽教程】快捷指令脚本制作教程</a></b>" +

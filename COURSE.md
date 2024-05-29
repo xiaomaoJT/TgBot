@@ -125,7 +125,9 @@ https://docs.google.com/spreadsheets/d/XXXXXXX这一串就是表格IDXXXXXXXXXXX
 ```javascript
 https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应用网址
 //上面链接替换 你的tg机器人Token和你的web应用网址 内容即可
-//注意链接不要留空格
+//⚠️注意链接不要留空格
+//⚠️注意链接不要留空格 -- 空格会被浏览器自动转义成 %20 ，请注意排查问题～
+//⚠️注意链接不要留空格
 //注意token前面有bot需要保留
 
 //替换完成后，复制链接到浏览器打开，返回下方内容皆为成功
