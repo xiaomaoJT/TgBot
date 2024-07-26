@@ -43,6 +43,10 @@
 
 #### <span id="couse">🎟 Telegram Bot 搭建教程</span>
 
+> ##### ⏺️ 视频教程地址：https://www.alipan.com/s/z21rrmknNYZ
+>
+> *- 视频录制特别鸣谢大佬**@BFJWR***
+
 > 轻松上手，带你免费打造属于自己的telegram机器人
 >
 > [三分钟免费注册外区Apple ID 教程](https://mp.weixin.qq.com/s/YzYsF9QyHZVJK9P7bsrURQ)

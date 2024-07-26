@@ -225,14 +225,13 @@ function doPost(e) {
     console.log(
       "e参数示例：",
       testParams,
-      "该示例仅用于数据结构展示，请勿用于实力生产！！！"
+      "该示例仅用于数据结构展示，请勿用于生产！！！"
     );
     console.error(
-      "⚠️⚠️⚠️若正式环境执行出现此内容，则证明数据尚未接入成功，请核对教程第四步，https://api.telegram.org/bot『你的tg机器人Token』/setWebhook?url=『你的web应用网址』，注意删除过于空格！！"
+      "⚠️⚠️⚠️若正式环境执行出现此内容，则证明数据尚未接入成功，请核对教程第四步，https://api.telegram.org/bot『你的tg机器人Token』/setWebhook?url=『你的web应用网址』，注意删除多余空格！！"
     );
     console.log(
-      "%c【无法通过GAS直接执行问题】机器人通过检测到TG消息方才会响应，直接运行将使得入口函数doPost缺失关键参数而导致失败，若需直接执行，请于本地补全参数e，可作于调试运行。参数e的获取建议于部署完成后，通过私人推送服务获取原始数据。",
-      "color: yellow;"
+      "【无法通过GAS直接执行问题】机器人通过检测到TG消息方才会响应，直接运行将使得入口函数doPost缺失关键参数而导致失败，若需直接执行，请于本地补全参数e，可作于调试运行。参数e的获取建议于部署完成后，通过私人推送服务获取原始数据。"
     );
     return;
     e = testParams;
@@ -1266,7 +1265,19 @@ function processReplyWord(key, useId, userJson) {
           "\n" +
           "𝟙𝟟𝟞 <a href='https://t.me/XiaoMaoScript/240'> 音频提取</a> ➤ 工具" +
           "\n" +
-          "𝟙𝟟𝟟 <a href='https://t.me/XiaoMaoScript/241'> That Girl</a> ➤ 例行公事" +
+          "𝟙𝟟𝟟 <a href='https://t.me/XiaoMaoScript/241'> That Girl</a> ➤ 习惯追逐" +
+          "\n" +
+          "𝟙𝟟𝟠 <a href='https://t.me/XiaoMaoScript/242'> Unit Converter</a> ➤ 工具" +
+          "\n" +
+          "𝟙𝟟𝟡 <a href='https://t.me/XiaoMaoScript/243'> Ai Speech</a> ➤ AI/工具" +
+          "\n" +
+          "𝟙𝟠𝟘 <a href='https://t.me/XiaoMaoScript/244'> Home Design Ai</a> ➤ AI/工具",
+        "\n" +
+          "𝟙𝟠𝟙 <a href='https://t.me/XiaoMaoScript/245'> Spin The Wheel</a> ➤ 娱乐" +
+          "\n" +
+          "𝟙𝟠𝟚 <a href='https://t.me/XiaoMaoScript/248'> Haps</a> ➤ 小组件" +
+          "\n" +
+          "𝟙𝟠𝟛 <a href='https://t.me/XiaoMaoScript/249'> Sing Ai</a> ➤ AI/工具" +
           "\n" +
           "\n" +
           "<b>带有「BoxJS」标签支持通过BoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
@@ -1369,6 +1380,8 @@ function processReplyWord(key, useId, userJson) {
         "\n" +
         "𝟛𝟘 <a href='https://t.me/XiaoMaoScript/230'> Apple Beta更新</a>" +
         "\n" +
+        "𝟛𝟙 <a href='https://t.me/XiaoMaoScript/246'> 多元图片推送</a>" +
+        "\n" +
         "\n" +
         "<b>带有「BoxJS」标签支持通过XiaoMaoBoxJS自定义配置，对脚本、BoxJS不熟悉？点击菜单 图文教程</b>。" +
         "\n" +
@@ -1395,6 +1408,8 @@ function processReplyWord(key, useId, userJson) {
         "𝟘𝟟 <a href='https://t.me/XiaoMaoScript/187'> AI大杂烩</a>" +
         "\n" +
         "𝟘𝟠 <a href='https://t.me/XiaoMaoScript/195'> 蜂窝快捷操作</a>" +
+        "\n" +
+        "𝟘𝟡 <a href='https://t.me/XiaoMaoScript/246'> 多元图片推送</a>" +
         "\n" +
         "\n" +
         "<b>🧲<a href='http://mtw.so/5Fan5S'>【帽教程】快捷指令脚本制作教程</a></b>" +
