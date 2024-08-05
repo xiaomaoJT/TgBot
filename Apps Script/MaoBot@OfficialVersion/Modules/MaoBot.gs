@@ -4,7 +4,10 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * V1.0
+ * V1.0 - 正式版
+ * 
+ * 核心函数
+ * 无需改动
  *
  * Google App Script
  * 用于执行tg机器人功能
