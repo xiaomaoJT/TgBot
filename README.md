@@ -48,8 +48,8 @@
 
 
 
-- 🚀 [正式版部署 - 文字教程](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot%40OfficialVersion/COURSE.md) 更新中....
-- 🚁 [正式版源码解析](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot%40OfficialVersion/README.md)
+- 🚀 [正式版部署 - 文字教程](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/COURSE.md) 更新中....
+- 🚁 [正式版源码解析](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/README.md)  更新中....
 
 
 
