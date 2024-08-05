@@ -7,13 +7,13 @@
 
 #### Telegram Bot机器人，基于Google Apps Script实现。
 
-| **最近更新时间** | **2024年07月26日**                                           |
+| **最近更新时间** | **2024年08月02日**                                           |
 | :--------------- | :----------------------------------------------------------- |
-| **当前版本**     | **Beta 4.6-643**                                             |
-| **Bot功能**      | **功能描述：** ❶ 超级群管功能❷ 广告词/敏感词过滤、自动删除/警告❸ 多样化接口查询、XiaoMao数据加工❹ 自定义聊天窗快捷键盘/消息跟随按钮❺ 关键字消息/私聊消息 自动回复❻ 私聊消息/群组消息 捕捉及消息私人推送❼ 私聊消息/群组消息 自动存储<br /><br />**功能细则：** 入群检测、退群检测、入群欢迎、退群欢送、超级群管功能、用户封禁、用户解封、用户禁言、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能 |
-| **仓库作者**     | <br /><br />**⚠️  源码开发不易，使用引用请注明出处！⚠️**<br /><br />**@XiaoMao   <br /><br />⚠️  源码开发不易，使用引用请注明出处！⚠️**<br /><br /> |
-| **搭建成本**     | **完全免费，持续更新**                                       |
-| **体验机器人**   | [**XiaoMaoBot机器人 在线快速体验**](https://t.me/Xiao_MaoMao_bot) |
+| **当前版本**     | **V1.00**                                                    |
+| **功能清单**     | **功能描述：** ❶ 超级群管功能❷ 广告词/敏感词过滤、自动删除/警告❸ 多样化接口查询、XiaoMao数据加工❹ 自定义聊天窗快捷键盘/消息跟随按钮❺ 关键字消息/私聊消息 自动回复❻ 私聊消息/群组消息 捕捉及消息私人推送❼ 私聊消息/群组消息 自动存储<br />**功能细则：** 入群检测、退群检测、入群欢迎、退群欢送、超级群管功能、用户封禁、用户解封、用户禁言、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能 |
+| **作者**         | <br />**⚠️  源码开发不易，使用引用请注明出处！⚠️**<br /><br />**@XiaoMao   <br /><br />⚠️  源码开发不易，使用引用请注明出处！⚠️**<br /><br /> |
+| **成本**         | **完全免费｜持续更新**                                       |
+| **机器人**       | [**XiaoMaoBot机器人 在线快速体验**](https://t.me/Xiao_MaoMao_bot) |
 | **安全检测**     | **已通过OSCS社区的安全工具检测，该项目暂无安全风险**         |
 
 
@@ -47,31 +47,34 @@
 
 📖 [仓库资源更新日志](https://github.com/xiaomaoJT/TgBot/blob/main/UPDATELOG.md)
 
-📚 [XiaoMaoBot机器人源码](https://raw.githubusercontent.com/xiaomaoJT/TgBot/main/Apps%20Script/MaoBot.gs/maoBot.gs)
+正式版教程更新中.....
 
-🌲 [XiaoMaoBot机器人源码 · 参数解析](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs)
+正式版教程更新中.....
 
-
+正式版教程更新中.....
 
 ------------
 
 
 ##### 🎟 目录构成
 + ###### [Apps Script](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script) **总目录**
-    * > ###### [MaoBot.gs](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/MaoBot.gs) **一键脚本 - 完善相关ID Token即可部署使用**
-    * > ###### [配置图解](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/配置图解) **图解配置教程**
-    * > ###### [Base.gs](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/Base.gs) **基础脚本 - 入门必学**
-    * > ###### [Bot.gs](https://github.com/xiaomaoJT/TgBot/tree/main/Apps%20Script/Bot.gs) **相关优秀脚本库收藏**
+
+    + **MaoBot@OfficialVersion** -- 小帽机器人正式版「**模块化部署（持续更新）**」
+        + **DB** -- 初始化数据表
+        + **Modules** -- 模块化代码
+
+------
+
+- **MaoBot@BetaVersion** -- 小帽机器人测试版「**一体化部署（停止维护）**」
+
++ **配置图解**
++ **BotTest**
+    + **BaseBot** -- 基础用法
+    + **HighBot** -- 经典案例
 
 
 
-------------
-
-##### 🎟 Security Status
-
-[![Security Status](https://www.murphysec.com/platform3/v3/badge/1619885964084686848.svg?t=1)](https://www.murphysec.com/accept?code=b9c8f289554f659d667934ebb0baadbd&type=1&from=2&t=2)
-
-
+⚠️ 请注意，自正式版「V1.00」起，Beta测试版本将停止维护并不再更新，后续更新将于正式版「**MaoBot@OfficialVersion**」中进行。
 
 ------
 
