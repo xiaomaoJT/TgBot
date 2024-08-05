@@ -1,6 +1,8 @@
 /**
  * 参数类
  * 
+ * 需手动补全的参数 EXECID 、 BOTID 、KingId 、botIdAlone
+ * 
  * 用于预定义XiaoMaoBot所需参数
  */
 
