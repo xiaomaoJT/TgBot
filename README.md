@@ -7,7 +7,7 @@
 
 #### Telegram Bot机器人，基于Google Apps Script实现。
 
-| **最近更新时间** | **2024年08月05日**                                           |
+| **最近更新时间** | **2024年08月06日**                                           |
 | :--------------- | :----------------------------------------------------------- |
 | **当前版本**     | **正式版 - V1.00**                                           |
 | **功能清单**     | **功能描述：** ❶ 超级群管功能❷ 广告词/敏感词过滤、自动删除/警告❸ 多样化接口查询、XiaoMao数据加工❹ 自定义聊天窗快捷键盘/消息跟随按钮❺ 关键字消息/私聊消息 自动回复❻ 私聊消息/群组消息 捕捉及消息私人推送❼ 私聊消息/群组消息 自动存储<br />**功能细则：** 入群检测、退群检测、入群欢迎、退群欢送、超级群管功能、用户封禁、用户解封、用户禁言、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能 |
@@ -48,8 +48,8 @@
 
 
 
-- 🚀 [正式版部署 - 文字教程](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/COURSE.md) 更新中....
-- 🚁 [正式版源码解析](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/README.md)  更新中....
+- 🚀 [正式版部署 - 文字教程](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/COURSE.md) 
+- 🚁 [正式版源码解析](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/README.md)  
 
 
 
