@@ -44,14 +44,13 @@
 ##### 🎟 快速导航 · 目录
 
 - ▶️ [正式版部署 - 视频教程](https://www.alipan.com/s/dW2yPirBysi) ✅
+
+- 🚀 [正式版部署 - 文字教程](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/COURSE.md) ✅
+- 🚁 [正式版源码解析](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/README.md)  ✅
+
+
+
 - 📖 [仓库资源更新日志](https://github.com/xiaomaoJT/TgBot/blob/main/UPDATELOG.md)
-
-
-
-- 🚀 [正式版部署 - 文字教程](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/COURSE.md) 
-- 🚁 [正式版源码解析](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/README.md)  
-
-
 
 - 🚗 [测试版部署 - 文字教程](https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md)
 
@@ -67,14 +66,12 @@
         + **DB** -- 初始化数据表
         + **Modules** -- 模块化代码
 
-------
+    + **MaoBot@BetaVersion** -- 小帽机器人测试版「**一体化部署（停止维护）**」
 
-- **MaoBot@BetaVersion** -- 小帽机器人测试版「**一体化部署（停止维护）**」
-
-+ **配置图解**
-+ **BotTest**
-    + **BaseBot** -- 基础用法
-    + **HighBot** -- 经典案例
+    + **配置图解**
+    + **BotTest**
+        + **BaseBot** -- 基础用法
+        + **HighBot** -- 经典案例
 
 
 
