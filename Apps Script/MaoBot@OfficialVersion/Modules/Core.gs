@@ -154,7 +154,7 @@ const getCacheAuthorityList = () => {
 
   if (!authorityList) {
     manageList.length ? "" : readSpreadsheet(AUTHORITYMANAGEMENT).slice(2);
-    authorityList = manageList[1].slice(1).filter(Boolean).push(KingId);
+    authorityList = manageList[1].slice(1).filter(Boolean).concat([KingId]);
     Cache.put(
       "authorityManagement",
       JSON.stringify(authorityList),
