@@ -4,8 +4,8 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * V1.0 - 正式版
- * 
+ * V1.03 - 正式版
+ *
  * 核心函数
  * 无需改动
  *
@@ -68,6 +68,8 @@ const doPost = (e) => {
     MESSAGETYPE = 2;
   }
 
+  getCacheAuthorityList();
+
   //计算返回式
   let messageUserID =
     userMessage.message.chat.type == "private"
@@ -82,7 +84,6 @@ const doPost = (e) => {
       ))
     : "";
 
-  getCacheAuthorityList();
   //回调响应逻辑
   let payload = processData(userMessage);
   let data = null;
@@ -718,7 +719,6 @@ const processReplyWord = (key, useId, userJson) => {
 
   return returnHtmlReply;
 };
-
 
 /**
  * 用于捕捉机器人信息
