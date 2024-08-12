@@ -1,6 +1,6 @@
 /**
  * 工具类
- * 
+ *
  * 无需改动
  */
 
@@ -14,7 +14,6 @@ const getString = (key, keyApi) => {
   const apiString = key.split(keyApi)[1] || "";
   return apiString.replace(/\s*/g, "").replace("@Xiao_MaoMao_bot", "");
 };
-
 
 /**
  * 用于api接口参数识别
@@ -232,3 +231,32 @@ const checkSensitiveDFA = (content) => {
 
   return sensitiveCheckWords;
 };
+
+/**
+ * 判断时间是否是今天
+ * @param givenTimeString
+ * @returns
+ */
+function isSameDay(givenTimeString) {
+  // 将字符串转换为日期对象
+  const givenTime = new Date(givenTimeString);
+  // 获取当前日期
+  const currentTime = new Date();
+  // 比较年份、月份和日期
+  return (
+    givenTime.getFullYear() === currentTime.getFullYear() &&
+    givenTime.getMonth() === currentTime.getMonth() &&
+    givenTime.getDate() === currentTime.getDate()
+  );
+}
+
+/**
+ * 对象根据total排序
+ * @param obj
+ * @returns
+ */
+function sortByTotalDescending(obj) {
+  return Object.entries(obj)
+    .sort(([, a], [, b]) => b.total - a.total)
+    .map(([key, value]) => value);
+}

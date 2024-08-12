@@ -1,6 +1,6 @@
 /**
  * 接口类
- * 
+ *
  * 无需改动
  */
 
@@ -1036,4 +1036,67 @@ const getDouBan = (params) => {
     return returnText;
   }
   return returnText;
+};
+
+/**
+ * 话痨排行榜
+ * @returns
+ */
+const getChatterboxUser = (useId, userJson) => {
+  if (useId.toString().indexOf("-") == -1) {
+    return "请在非私密群组内使用话痨排行榜功能！";
+  }
+  let textListJson = readSpreadsheet(EXECNAME);
+  let textList = textListJson.slice(3, textListJson.length).reverse();
+  let ChatterboxUserListJson = {};
+  for (let item in textList) {
+    let isToday = isSameDay(textList[item][0]);
+    if (
+      textList[item][1] != "" &&
+      textList[item][6].toString() == useId.toString() &&
+      isToday
+    ) {
+      if (ChatterboxUserListJson.hasOwnProperty(textList[item][1].toString())) {
+        ChatterboxUserListJson[textList[item][1].toString()].total += 1;
+      } else {
+        ChatterboxUserListJson[textList[item][1].toString()] = {
+          total: 1,
+          userNameKey: textList[item][2],
+          userName: textList[item][3],
+          userId: textList[item][1],
+        };
+      }
+    } else if (!isToday) {
+      break;
+    }
+  }
+  let ChatterboxUserList = sortByTotalDescending(ChatterboxUserListJson);
+  let textHtml =
+    "💬<b>「" + userJson.chat.title + "」今日话痨排行榜</b>" + "\n\n";
+  let textIndex = 1;
+  let textRank = ["🥇", "🥈", "🥉"];
+  if (ChatterboxUserList.length) {
+    ChatterboxUserList.map((el) => {
+      if (el.userName !== "Telegram" && el.userName !== "XiaoMaoBot") {
+        textHtml =
+          textHtml +
+          (textIndex < 4
+            ? textRank[textIndex - 1]
+            : textIndex < 10
+            ? "0" + textIndex
+            : textIndex) +
+          " " +
+          el.userName +
+          "\n" +
+          "发言次数：" +
+          el.total +
+          "\n\n";
+        textIndex += 1;
+      }
+    });
+  } else {
+    textHtml = textHtml + "当前群组暂无发言数据！";
+  }
+
+  return textHtml;
 };
