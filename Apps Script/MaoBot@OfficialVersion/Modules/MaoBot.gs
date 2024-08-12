@@ -678,6 +678,14 @@ const processReplyWord = (key, useId, userJson) => {
             getHoroscopeList(getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
+        case 21:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "\n" +
+            getChatterboxUser(useId,userJson);
+          returnHtmlReply.state = true;
+          break;
         default:
           returnHtmlReply.state = false;
           break;

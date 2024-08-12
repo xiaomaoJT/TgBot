@@ -245,6 +245,7 @@ var commandWord = [
   { api: "/hot", apiId: 18 },
   { api: "/db", apiId: 19 },
   { api: "/xz", apiId: 20 },
+  { api: "/hl", apiId: 21 },
 ];
 
 // 通用类键盘 --------------------------------
