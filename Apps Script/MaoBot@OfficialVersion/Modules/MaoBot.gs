@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * V1.03 - 正式版
+ * V1.11 - 正式版
  *
  * 核心函数
  * 无需改动
@@ -290,13 +290,16 @@ const processData = (userMessage) => {
               "</b>"
             : dealMessage.htmlReply;
 
+        let dealMessageParseMode = dealMessage.hasOwnProperty("parseMode")
+          ? dealMessage.parseMode
+          : "HTML";
         if (dealMessage.htmlReply2 == null) {
           payloadPostData = {
             method: "sendMessage",
             chat_id: messageUserID,
-            text: HTML_REPLY,
+            text: dealMessageParseMode !== 'HTML' ? HTML_REPLY.replace(/<\/?[^>]+(>|$)/g, '*') : HTML_REPLY,
             reply_to_message_id: messageReplyID,
-            parse_mode: "HTML",
+            parse_mode: dealMessageParseMode,
             reply_markup: JSON.stringify(keyboardParams),
             disable_web_page_preview: true,
           };
@@ -305,9 +308,9 @@ const processData = (userMessage) => {
             {
               method: "sendMessage",
               chat_id: messageUserID,
-              text: HTML_REPLY,
+              text: dealMessageParseMode !== 'HTML' ? HTML_REPLY.replace(/<\/?[^>]+(>|$)/g, '*') : HTML_REPLY,
               reply_to_message_id: messageReplyID,
-              parse_mode: "HTML",
+              parse_mode: dealMessageParseMode,
               reply_markup: JSON.stringify(keyboardParams),
               disable_web_page_preview: true,
             },
@@ -317,8 +320,8 @@ const processData = (userMessage) => {
                 return payloadPostData.push({
                   method: "sendMessage",
                   chat_id: messageUserID,
-                  text: e,
-                  parse_mode: "HTML",
+                  text: dealMessageParseMode !== 'HTML' ? e.replace(/<\/?[^>]+(>|$)/g, '*') : e,
+                  parse_mode: dealMessageParseMode,
                   reply_markup: JSON.stringify(keyboardParams),
                   disable_web_page_preview: true,
                 });
@@ -683,7 +686,7 @@ const processReplyWord = (key, useId, userJson) => {
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
-            getChatterboxUser(useId,userJson);
+            getChatterboxUser(useId, userJson);
           returnHtmlReply.state = true;
           break;
         default:
@@ -706,6 +709,9 @@ const processReplyWord = (key, useId, userJson) => {
                 ? (returnHtmlReply.htmlReply2 = item.replyWordMore)
                 : (returnHtmlReply.htmlReply2 = null);
               returnHtmlReply.state = true;
+              returnHtmlReply.parseMode = item.hasOwnProperty("parseMode")
+                ? item.parseMode
+                : "HTML";
               throw new Error("匹配成功");
             }
           });

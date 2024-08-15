@@ -1,6 +1,6 @@
 /**
  * 核心能力类
- * 
+ *
  * 无需改动
  */
 
@@ -74,28 +74,43 @@ const getKeyWords = () => {
       if (itemWords.length) {
         // 当前单元格内容
         let keyValueList = [];
-        itemWords.map((word) => {
-          // 切割换行
-          let wordsList = word.toString().split("\n");
-          let keyValue = "";
-          if (wordsList.length) {
-            // 处理为通用html text
-            wordsList.map((list, listIndex) => {
-              keyValue = keyValue + convertString(list) + "\n";
-            });
-            keyValueList.push(keyValue);
-          }
-        });
-        replyList.push({
-          keyword: keyName,
-          replyWord: keyValueList[0],
-          replyWordMore: keyValueList
-            .slice(1, keyValueList.length)
-            .filter((item) => item !== "\n"),
-        });
+        // 获取解析模式
+        if (itemWords[0] !== "MarkdownV2") {
+          itemWords.map((word) => {
+            // 切割换行
+            let wordsList = word.toString().split("\n");
+            let keyValue = "";
+            if (wordsList.length) {
+              // 处理为通用html text
+              wordsList.map((list, listIndex) => {
+                keyValue = keyValue + convertString(list) + "\n";
+              });
+              keyValueList.push(keyValue);
+            }
+          });
+          replyList.push({
+            keyword: keyName,
+            parseMode: "HTML",
+            replyWord: keyValueList[0],
+            replyWordMore: keyValueList
+              .slice(1, keyValueList.length)
+              .filter((item) => item !== "\n"),
+          });
+        } else {
+          keyValueList = itemWords.slice(1);
+          replyList.push({
+            keyword: keyName,
+            parseMode: "MarkdownV2",
+            replyWord: keyValueList[0],
+            replyWordMore: keyValueList
+              .slice(1, keyValueList.length)
+              .filter((item) => item !== "\n"),
+          });
+        }
       } else {
         replyList.push({
           keyword: keyName,
+          parseMode: "HTML",
           replyWord: "关键字内容为空，或获取失败，请检查关键字表单内容格式!",
           replyWordMore: [],
         });
