@@ -85,7 +85,7 @@
 
 **1、Graphic message [ in development ✅ ]**
 
-**2、Channel information monitoring, query, keyword push**
+**2、Channel information monitor, query, keyword push**
 
 **3、Message auto-destruction [Not yet started - Low priority - Constrained by GAS]**
 
