@@ -4,7 +4,7 @@
 
 
 
-##### 🌠 DB数据库
+##### 🌠 DB数据库 V1.20+
 
 ```text
 初始化数据表
@@ -77,14 +77,15 @@ MarkdownV2格式【官方示例：https://core.telegram.org/bots/api#markdownv2-
 使用GraphicMessage格式，需在标识块指定填写「GraphicMessage」以激活
 内容块1填写图片文件ID或图片URL，多条按「换行」填写
 内容块2填写需要跟随的文本内容，暂仅支持「MarkdownV2」格式
-⚠️图片ID查询(上传图片并附带文字指令以激活) 「 #photoid 」
-
+🚨 图片ID查询(上传图片并附带文字指令以激活) 「 #photoid 」
+⚠️ 官方建议以ID方式调用，性能更佳
 
 📋VideoMessage
 使用VideoMessage格式，需在标识块指定填写「VideoMessage」以激活
 内容块1填写视频文件ID或视频URL，多条按「换行」填写
 内容块2填写需要跟随的文本内容，暂仅支持「MarkdownV2」格式
-⚠️视频ID查询(上传视频并附带文字指令以激活)「 #videoid 」
+🚨视频ID查询(上传视频并附带文字指令以激活)「 #videoid 」
+⚠️ 官方建议以ID方式调用，性能更佳
 ```
 
 ###### 🎲 内容块 - 必填

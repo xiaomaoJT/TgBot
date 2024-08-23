@@ -183,6 +183,45 @@ const processData = (userMessage) => {
     disable_web_page_preview: true,
   };
 
+  // 获取图片fileID
+  if (
+    userMessage.message.hasOwnProperty("photo") &&
+    userMessage.message.hasOwnProperty("caption") &&
+    userMessage.message.caption == "#photoid"
+  ) {
+    let photoList = userMessage.message.photo;
+    if (photoList.length) {
+      let photoText =
+        "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+        "\n" +
+        "\n" +
+        `识别到图片存储指令，图片文件ID是\n\n<code>${
+          photoList[photoList.length - 1].file_id
+        }</code>`;
+
+      payloadPostData.text =
+        photoText +
+        `\n\n图片文件ID可用于填充关键字表[key_params]内[GraphicMessage]类型回复`;
+    }
+  }
+  // 获取视频fileID
+  if (
+    userMessage.message.hasOwnProperty("video") &&
+    userMessage.message.hasOwnProperty("caption") &&
+    userMessage.message.caption == "#videoid"
+  ) {
+    let videoObj = userMessage.message.video;
+    let videoText =
+      "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+      "\n" +
+      "\n" +
+      `识别到视频存储指令，视频文件ID是\n\n<code>${videoObj.file_id}</code>`;
+
+    payloadPostData.text =
+      videoText +
+      `\n\n视频文件ID可用于填充关键字表[key_params]内[VideoMessage]类型回复`;
+  }
+
   //判断消息类型 - 消息跟踪键盘 callback返回
   if (MESSAGETYPE == 1) {
     let callbackChatID = userMessage.message.chat.id.toFixed();
@@ -294,21 +333,38 @@ const processData = (userMessage) => {
           ? dealMessage.parseMode
           : "HTML";
         if (dealMessage.htmlReply2 == null) {
-          payloadPostData = {
-            method: "sendMessage",
-            chat_id: messageUserID,
-            text: dealMessageParseMode !== 'HTML' ? HTML_REPLY.replace(/<\/?[^>]+(>|$)/g, '*') : HTML_REPLY,
-            reply_to_message_id: messageReplyID,
-            parse_mode: dealMessageParseMode,
-            reply_markup: JSON.stringify(keyboardParams),
-            disable_web_page_preview: true,
-          };
+          if (dealMessageParseMode == "GraphicMessage") {
+            payloadPostData = {
+              method: "sendMediaGroup",
+              chat_id: messageUserID,
+              media: HTML_REPLY.replace(
+                "<b>🕹 来自XiaoMaoBot的消息：</b>\n\n",
+                ""
+              ),
+            };
+          } else {
+            payloadPostData = {
+              method: "sendMessage",
+              chat_id: messageUserID,
+              text:
+                dealMessageParseMode !== "HTML"
+                  ? HTML_REPLY.replace(/<\/?[^>]+(>|$)/g, "*")
+                  : HTML_REPLY,
+              reply_to_message_id: messageReplyID,
+              parse_mode: dealMessageParseMode,
+              reply_markup: JSON.stringify(keyboardParams),
+              disable_web_page_preview: true,
+            };
+          }
         } else {
           payloadPostData = [
             {
               method: "sendMessage",
               chat_id: messageUserID,
-              text: dealMessageParseMode !== 'HTML' ? HTML_REPLY.replace(/<\/?[^>]+(>|$)/g, '*') : HTML_REPLY,
+              text:
+                dealMessageParseMode !== "HTML"
+                  ? HTML_REPLY.replace(/<\/?[^>]+(>|$)/g, "*")
+                  : HTML_REPLY,
               reply_to_message_id: messageReplyID,
               parse_mode: dealMessageParseMode,
               reply_markup: JSON.stringify(keyboardParams),
@@ -320,7 +376,10 @@ const processData = (userMessage) => {
                 return payloadPostData.push({
                   method: "sendMessage",
                   chat_id: messageUserID,
-                  text: dealMessageParseMode !== 'HTML' ? e.replace(/<\/?[^>]+(>|$)/g, '*') : e,
+                  text:
+                    dealMessageParseMode !== "HTML"
+                      ? e.replace(/<\/?[^>]+(>|$)/g, "*")
+                      : e,
                   parse_mode: dealMessageParseMode,
                   reply_markup: JSON.stringify(keyboardParams),
                   disable_web_page_preview: true,
