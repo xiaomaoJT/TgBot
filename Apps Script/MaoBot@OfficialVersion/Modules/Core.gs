@@ -75,8 +75,8 @@ const getKeyWords = () => {
         // 当前单元格内容
         let keyValueList = [];
         // 获取解析模式
-        if (itemWords[0] !== "MarkdownV2") {
-          itemWords.map((word) => {
+        if (itemWords[0] == "HTML") {
+          itemWords.slice(1).map((word) => {
             // 切割换行
             let wordsList = word.toString().split("\n");
             let keyValue = "";
@@ -96,7 +96,7 @@ const getKeyWords = () => {
               .slice(1, keyValueList.length)
               .filter((item) => item !== "\n"),
           });
-        } else {
+        } else if (itemWords[0] == "MarkdownV2") {
           keyValueList = itemWords.slice(1);
           replyList.push({
             keyword: keyName,
@@ -105,6 +105,32 @@ const getKeyWords = () => {
             replyWordMore: keyValueList
               .slice(1, keyValueList.length)
               .filter((item) => item !== "\n"),
+          });
+        } else if (
+          ["GraphicMessage", "VideoMessage"].indexOf(itemWords[0]) != -1
+        ) {
+          let mediaArr = itemWords[1].split("\n").filter(Boolean);
+          let messageText = itemWords[2] ?? "";
+          let mediaList = [];
+          if (mediaArr.length) {
+            mediaArr.map((el, i) => {
+              let mediaObj = {
+                type: itemWords[0] == "GraphicMessage" ? "photo" : "video",
+                media: el,
+              };
+              if (i == mediaArr.length - 1) {
+                mediaObj.caption = messageText;
+                mediaObj.parse_mode = "MarkdownV2";
+                mediaObj.disable_web_page_preview = true;
+              }
+              mediaList.push(mediaObj);
+            });
+          }
+          replyList.push({
+            keyword: keyName,
+            parseMode: "GraphicMessage",
+            replyWord: JSON.stringify(mediaList),
+            replyWordMore: [],
           });
         }
       } else {
