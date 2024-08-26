@@ -7,7 +7,7 @@
 
 #### Telegram Bot机器人，基于Google Apps Script实现。
 
-| **最近更新时间** | **2024年08月23日**                                           |
+| **最近更新时间** | **2024年08月26日**                                           |
 | :--------------- | :----------------------------------------------------------- |
 | **当前版本**     | **正式版 - V1.20**                                           |
 | **功能清单**     | **功能描述：** ❶ 超级群管功能❷ 广告词/敏感词过滤、自动删除/警告❸ 多样化接口查询、XiaoMao数据加工❹ 自定义聊天窗快捷键盘/消息跟随按钮❺ 关键字消息/私聊消息 自动回复❻ 私聊消息/群组消息 捕捉及消息私人推送❼ 私聊消息/群组消息 自动存储<br />**功能细则：** 入群检测、退群检测、入群欢迎、退群欢送、超级群管功能、用户封禁、用户解封、用户禁言、广告词敏感词拦截及自动删除、chatGPT查询、消息私人推送、BOT消息主动回复、自动接口查询及数据加工、自定义键盘、私聊及自动回复、关键字自动回复、消息存储等功能 |
@@ -51,7 +51,7 @@
 
 
 
-- 📖 [仓库资源更新日志](https://github.com/xiaomaoJT/TgBot/blob/main/UPDATELOG.md) **小版本模块更新说明请参见此处**
+- 📖 [仓库资源更新日志](https://github.com/xiaomaoJT/TgBot/blob/main/UPDATELOG.md) **小版本模块更新说明请参见更新日志**
 
 - 🚗 [测试版部署 - 文字教程](https://github.com/xiaomaoJT/TgBot/blob/main/COURSE.md)
 
@@ -84,13 +84,13 @@
 
 #### 📋 To-Do
 
-**1、Graphic message [ Completion of development 🎉 ]**
+**1、Graphic message [ Completion of development 🎉 ] 「20240823 - V1.20+」**
 
 **2、Channel information monitor, query, keyword push [ in development ✅ ]**
 
 **3、Message auto-destruction [Not yet started - Low priority - Constrained by GAS]**
 
-**4、Hot deployment**
+**4、Hot deployment [Not yet started]**
 
 
 
