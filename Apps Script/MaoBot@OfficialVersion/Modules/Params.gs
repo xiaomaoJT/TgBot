@@ -64,9 +64,17 @@ var MESSAGETYPE = 0;
 // 用于承接返回数据
 var dealMessage = {};
 // 强ban关键字截止位
-var banKeyLastIndex = 14;
+var banKeyLastIndex = 21;
 // 敏感词库 -- 内容已作加密处理base64
 var sensitiveEncodeList = [
+  "5Luj5byA5Lya5ZGY",
+  "5Luj5Yi3",
+  "576k5Y+R6L2v5Lu2",
+  "5bm/5ZGK5Luj5Y+R",
+  "55yL5oiR566A5LuL",
+  "5ouN6L2m6L6G6L+d5YGc",
+  "5ouN54Wn54mH5pel5YWl",
+  "54K55Ye75a+55o6l",
   "5oOz5YGa55qE5p2l",
   "5LiA5pel5YWr5L2w",
   "5oub5Lq65aSE55CG5pWw5o2u",

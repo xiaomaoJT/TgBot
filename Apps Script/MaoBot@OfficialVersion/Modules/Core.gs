@@ -10,8 +10,10 @@
  */
 const linkBot = (data) => {
   try {
-    UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
-  } catch (error) {}
+    let res = UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
+    return res.getContentText()
+  } catch (error) {
+  }
 };
 
 /**
@@ -220,7 +222,27 @@ const setStorage = (MESSAGE, TYPE) => {
     messageSourceID,
     messageType,
     messageContent = "";
-  if (TYPE != "MESSAGEBACK") {
+
+  switch (TYPE) {
+    case "POSTDATA":
+      messageType = "主动发起";
+      break;
+    case "CALLBACK":
+      messageType = "键盘回调";
+      break;
+    case "CHANNELPOST":
+      messageType = "频道监听";
+      break;
+    default:
+      messageType = "--自动回复";
+      break;
+  }
+
+  let spreadSheet = SpreadsheetApp.openById(EXECID);
+  let Sheet = spreadSheet.getSheetByName(EXECNAME);
+  let lastSheetRow = spreadSheet.getLastRow();
+
+  if (TYPE != "MESSAGEBACK" && TYPE != "CHANNELPOST") {
     userID = MESSAGE.message.from.id.toString();
 
     userName =
@@ -239,23 +261,12 @@ const setStorage = (MESSAGE, TYPE) => {
     if (userAllName == "") {
       userAllName = "该用户未设置昵称";
     }
-    let messageInfoType = MESSAGE.message.hasOwnProperty("text")
-      ? "[文本消息]"
-      : MESSAGE.message.hasOwnProperty("sticker")
-      ? "[表情消息]"
-      : MESSAGE.message.hasOwnProperty("photo")
-      ? "[图片消息]"
-      : MESSAGE.message.hasOwnProperty("video")
-      ? "[视频消息]"
-      : MESSAGE.message.hasOwnProperty("document")
-      ? "[文件消息]"
-      : MESSAGE.message.hasOwnProperty("voice")
-      ? "[音频消息]"
-      : "[未知消息类型]";
-
+    let messageInfoType = getMessageType(MESSAGE, "message");
     messageContent =
       messageInfoType +
-      (messageInfoType.indexOf("[文本消息]") != -1 ? MESSAGE.message.text : "");
+      (messageInfoType.indexOf("[文本消息]") != -1
+        ? MESSAGE.message.text
+        : MESSAGE.message?.caption);
 
     messageSource =
       (MESSAGE.message.chat.type == "supergroup"
@@ -270,47 +281,77 @@ const setStorage = (MESSAGE, TYPE) => {
       ")";
 
     messageSourceID = MESSAGE.message.chat.id.toString();
+
+    //用户ID
+    Sheet.getRange(lastSheetRow + 1, 2).setValue(userID);
+    //用户名称
+    Sheet.getRange(lastSheetRow + 1, 3).setValue(userName);
+    // 用户昵称
+    Sheet.getRange(lastSheetRow + 1, 4).setValue(userAllName);
+    // 消息来源
+    Sheet.getRange(lastSheetRow + 1, 6).setValue(messageSource);
+    // 消息来源ID
+    Sheet.getRange(lastSheetRow + 1, 7).setValue(messageSourceID);
+    // 消息内容
+    Sheet.getRange(lastSheetRow + 1, 8).setValue(messageContent);
+  } else if (TYPE == "CHANNELPOST") {
+    //用户ID
+    Sheet.getRange(lastSheetRow + 1, 2).setValue(MESSAGE.channel_post.chat.id);
+    //用户名称
+    Sheet.getRange(lastSheetRow + 1, 3).setValue("[频道]");
+    // 用户昵称
+    Sheet.getRange(lastSheetRow + 1, 4).setValue(
+      MESSAGE.channel_post.chat.title
+    );
+    // 消息来源
+    Sheet.getRange(lastSheetRow + 1, 6).setValue("(频道消息)");
+    // 消息来源ID
+    Sheet.getRange(lastSheetRow + 1, 7).setValue(MESSAGE.channel_post.chat.id);
+    let messageInfoType = getMessageType(MESSAGE, "channel_post");
+    messageContent =
+      messageInfoType +
+      (messageInfoType.indexOf("[文本消息]") != -1
+        ? MESSAGE.channel_post.text
+        : MESSAGE.channel_post?.caption);
+    // 消息内容
+    Sheet.getRange(lastSheetRow + 1, 8).setValue(messageContent);
   }
-
-  messageType =
-    TYPE == "POSTDATA"
-      ? "主动发起"
-      : TYPE == "CALLBACK"
-      ? "键盘回调"
-      : "--自动回复";
-
-  let spreadSheet = SpreadsheetApp.openById(EXECID);
-  let Sheet = spreadSheet.getSheetByName(EXECNAME);
-  let lastSheetRow = spreadSheet.getLastRow();
 
   //发起时间
   Sheet.getRange(lastSheetRow + 1, 1).setValue(time);
-  //用户ID
-  TYPE != "MESSAGEBACK"
-    ? Sheet.getRange(lastSheetRow + 1, 2).setValue(userID)
-    : "";
-  //用户名称
-  TYPE != "MESSAGEBACK"
-    ? Sheet.getRange(lastSheetRow + 1, 3).setValue(userName)
-    : "";
-  // 用户昵称
-  TYPE != "MESSAGEBACK"
-    ? Sheet.getRange(lastSheetRow + 1, 4).setValue(userAllName)
-    : "";
   // 消息类型
   Sheet.getRange(lastSheetRow + 1, 5).setValue(messageType);
-  // 消息来源
-  TYPE != "MESSAGEBACK"
-    ? Sheet.getRange(lastSheetRow + 1, 6).setValue(messageSource)
-    : "";
-  // 消息来源ID
-  TYPE != "MESSAGEBACK"
-    ? Sheet.getRange(lastSheetRow + 1, 7).setValue(messageSourceID)
-    : "";
-  // 消息内容
-  TYPE != "MESSAGEBACK"
-    ? Sheet.getRange(lastSheetRow + 1, 8).setValue(messageContent)
-    : "";
   // 消息JSON
   Sheet.getRange(lastSheetRow + 1, 9).setValue(JSON.stringify(MESSAGE));
 };
+
+
+/**
+ * 获取api返回数据列表
+ * @param data 
+ */
+const getApiBackList = (data) => {
+  let list = [];
+  for (let i = 0; i < data.length; i++) {
+    const e = data[i];
+    if (e.payload.hasOwnProperty("reply_to_message_id")) {
+      try {
+        let linkData = linkBot(e);
+        setStorage(e, "MESSAGEBACK");
+        linkData = JSON.parse(linkData);
+        if (
+          linkData?.result?.reply_to_message?.chat &&
+          linkData.result.message_id &&
+          linkData.result.chat.type
+        ) {
+          const chatId = linkData.result.reply_to_message.chat.id.toString();
+          const messageId = linkData.result.message_id.toString();
+          const chatType = linkData.result.chat.type;
+          list.push([chatId, messageId, chatType]);
+        } else {
+        }
+      } catch (error) {}
+    }
+  }
+  return list
+}
