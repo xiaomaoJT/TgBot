@@ -24,7 +24,7 @@
  * 用于接收用户传来的讯息JSON
  * @param {*} e
  */
-const doPost = (e) => {
+const doPost = async (e) => {
   // ！！！！！仅用于数据结构展示，此段代码无效！！！！！
   if (e == undefined) {
     let testParams = {
@@ -56,6 +56,13 @@ const doPost = (e) => {
 
   // 获取响应数据 必传
   let userMessage = JSON.parse(e.postData.contents);
+
+  // 频道消息
+  if (userMessage?.channel_post) {
+    setStorage(userMessage, "CHANNELPOST");
+    return;
+  }
+
   // 判断消息类型
   if (userMessage.hasOwnProperty("callback_query")) {
     MESSAGETYPE = 1;
@@ -125,18 +132,103 @@ const doPost = (e) => {
       userMessage.message.entities[0].type == "bold")
   ) {
     if (payloadStatus) {
-      data.length
-        ? data.map(async (e) => {
-            await linkBot(e);
-            await setStorage(e, "MESSAGEBACK");
-          })
-        : "";
+      if (data.length) {
+        let list = getApiBackList(data);
+        if (list.length) {
+          createDelayedTriggerWithParams(list);
+        }
+      }
     } else {
       linkBot(data);
       setStorage(data, "MESSAGEBACK");
     }
   }
 };
+
+/**
+ * 普通账号上限20个
+ * 删除多余触发器
+ */
+const deleteClockTriggers = () => {
+  let allTriggers = ScriptApp.getProjectTriggers();
+  // 删除关闭的触发器
+  allTriggers
+    .filter((t) => t.getTriggerSource() === ScriptApp.TriggerSource.CLOCK)
+    .forEach((t) => ScriptApp.deleteTrigger(t));
+
+  return ScriptApp.getProjectTriggers().length;
+};
+
+/**
+ * 创建消息删除触发器
+ * @param params botapi返回数据列表
+ */
+const createDelayedTriggerWithParams = (params) => {
+  let list = {};
+  const scriptProperties = PropertiesService.getScriptProperties();
+  let paramsList = scriptProperties.getProperty("triggerParams");
+  if (paramsList) {
+    list = JSON.parse(paramsList);
+    let objKeyLength = Object.keys(list);
+    if (objKeyLength.length) {
+      let keyName = Object.keys(list).sort((a, b) => {
+        return a - b;
+      })[objKeyLength.length - 1];
+      list[parseInt(keyName) + 1] = params;
+    } else {
+      list = { 0: params };
+    }
+  } else {
+    list = { 0: params };
+  }
+  scriptProperties.setProperty("triggerParams", JSON.stringify(list));
+  try {
+    if (deleteClockTriggers() >= 20) {
+      return;
+    }
+    const now = new Date();
+    const delayTime = new Date(now.getTime() + 30 * 1000);
+    // 创建触发器
+    ScriptApp.newTrigger("executeAfterDelay")
+      .timeBased()
+      .at(delayTime)
+      .create();
+  } catch (e) {}
+};
+
+/**
+ * 消息触发器
+ * @returns
+ */
+function executeAfterDelay() {
+  deleteClockTriggers();
+  const scriptProperties = PropertiesService.getScriptProperties();
+  const paramsString = scriptProperties.getProperty("triggerParams");
+  if (paramsString) {
+    const params = JSON.parse(paramsString);
+    let list = [];
+    let objKeyLength = Object.keys(params);
+    if (objKeyLength.length) {
+      let keyName = Object.keys(params).sort((a, b) => {
+        return a - b;
+      })[0];
+      list = params[keyName];
+      try {
+        list.map((listItem) => {
+          if (listItem[2] == "supergroup") {
+            deleteMessageApi(listItem[0], listItem[1]);
+          }
+        });
+        delete params[keyName];
+        scriptProperties.setProperty("triggerParams", JSON.stringify(params));
+      } catch (e) {}
+    } else {
+      return;
+    }
+  } else {
+    return;
+  }
+}
 
 /**
  * 用于处理用户信息并进行回复
@@ -380,6 +472,7 @@ const processData = (userMessage) => {
                     dealMessageParseMode !== "HTML"
                       ? e.replace(/<\/?[^>]+(>|$)/g, "*")
                       : e,
+                  reply_to_message_id: messageReplyID,
                   parse_mode: dealMessageParseMode,
                   reply_markup: JSON.stringify(keyboardParams),
                   disable_web_page_preview: true,

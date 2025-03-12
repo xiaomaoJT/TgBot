@@ -260,3 +260,26 @@ function sortByTotalDescending(obj) {
     .sort(([, a], [, b]) => b.total - a.total)
     .map(([key, value]) => value);
 }
+
+
+/**
+ * 判断消息类型
+ * @param MESSAGE 原始消息体
+ * @param typeParams 消息类型
+ * @returns 
+ */
+function getMessageType(MESSAGE, typeParams) {
+  return MESSAGE[typeParams].hasOwnProperty("text")
+    ? "[文本消息]"
+    : MESSAGE[typeParams].hasOwnProperty("sticker")
+    ? "[表情消息]"
+    : MESSAGE[typeParams].hasOwnProperty("photo")
+    ? "[图片消息]"
+    : MESSAGE[typeParams].hasOwnProperty("video")
+    ? "[视频消息]"
+    : MESSAGE[typeParams].hasOwnProperty("document")
+    ? "[文件消息]"
+    : MESSAGE[typeParams].hasOwnProperty("voice")
+    ? "[音频消息]"
+    : "[未知消息类型]";
+}
