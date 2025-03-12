@@ -134,9 +134,11 @@ const doPost = async (e) => {
     if (payloadStatus) {
       if (data.length) {
         let list = getApiBackList(data);
-        if (list.length) {
-          createDelayedTriggerWithParams(list);
-        }
+        try {
+          if (list.length && list[0][2] == "supergroup") {
+            createDelayedTriggerWithParams(list);
+          }
+        } catch (error) {}
       }
     } else {
       linkBot(data);
