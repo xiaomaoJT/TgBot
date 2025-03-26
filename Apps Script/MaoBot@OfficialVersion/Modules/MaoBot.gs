@@ -149,17 +149,51 @@ const doPost = async (e) => {
 
 /**
  * 普通账号上限20个
- * 删除多余触发器
+ * 删除指定触发器 index true
+ * 删除多余触发器 false num
  */
-const deleteClockTriggers = () => {
-  let allTriggers = ScriptApp.getProjectTriggers();
-  // 删除关闭的触发器
-  allTriggers
-    .filter((t) => t.getTriggerSource() === ScriptApp.TriggerSource.CLOCK)
-    .forEach((t) => ScriptApp.deleteTrigger(t));
-
-  return ScriptApp.getProjectTriggers().length;
+const deleteClockTriggers = (index = 0,status = true,num = 0) => {
+  // 获取所有时间类型触发器
+  let allTriggers = ScriptApp.getProjectTriggers().filter(
+    (t) => t.getTriggerSource() === ScriptApp.TriggerSource.CLOCK
+  );
+  if(allTriggers.length && allTriggers.length > index){
+    if(status){
+      ScriptApp.deleteTrigger(allTriggers[index])
+    }else{
+      for (let i = 0; i < num; i++) {
+        ScriptApp.deleteTrigger(allTriggers[i])
+      }
+    }
+  }
 };
+
+/**
+ * 普通账号上限20个
+ * 查询触发器数量 - 大于19个立即循环执行消息删除函数
+ * @returns 
+ */
+const getClockTriggersNum = () => {
+  // 获取所有时间类型触发器
+  let allTriggers = ScriptApp.getProjectTriggers().filter(
+    (t) => t.getTriggerSource() === ScriptApp.TriggerSource.CLOCK
+  );
+  if(allTriggers.length >= 19){
+    let surplusIndex = allTriggers.length - 19
+    cyclicDeleteTrigger(surplusIndex)
+  }
+  return allTriggers.length;
+};
+
+/**
+ * 循环执行多余触发器
+ * @param num 
+ */
+const cyclicDeleteTrigger = (num) => {
+  for (let index = 0; index < num; index++) {
+    executeAfterDelay()
+  }
+}
 
 /**
  * 创建消息删除触发器
@@ -185,8 +219,11 @@ const createDelayedTriggerWithParams = (params) => {
   }
   scriptProperties.setProperty("triggerParams", JSON.stringify(list));
   try {
-    if (deleteClockTriggers() >= 20) {
-      return;
+    let surplusParamsIndex = Object.keys(list).length - getClockTriggersNum()
+    if(surplusParamsIndex > 1){
+      cyclicDeleteTrigger(surplusParamsIndex - 1)
+    }else{
+      deleteClockTriggers(0,false,(surplusParamsIndex * -1) + 1)
     }
     const now = new Date();
     const delayTime = new Date(now.getTime() + 30 * 1000);
@@ -203,7 +240,6 @@ const createDelayedTriggerWithParams = (params) => {
  * @returns
  */
 function executeAfterDelay() {
-  deleteClockTriggers();
   const scriptProperties = PropertiesService.getScriptProperties();
   const paramsString = scriptProperties.getProperty("triggerParams");
   if (paramsString) {
@@ -222,6 +258,7 @@ function executeAfterDelay() {
           }
         });
         delete params[keyName];
+        deleteClockTriggers()
         scriptProperties.setProperty("triggerParams", JSON.stringify(params));
       } catch (e) {}
     } else {
