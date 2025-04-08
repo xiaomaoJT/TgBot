@@ -220,8 +220,8 @@ const createDelayedTriggerWithParams = (params) => {
   scriptProperties.setProperty("triggerParams", JSON.stringify(list));
   try {
     let surplusParamsIndex = Object.keys(list).length - getClockTriggersNum()
-    if(surplusParamsIndex > 1){
-      cyclicDeleteTrigger(surplusParamsIndex - 1)
+    if(surplusParamsIndex > 0){
+      cyclicDeleteTrigger(surplusParamsIndex)
     }else{
       deleteClockTriggers(0,false,(surplusParamsIndex * -1) + 1)
     }
