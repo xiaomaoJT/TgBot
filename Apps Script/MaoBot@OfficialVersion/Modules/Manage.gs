@@ -10,6 +10,18 @@
  * @returns
  */
 const getUnBanUser = (userJson) => {
+  try {
+    let resultAdministrators = UrlFetchApp.fetch(
+      "https://api.telegram.org/bot" +
+        BOTID +
+        "/" +
+        "getChatAdministrators?chat_id="+PermissionGroupId
+    );
+    let userAdministrators = JSON.parse(
+      resultAdministrators.getContentText()
+    ).result.map((el) => el.user.id);
+    PermissionReleaseList = PermissionReleaseList.concat(userAdministrators);
+  } catch (error) {}
   if (PermissionReleaseList.indexOf(userJson.from.id.toString()) == -1) {
     returnText =
       "Bot用户封禁功能仅开放于Bot管理者，请拉取最新版XiaoMaoBot代码部署后再试吧！";
@@ -170,7 +182,7 @@ const getUnBanUser = (userJson) => {
 /**
  * 删除信息 - 不建议主动调用，建议使用deleteMessageApi
  * @param params
- * @param type 1主动删除 2调用删除 3删除回复 
+ * @param type 1主动删除 2调用删除 3删除回复
  */
 const deleteUserMessage = (params, type = 1) => {
   let payloadDeletePostData = {
@@ -189,11 +201,10 @@ const deleteUserMessage = (params, type = 1) => {
     let chat_id = userJsonText.substring(firstIndex + 12, lastIndex);
     payloadDeletePostData.chat_id = chat_id;
     payloadDeletePostData.message_id = message_id;
-  } else if(type == 3){
+  } else if (type == 3) {
     payloadDeletePostData.chat_id = params.reply_to_message.chat.id.toString();
-    payloadDeletePostData.message_id =
-      params.message_id.toString();
-  }else {
+    payloadDeletePostData.message_id = params.message_id.toString();
+  } else {
     payloadDeletePostData.chat_id = params.reply_to_message.chat.id.toString();
     payloadDeletePostData.message_id =
       params.reply_to_message.message_id.toString();
@@ -212,7 +223,7 @@ const deleteUserMessage = (params, type = 1) => {
  * @param key1 chat_id
  * @param key2 message_id
  */
-const deleteMessageApi = (key1,key2) => {
+const deleteMessageApi = (key1, key2) => {
   let payloadDeletePostData = {
     method: "deleteMessage",
     chat_id: key1,
@@ -224,7 +235,7 @@ const deleteMessageApi = (key1,key2) => {
       payload: payloadDeletePostData,
     });
   } catch (e) {}
-}
+};
 
 /**
  * 封禁用户
@@ -233,6 +244,18 @@ const deleteMessageApi = (key1,key2) => {
  */
 const getBanUser = (userJson) => {
   let timeFrame = userJson.text.replace("/ban", "") || "";
+  try {
+    let resultAdministrators = UrlFetchApp.fetch(
+      "https://api.telegram.org/bot" +
+        BOTID +
+        "/" +
+        "getChatAdministrators?chat_id="+PermissionGroupId
+    );
+    let userAdministrators = JSON.parse(
+      resultAdministrators.getContentText()
+    ).result.map((el) => el.user.id);
+    PermissionReleaseList = PermissionReleaseList.concat(userAdministrators);
+  } catch (error) {}
   if (PermissionReleaseList.indexOf(userJson.from.id.toString()) == -1) {
     returnText =
       "Bot用户封禁功能仅开放于Bot管理者，请拉取最新版XiaoMaoBot代码部署后再试吧！";
@@ -418,6 +441,18 @@ const getRestrictUser = (userJson) => {
     can_manage_topics: false,
   };
   let timeFrame = userJson.text.replace("/restrict", "") || "";
+  try {
+    let resultAdministrators = UrlFetchApp.fetch(
+      "https://api.telegram.org/bot" +
+        BOTID +
+        "/" +
+        "getChatAdministrators?chat_id="+PermissionGroupId
+    );
+    let userAdministrators = JSON.parse(
+      resultAdministrators.getContentText()
+    ).result.map((el) => el.user.id);
+    PermissionReleaseList = PermissionReleaseList.concat(userAdministrators);
+  } catch (error) {}
   if (PermissionReleaseList.indexOf(userJson.from.id.toString()) == -1) {
     returnText =
       "Bot用户限制功能仅开放于Bot管理者，请拉取最新版XiaoMaoBot代码部署后再试吧！";

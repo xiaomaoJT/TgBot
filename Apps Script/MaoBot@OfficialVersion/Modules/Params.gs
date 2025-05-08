@@ -54,6 +54,8 @@ var cacheExpirationStatus = true;
  * +++++++++ 系统默认通用参数·无需改动 +++++++++
  */
 
+// 群ID - 暂只支持单个群管理
+var PermissionGroupId = "";
 // 管理员ID列表
 var PermissionReleaseList = [];
 // 用于过滤需要排除捕捉的群组信息
