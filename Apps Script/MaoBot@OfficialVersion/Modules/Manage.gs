@@ -10,17 +10,22 @@
  * @returns
  */
 const getUnBanUser = (userJson) => {
+  let PermissionGroupId = "";
   try {
-    let resultAdministrators = UrlFetchApp.fetch(
-      "https://api.telegram.org/bot" +
-        BOTID +
-        "/" +
-        "getChatAdministrators?chat_id="+PermissionGroupId
-    );
-    let userAdministrators = JSON.parse(
-      resultAdministrators.getContentText()
-    ).result.map((el) => el.user.id);
-    PermissionReleaseList = PermissionReleaseList.concat(userAdministrators);
+    if (userJson.chat.type == "supergroup") {
+      PermissionGroupId = userJson.reply_to_message.chat.id.toString();
+      let resultAdministrators = UrlFetchApp.fetch(
+        "https://api.telegram.org/bot" +
+          BOTID +
+          "/" +
+          "getChatAdministrators?chat_id=" +
+          PermissionGroupId
+      );
+      let userAdministrators = JSON.parse(
+        resultAdministrators.getContentText()
+      ).result.map((el) => el.user.id);
+      PermissionReleaseList = PermissionReleaseList.concat(userAdministrators);
+    }
   } catch (error) {}
   if (PermissionReleaseList.indexOf(userJson.from.id.toString()) == -1) {
     returnText =
@@ -244,17 +249,22 @@ const deleteMessageApi = (key1, key2) => {
  */
 const getBanUser = (userJson) => {
   let timeFrame = userJson.text.replace("/ban", "") || "";
+  let PermissionGroupId = "";
   try {
-    let resultAdministrators = UrlFetchApp.fetch(
-      "https://api.telegram.org/bot" +
-        BOTID +
-        "/" +
-        "getChatAdministrators?chat_id="+PermissionGroupId
-    );
-    let userAdministrators = JSON.parse(
-      resultAdministrators.getContentText()
-    ).result.map((el) => el.user.id);
-    PermissionReleaseList = PermissionReleaseList.concat(userAdministrators);
+    if (userJson.chat.type == "supergroup") {
+      PermissionGroupId = userJson.reply_to_message.chat.id.toString();
+      let resultAdministrators = UrlFetchApp.fetch(
+        "https://api.telegram.org/bot" +
+          BOTID +
+          "/" +
+          "getChatAdministrators?chat_id=" +
+          PermissionGroupId
+      );
+      let userAdministrators = JSON.parse(
+        resultAdministrators.getContentText()
+      ).result.map((el) => el.user.id);
+      PermissionReleaseList = PermissionReleaseList.concat(userAdministrators);
+    }
   } catch (error) {}
   if (PermissionReleaseList.indexOf(userJson.from.id.toString()) == -1) {
     returnText =
@@ -441,17 +451,22 @@ const getRestrictUser = (userJson) => {
     can_manage_topics: false,
   };
   let timeFrame = userJson.text.replace("/restrict", "") || "";
+  let PermissionGroupId = "";
   try {
-    let resultAdministrators = UrlFetchApp.fetch(
-      "https://api.telegram.org/bot" +
-        BOTID +
-        "/" +
-        "getChatAdministrators?chat_id="+PermissionGroupId
-    );
-    let userAdministrators = JSON.parse(
-      resultAdministrators.getContentText()
-    ).result.map((el) => el.user.id);
-    PermissionReleaseList = PermissionReleaseList.concat(userAdministrators);
+    if (userJson.chat.type == "supergroup") {
+      PermissionGroupId = userJson.reply_to_message.chat.id.toString();
+      let resultAdministrators = UrlFetchApp.fetch(
+        "https://api.telegram.org/bot" +
+          BOTID +
+          "/" +
+          "getChatAdministrators?chat_id=" +
+          PermissionGroupId
+      );
+      let userAdministrators = JSON.parse(
+        resultAdministrators.getContentText()
+      ).result.map((el) => el.user.id);
+      PermissionReleaseList = PermissionReleaseList.concat(userAdministrators);
+    }
   } catch (error) {}
   if (PermissionReleaseList.indexOf(userJson.from.id.toString()) == -1) {
     returnText =
