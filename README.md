@@ -82,15 +82,23 @@
 
 ------
 
-#### 📋 To-Do
+#### 📋 To-Do / 待办列表
 
 **1、Graphic message [ Completion of development 🎉 ] 「20240823 - V1.20+」**
 
-**2、Channel information monitor, query, keyword push [ in development ✅ ]**
+- 图文消息 [开发完成 🎉] 「完成于20240823，版本V1.20+已支持」
 
-**3、Message auto-destruction [Not yet started - Low priority - Constrained by GAS]**
+**2、Channel information monitor, query, keyword push [Not yet started]**
+
+- 频道消息监听、查询、关键词推送 [未开始...]
+
+**3、Message auto-destruction [ Completion of development 🎉 ] 「20250312 - V1.30+」 [⚠️ Due to GAS limitations, high concurrency is only supported at 20 times per 30 seconds]**
+
+- 消息自动删除 [开发完成 🎉] 「完成于20250312，版本V1.30+已支持」「受限于GAS，高并发仅支持20次/30s」
 
 **4、Hot deployment [Not yet started]**
+
+- 热更新 [未开始...]
 
 
 
