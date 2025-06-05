@@ -179,18 +179,7 @@ const checkSensitiveDFA = (content) => {
     return result;
   }
 
-  //获取敏感词并解密
-  function getSensitiveWords() {
-    // GAS 解密方法
-    let words =
-      sensitiveEncodeList.map((word) =>
-        Utilities.newBlob(Utilities.base64Decode(word)).getDataAsString()
-      ) || [];
-
-    return words;
-  }
-
-  const sensitiveWords = getSensitiveWords() || [];
+  const sensitiveWords = getSensitiveAndBanWords() || [];
   let map = buildMap(sensitiveWords) || {};
 
   //检测机制
@@ -261,12 +250,11 @@ function sortByTotalDescending(obj) {
     .map(([key, value]) => value);
 }
 
-
 /**
  * 判断消息类型
  * @param MESSAGE 原始消息体
  * @param typeParams 消息类型
- * @returns 
+ * @returns
  */
 function getMessageType(MESSAGE, typeParams) {
   return MESSAGE[typeParams].hasOwnProperty("text")
@@ -282,4 +270,94 @@ function getMessageType(MESSAGE, typeParams) {
     : MESSAGE[typeParams].hasOwnProperty("voice")
     ? "[音频消息]"
     : "[未知消息类型]";
+}
+
+/**
+ * 获取敏感词
+ * sensitive: 敏感词
+ * ban: 绝杀词
+ * @returns
+ */
+function getSensitiveAndBanWords(type = "sensitive") {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName(SENSITIVEWORDS);
+  const lastRow = sheet.getLastRow();
+
+  if (type == "ban") {
+    // 获取绝杀词
+    const rangeBan = sheet.getRange(3, 1, lastRow); // 参数：起始行、起始列、行数
+    const valuesBan = rangeBan.getValues();
+    const columnAValues = valuesBan.flat().filter((e) => e);
+
+    return getSensitiveWords(columnAValues);
+  } else {
+    // 获取绝杀词
+    const rangeBan = sheet.getRange(3, 1, lastRow); // 参数：起始行、起始列、行数
+    const valuesBan = rangeBan.getValues();
+    const columnAValues = valuesBan.flat().filter((e) => e);
+
+    // 获取敏感词
+    const rangeSensitive = sheet.getRange(3, 2, lastRow); // 参数：起始行、起始列、行数
+    const valuesSensitive = rangeSensitive.getValues();
+    const columnBValues = valuesSensitive.flat().filter((e) => e);
+    return getSensitiveWords(columnBValues).concat(
+      getSensitiveWords(columnAValues)
+    );
+  }
+}
+
+/**
+ * 敏感词解密
+ * @returns
+ */
+function getSensitiveWords(list) {
+  // GAS 解密方法
+  let words =
+    list.map((word) =>
+      Utilities.newBlob(Utilities.base64Decode(word)).getDataAsString()
+    ) || [];
+
+  return words;
+}
+
+/**
+ * 敏感词加密
+ * @param word
+ * @returns
+ */
+function setSensitiveWords(word) {
+  return Utilities.base64Encode(Utilities.newBlob(word).getBytes());
+}
+
+/**
+ * 新增敏感词
+ * @param word
+ * @param type
+ */
+function setSensitiveAndBanWords(word, type = "sensitive") {
+  const encodedWords = setSensitiveWords(word);
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName(SENSITIVEWORDS);
+  let column = type == "ban" ? 1 : 2;
+  const lastRow = getLastRowInColumn(sheet, column);
+  sheet.getRange(lastRow + 1, column).setValue(encodedWords);
+}
+
+/**
+ * 获取指定列的最后一行（非空行）
+ * @param Sheet
+ * @param number
+ * @returns number 最后一行的行号
+ */
+function getLastRowInColumn(sheet, column) {
+  // 获取该列所有已使用的行
+  const range = sheet.getRange(1, column, sheet.getMaxRows(), 1);
+  const values = range.getValues();
+  // 反向遍历，找到最后一个非空单元格
+  for (let row = values.length - 1; row >= 0; row--) {
+    if (values[row][0] !== "") {
+      return row + 1; // 返回行号（从 1 开始）
+    }
+  }
+  return 0; // 如果列为空，返回 0
 }

@@ -4,7 +4,7 @@
  * # 微信公众号 【小帽集团】
  * # XiaoMao · Tg频道频道：https://t.me/xiaomaoJT
  *
- * V1.11 - 正式版
+ * V1.53 - 正式版
  *
  * 核心函数
  * 无需改动
@@ -152,17 +152,17 @@ const doPost = async (e) => {
  * 删除指定触发器 index true
  * 删除多余触发器 false num
  */
-const deleteClockTriggers = (index = 0,status = true,num = 0) => {
+const deleteClockTriggers = (index = 0, status = true, num = 0) => {
   // 获取所有时间类型触发器
   let allTriggers = ScriptApp.getProjectTriggers().filter(
     (t) => t.getTriggerSource() === ScriptApp.TriggerSource.CLOCK
   );
-  if(allTriggers.length && allTriggers.length > index){
-    if(status){
-      ScriptApp.deleteTrigger(allTriggers[index])
-    }else{
+  if (allTriggers.length && allTriggers.length > index) {
+    if (status) {
+      ScriptApp.deleteTrigger(allTriggers[index]);
+    } else {
       for (let i = 0; i < num; i++) {
-        ScriptApp.deleteTrigger(allTriggers[i])
+        ScriptApp.deleteTrigger(allTriggers[i]);
       }
     }
   }
@@ -171,29 +171,29 @@ const deleteClockTriggers = (index = 0,status = true,num = 0) => {
 /**
  * 普通账号上限20个
  * 查询触发器数量 - 大于19个立即循环执行消息删除函数
- * @returns 
+ * @returns
  */
 const getClockTriggersNum = () => {
   // 获取所有时间类型触发器
   let allTriggers = ScriptApp.getProjectTriggers().filter(
     (t) => t.getTriggerSource() === ScriptApp.TriggerSource.CLOCK
   );
-  if(allTriggers.length >= 19){
-    let surplusIndex = allTriggers.length - 19
-    cyclicDeleteTrigger(surplusIndex)
+  if (allTriggers.length >= 19) {
+    let surplusIndex = allTriggers.length - 19;
+    cyclicDeleteTrigger(surplusIndex);
   }
   return allTriggers.length;
 };
 
 /**
  * 循环执行多余触发器
- * @param num 
+ * @param num
  */
 const cyclicDeleteTrigger = (num) => {
   for (let index = 0; index < num; index++) {
-    executeAfterDelay()
+    executeAfterDelay();
   }
-}
+};
 
 /**
  * 创建消息删除触发器
@@ -219,11 +219,11 @@ const createDelayedTriggerWithParams = (params) => {
   }
   scriptProperties.setProperty("triggerParams", JSON.stringify(list));
   try {
-    let surplusParamsIndex = Object.keys(list).length - getClockTriggersNum()
-    if(surplusParamsIndex > 0){
-      cyclicDeleteTrigger(surplusParamsIndex)
-    }else{
-      deleteClockTriggers(0,false,(surplusParamsIndex * -1) + 1)
+    let surplusParamsIndex = Object.keys(list).length - getClockTriggersNum();
+    if (surplusParamsIndex > 0) {
+      cyclicDeleteTrigger(surplusParamsIndex);
+    } else {
+      deleteClockTriggers(0, false, surplusParamsIndex * -1 + 1);
     }
     const now = new Date();
     const delayTime = new Date(now.getTime() + 30 * 1000);
@@ -258,7 +258,7 @@ function executeAfterDelay() {
           }
         });
         delete params[keyName];
-        deleteClockTriggers()
+        deleteClockTriggers();
         scriptProperties.setProperty("triggerParams", JSON.stringify(params));
       } catch (e) {}
     } else {
@@ -552,12 +552,7 @@ const processData = (userMessage) => {
         });
 
         //强杀广告 - 直接ban
-        let banKeyWords =
-          sensitiveEncodeList
-            .slice(0, banKeyLastIndex)
-            .map((word) =>
-              Utilities.newBlob(Utilities.base64Decode(word)).getDataAsString()
-            ) || [];
+        let banKeyWords = getSensitiveAndBanWords("ban");
         function judgeBanStatus(banStauts = false) {
           for (i in banKeyWords) {
             if (userMessage.message.text.includes(banKeyWords[i])) {
@@ -878,6 +873,22 @@ const processReplyWord = (key, useId, userJson) => {
             "\n" +
             "\n" +
             getChatterboxUser(useId, userJson);
+          returnHtmlReply.state = true;
+          break;
+        case 22:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "\n" +
+            setBanOrSensitiveWords(userJson,'ban');
+          returnHtmlReply.state = true;
+          break;
+        case 23:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "\n" +
+            setBanOrSensitiveWords(userJson,'sensitive');
           returnHtmlReply.state = true;
           break;
         default:
