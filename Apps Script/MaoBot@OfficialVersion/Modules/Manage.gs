@@ -705,3 +705,28 @@ const getReply = (userJson) => {
     }
   }
 };
+
+/**
+ * 设置敏感词 / 违禁词
+ * @param userJson
+ */
+const setBanOrSensitiveWords = (userJson, type) => {
+  let wordFrame = "";
+  let returnText = "";
+  if (type == "ban") {
+    wordFrame = userJson.text.replace("/banword", "").trim() || "";
+  } else if (type == "sensitive") {
+    wordFrame = userJson.text.replace("/sensitiveword", "").trim() || "";
+  }
+  if (userJson.from.id.toString() == KingId) {
+    if (!wordFrame) {
+      return "敏感词为空，请于指令后带上敏感词！";
+    }
+    setSensitiveAndBanWords(wordFrame, type);
+    return type == "ban" ? "绝杀词添加成功！" : "敏感词添加成功！";
+  } else {
+    returnText =
+      "Bot违禁词管理暂只开放于Bot所有者，请使用创建者账号操作，管理员权限开放静候更新！";
+    return returnText;
+  }
+};
