@@ -33,7 +33,12 @@
 「⚠️数据缓存默认3小时刷新一次」
 
 · authority_management -- 权限控制表
-「群组消息屏蔽、管理员权限释放」
+「群组消息屏蔽、管理员权限释放（管理员权限V1.33起已支持自动下放）」
+
+· sensitive_words -- 敏感词列表
+「绝杀词（拦截、删除、封禁）、敏感词（拦截、删除）」
+「Base64加密」
+「支持指令新增，详见 - 正式版文字教程新特性5」
 ```
 
 
@@ -55,6 +60,7 @@ doPost -- TG消息接收函数
 processData -- 消息处理函数
 processReplyWord -- 关键字处理函数
 pushDataToKing -- 消息推送函数
+deleteClockTriggers、getClockTriggersNum、cyclicDeleteTrigger、createDelayedTriggerWithParams、executeAfterDelay - 消息触发器、机器人消息自动删除相关函数
 ```
 
 
@@ -99,10 +105,12 @@ setStorage -- 消息存储函数
 群管逻辑脚本
 
 getUnBanUser -- 解禁用户函数
-deleteUserMessage -- 删除信息函数
+deleteUserMessage、deleteMessageApi -- 删除信息相关函数
+getPermissionList - 获取管理员列表
 getBanUser -- 封禁用户函数
 getRestrictUser -- 禁言用户函数
 getReply -- 主动回复函数
+setBanOrSensitiveWords - 设置敏感词
 ```
 
 
@@ -141,8 +149,10 @@ getDouBan -- 豆瓣电影查询
 
 getString -- api内容处理函数
 isApi -- api响应逻辑函数
-getNowDate -- 日期格式化函数
-getUnixTime -- Unix时间戳函数
+getNowDate、getUnixTime、getNowDate、isSameDay -- 日期处理相关函数
 checkSensitiveDFA -- 敏感词过滤函数
+getMessageType -- 获取消息类型
+sortByTotalDescending -- 对象排序函数
+getSensitiveWords、setSensitiveWords、setSensitiveAndBanWords、getLastRowInColumn -- 敏感词处理相关函数
 ```
 

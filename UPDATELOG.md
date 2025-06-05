@@ -37,14 +37,14 @@
 
 > 诸如行内键盘调用类更新将不作细致更新记录，最新更新时间以首页或本页或版本号为主。
 
-> 本仓自2022年9月10日起 已持续更新 ***168*** 次
+> 本仓自2022年9月10日起 已持续更新 ***169*** 次
 
-> ***最新更新时间 2025.06.05 10:45***
+> ***最新更新时间 2025.06.05 11:25***
 
 
 + **20250605**
 
-  * > 更新MaoBotV1.53「更新模块 『 MaoBot.gs 』、『 Manage.gs 』、『 Params.gs 』、『 Utils.gs 』、『 XiaoMaoBot_DB.xlsx 』」
+  * > 更新MaoBotV1.53「更新模块 『 MaoBot.gs 』、『 Manage.gs 』、『 Params.gs 』、『 Utils.gs 』、『 XiaoMaoBot_DB.xlsx（新增sensitive_words工作表） 』」
 
   * > 更改敏感词逻辑，支持动态配置 「 /banword+绝杀词」、「/sensitiveword+敏感词」。
 
