@@ -555,6 +555,16 @@ const processData = (userMessage) => {
         let banKeyWords = getSensitiveAndBanWords("ban");
         function judgeBanStatus(banStauts = false) {
           for (i in banKeyWords) {
+            // 处理发言
+            let userText = userMessage.message.text;
+            // 处理引用
+            if (
+              userMessage.message.hasOwnProperty("quote") &&
+              userMessage.message.quote.hasOwnProperty("text")
+            ) {
+              userText = userText + userMessage.message.quote.text;
+            }
+
             if (userMessage.message.text.includes(banKeyWords[i])) {
               banStauts = true;
               break;
@@ -663,7 +673,7 @@ const processReplyWord = (key, useId, userJson) => {
       "<a href='http://mp.weixin.qq.com/mp/homepage?__biz=MzI3MjE3NTc4OA==&hid=1&sn=69f77280608382e9ab1e6afac8c2a881&scene=18#wechat_redirect'><b>点击查看 👈</b></a>";
     returnHtmlReply.state = true;
   } else {
-    let dfa = checkSensitiveDFA(key);
+    let dfa = checkSensitiveDFA(key,userJson);
     if (dfa.wordLength > 0) {
       returnHtmlReply.dfa = dfa;
       returnHtmlReply.htmlReply = null;
@@ -880,7 +890,7 @@ const processReplyWord = (key, useId, userJson) => {
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
-            setBanOrSensitiveWords(userJson,'ban');
+            setBanOrSensitiveWords(userJson, "ban");
           returnHtmlReply.state = true;
           break;
         case 23:
@@ -888,7 +898,7 @@ const processReplyWord = (key, useId, userJson) => {
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
-            setBanOrSensitiveWords(userJson,'sensitive');
+            setBanOrSensitiveWords(userJson, "sensitive");
           returnHtmlReply.state = true;
           break;
         default:
