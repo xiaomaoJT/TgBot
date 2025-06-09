@@ -143,7 +143,7 @@ const getUnixTime = (t = "") => {
  * 敏感词已放置于代码前置
  * 因gas性能有限，暂只收录124条常用敏感词
  */
-const checkSensitiveDFA = (content) => {
+const checkSensitiveDFA = (content, userJson) => {
   // 特殊符号过滤逻辑
   let ignoreChars =
     " \t\r\n~!@#$%^&*()_+-=【】、{}|;':\"，。、《》？αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ。，、；：？！…—·ˉ¨‘’“”々～‖∶＂＇｀｜〃〔〕〈〉《》「」『』．〖〗【】（）［］｛｝ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅫ⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑⒒⒓⒔⒕⒖⒗⒘⒙⒚⒛㈠㈡㈢㈣㈤㈥㈦㈧㈨㈩①②③④⑤⑥⑦⑧⑨⑩⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽⑾⑿⒀⒁⒂⒃⒄⒅⒆⒇≈≡≠＝≤≥＜＞≮≯∷±＋－×÷／∫∮∝∞∧∨∑∏∪∩∈∵∴⊥∥∠⌒⊙≌∽√§№☆★○●◎◇◆□℃‰€■△▲※→←↑↓〓¤°＃＆＠＼︿＿￣―♂♀┌┍┎┐┑┒┓─┄┈├┝┞┟┠┡┢┣│┆┊┬┭┮┯┰┱┲┳┼┽┾┿╀╁╂╃└┕┖┗┘┙┚┛━┅┉┤┥┦┧┨┩┪┫┃┇┋┴┵┶┷┸┹┺┻╋╊╉╈╇╆╅╄";
@@ -215,7 +215,14 @@ const checkSensitiveDFA = (content) => {
     words: [],
     wordLength: 0,
   };
-  sensitiveCheckWords.words = check(content);
+  let userText = content;
+  if (
+    userJson.hasOwnProperty("quote") &&
+    userJson.quote.hasOwnProperty("text")
+  ) {
+    userText = userText + userJson.quote.text;
+  }
+  sensitiveCheckWords.words = check(userText);
   sensitiveCheckWords.wordLength = sensitiveCheckWords.words.length;
 
   return sensitiveCheckWords;
