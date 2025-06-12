@@ -226,7 +226,7 @@ const createDelayedTriggerWithParams = (params) => {
       deleteClockTriggers(0, false, surplusParamsIndex * -1 + 1);
     }
     const now = new Date();
-    const delayTime = new Date(now.getTime() + 30 * 1000);
+    const delayTime = new Date(now.getTime() + 60 * 1000);
     // 创建触发器
     ScriptApp.newTrigger("executeAfterDelay")
       .timeBased()
@@ -524,6 +524,7 @@ const processData = (userMessage) => {
           method: "deleteMessage",
           chat_id: userMessage.message.chat.id.toString(),
           message_id: userMessage.message.message_id.toString(),
+          user_id: userMessage.message.from.id.toString(),
         };
         let htmlReply =
           "<b>🕹 来自XiaoMaoBot的消息：</b>" +
@@ -899,6 +900,14 @@ const processReplyWord = (key, useId, userJson) => {
             "\n" +
             "\n" +
             setBanOrSensitiveWords(userJson, "sensitive");
+          returnHtmlReply.state = true;
+          break;
+        case 24:
+          htmlReply =
+            "<b>🕹 来自XiaoMaoBot的消息：</b>" +
+            "\n" +
+            "\n" +
+            releaseUser(userJson,getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
         default:

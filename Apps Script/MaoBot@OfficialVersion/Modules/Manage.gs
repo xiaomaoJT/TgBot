@@ -7,7 +7,7 @@
 /**
  * 删除信息 - 不建议主动调用，建议使用deleteMessageApi
  * @param params
- * @param type 1主动删除 2调用删除 3删除回复
+ * @param type 1主动删除 2调用删除 3删除回复 4调用批量删除
  */
 const deleteUserMessage = (params, type = 1) => {
   let payloadDeletePostData = {
@@ -29,6 +29,17 @@ const deleteUserMessage = (params, type = 1) => {
   } else if (type == 3) {
     payloadDeletePostData.chat_id = params.reply_to_message.chat.id.toString();
     payloadDeletePostData.message_id = params.message_id.toString();
+  } else if (type == 4) {
+    let messageUserID = params.reply_to_message.from.id.toString();
+    let messageChatID = params.reply_to_message.chat.id.toString();
+    let messageNowID = params.reply_to_message.message_id.toString();
+    payloadDeletePostData.method = "deleteMessages";
+    // @ts-ignore
+    delete payloadDeletePostData["message_id"];
+    payloadDeletePostData.message_ids = [
+      messageNowID,
+      ...getFilteredColumnMessageIdValues(messageUserID, messageChatID),
+    ];
   } else {
     payloadDeletePostData.chat_id = params.reply_to_message.chat.id.toString();
     payloadDeletePostData.message_id =
@@ -252,6 +263,68 @@ const getUnBanUser = (userJson) => {
 };
 
 /**
+ * 解除用户封禁 /releaseid + id
+ * @param userJson 
+ * @param userId 
+ * @returns 
+ */
+const releaseUser = (userJson, userId) => {
+  if (userId == "") {
+    return "请输入用户ID";
+  }
+  if (getPermissionList(userJson).indexOf(userJson.from.id.toString()) == -1) {
+    returnText =
+      "Bot用户解禁功能仅开放于Bot管理者，请拉取最新版XiaoMaoBot代码部署后再试吧！";
+    return returnText;
+  } else if (PermissionRelease && userJson.chat.type == "supergroup") {
+    let payloadPostData = {
+      method: "unbanChatMember",
+      only_if_banned: true,
+      chat_id: userJson.chat.id.toString(),
+      user_id: userId.toString(),
+    };
+    try {
+      linkBot({
+        method: "post",
+        payload: payloadPostData,
+      });
+    } catch (e) {}
+
+    let payloadPostData2 = {
+      method: "sendMessage",
+      chat_id: userJson.chat.id.toString(),
+      text:
+        "<b>📣来自XiaoMaoBot管理员的操作提醒</b>" +
+        "\n" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n" +
+        "\n" +
+        "<b>" +
+        payloadPostData.user_id +
+        "您已被XiaoMao管理员解除封禁，注意不要再次违规哟，" +
+        "<a href='https://t.me/hSuMjrQppKE5MWU9'> XiaoMao群聊 点击加入 </a>" +
+        "</b>" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n",
+      parse_mode: "HTML",
+      reply_markup: JSON.stringify(keyboardFollowManageParams),
+      disable_web_page_preview: true,
+    };
+    linkBot({
+      method: "post",
+      payload: payloadPostData2,
+    });
+    return "操作成功！";
+  } else if (userJson.chat.type == "private") {
+    return "Bot用户解禁功能仅限群聊类型消息喔！";
+  }
+};
+
+/**
  * 封禁用户
  * @param userJson
  * @returns
@@ -311,7 +384,7 @@ const getBanUser = (userJson) => {
       method: "post",
       payload: payloadPostData2,
     });
-    deleteUserMessage(userJson, 2);
+    deleteUserMessage(userJson, 4);
 
     return "操作成功！";
   } else if (userJson.chat.type == "private") {

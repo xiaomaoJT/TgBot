@@ -103,6 +103,7 @@ var commandWord = [
   { api: "/hl", apiId: 21 },
   { api: "/banword", apiId: 22 },
   { api: "/sensitiveword", apiId: 23 },
+  { api: "/releaseid", apiId: 24 },
 ];
 
 // 通用类键盘 --------------------------------
