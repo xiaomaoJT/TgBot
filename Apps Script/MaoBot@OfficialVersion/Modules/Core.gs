@@ -221,6 +221,7 @@ const setStorage = (MESSAGE, TYPE) => {
     messageSource,
     messageSourceID,
     messageType,
+    messageID,
     messageContent = "";
 
   switch (TYPE) {
@@ -281,6 +282,7 @@ const setStorage = (MESSAGE, TYPE) => {
       ")";
 
     messageSourceID = MESSAGE.message.chat.id.toString();
+    messageID = MESSAGE.message.message_id.toString();
 
     //用户ID
     Sheet.getRange(lastSheetRow + 1, 2).setValue(userID);
@@ -294,6 +296,9 @@ const setStorage = (MESSAGE, TYPE) => {
     Sheet.getRange(lastSheetRow + 1, 7).setValue(messageSourceID);
     // 消息内容
     Sheet.getRange(lastSheetRow + 1, 8).setValue(messageContent);
+    // 消息ID
+    Sheet.getRange(lastSheetRow + 1, 10).setValue(messageID);
+    // 消息类型
   } else if (TYPE == "CHANNELPOST") {
     //用户ID
     Sheet.getRange(lastSheetRow + 1, 2).setValue(MESSAGE.channel_post.chat.id);
@@ -315,6 +320,19 @@ const setStorage = (MESSAGE, TYPE) => {
         : MESSAGE.channel_post?.caption);
     // 消息内容
     Sheet.getRange(lastSheetRow + 1, 8).setValue(messageContent);
+  } else {
+    // 存储敏感用户消息ID
+    if(MESSAGE.payload.method == "deleteMessage"){
+      //用户ID
+      let userID = MESSAGE.payload.user_id.toString()
+      Sheet.getRange(lastSheetRow + 1, 2).setValue(userID);
+      // 消息来源ID
+      let chatID = MESSAGE.payload.chat_id.toString()
+      Sheet.getRange(lastSheetRow + 1, 7).setValue(chatID);
+      messageType = messageType + "(敏感词触发删除)";
+
+      getFilteredColumnUserIdValues(userID,chatID)
+    }
   }
 
   //发起时间

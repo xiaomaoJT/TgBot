@@ -368,3 +368,122 @@ function getLastRowInColumn(sheet, column) {
   }
   return 0; // 如果列为空，返回 0
 }
+
+/**
+ * 获取指定列的消息ID数据
+ * @returns
+ */
+function getFilteredColumnMessageIdValues(UserID, GroupID) {
+  // @ts-ignore
+  const sheet = SpreadsheetApp.openById(EXECID).getSheetByName(EXECNAME);
+  const data = sheet.getDataRange().getValues();
+
+  const now = new Date();
+  const nodeHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const result = [];
+  // 逆序遍历
+  for (let i = data.length - 1; i >= 0; i--) {
+    const row = data[i];
+    // 处理时间列
+    let timestamp;
+    try {
+      timestamp = new Date(row[0]);
+    } catch (e) {
+      continue;
+    }
+    // 时间过滤（超过节点时间前的数据直接终止循环）
+    if (timestamp < nodeHoursAgo) break;
+    // 条件过滤
+    if (row[1] == UserID && row[6] == GroupID) {
+      const value = row[9];
+      if (value !== undefined && value !== "") {
+        result.push(value);
+      }
+    }
+  }
+  return result;
+}
+
+/**
+ * 获取指定列的用户ID数据 - 敏感词触发3次激活ban
+ * @param UserID
+ * @param GroupID
+ */
+function getFilteredColumnUserIdValues(UserID, GroupID) {
+  // @ts-ignore
+  const sheet = SpreadsheetApp.openById(EXECID).getSheetByName(EXECNAME);
+  const data = sheet.getDataRange().getValues();
+
+  const now = new Date();
+  const nodeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+  let resultIndex = 0;
+  // 逆序遍历
+  for (let i = data.length - 1; i >= 0; i--) {
+    const row = data[i];
+    // 处理时间列
+    let timestamp;
+    try {
+      timestamp = new Date(row[0]);
+    } catch (e) {
+      continue;
+    }
+    // 时间过滤（超过节点时间前的数据直接终止循环）
+    if (timestamp < nodeHoursAgo) break;
+    // 条件过滤
+    if (
+      row[1] == UserID &&
+      row[6] == GroupID &&
+      row[4].includes("敏感词触发删除")
+    ) {
+      resultIndex++;
+    }
+  }
+
+  if (resultIndex >= 2) {
+    let payloadPostData = {
+      method: "banChatMember",
+      chat_id: GroupID,
+      user_id: UserID,
+      until_date: getUnixTime("").toString(),
+    };
+
+    try {
+      linkBot({
+        method: "post",
+        payload: payloadPostData,
+      });
+    } catch (e) {}
+
+    let payloadPostData2 = {
+      method: "sendMessage",
+      chat_id: GroupID,
+      text:
+        "<b>📣来自XiaoMaoBot管理员的违规提醒</b>" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n" +
+        "\n" +
+        "<b>" +
+        payloadPostData.user_id +
+        " 因连续违规3次，您已被管理员封禁（封禁时长：永久" +
+        "），申诉请私聊" +
+        "<a href='https://t.me/Xiao_MaoMao_bot'> XiaoMao机器人 </a>" +
+        "</b>" +
+        "\n" +
+        "\n" +
+        "<b>===========================</b>" +
+        "\n",
+      parse_mode: "HTML",
+      reply_markup: JSON.stringify(keyboardFollowManageParams),
+      disable_web_page_preview: true,
+    };
+
+    try {
+      linkBot({
+        method: "post",
+        payload: payloadPostData2,
+      });
+    } catch (e) {}
+  }
+}
