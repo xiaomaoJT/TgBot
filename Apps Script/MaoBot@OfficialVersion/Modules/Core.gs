@@ -10,10 +10,12 @@
  */
 const linkBot = (data) => {
   try {
-    let res = UrlFetchApp.fetch("https://api.telegram.org/bot" + BOTID + "/", data);
-    return res.getContentText()
-  } catch (error) {
-  }
+    let res = UrlFetchApp.fetch(
+      "https://api.telegram.org/bot" + BOTID + "/",
+      data
+    );
+    return res.getContentText();
+  } catch (error) {}
 };
 
 /**
@@ -322,16 +324,16 @@ const setStorage = (MESSAGE, TYPE) => {
     Sheet.getRange(lastSheetRow + 1, 8).setValue(messageContent);
   } else {
     // 存储敏感用户消息ID
-    if(MESSAGE.payload.method == "deleteMessage"){
+    if (MESSAGE.payload.method == "deleteMessage") {
       //用户ID
-      let userID = MESSAGE.payload.user_id.toString()
+      let userID = MESSAGE.payload.user_id.toString();
       Sheet.getRange(lastSheetRow + 1, 2).setValue(userID);
       // 消息来源ID
-      let chatID = MESSAGE.payload.chat_id.toString()
+      let chatID = MESSAGE.payload.chat_id.toString();
       Sheet.getRange(lastSheetRow + 1, 7).setValue(chatID);
       messageType = messageType + "(敏感词触发删除)";
 
-      getFilteredColumnUserIdValues(userID,chatID)
+      getFilteredColumnUserIdValues(userID, chatID);
     }
   }
 
@@ -343,10 +345,9 @@ const setStorage = (MESSAGE, TYPE) => {
   Sheet.getRange(lastSheetRow + 1, 9).setValue(JSON.stringify(MESSAGE));
 };
 
-
 /**
- * 获取api返回数据列表
- * @param data 
+ * 获取api返回数据列表 - 用于延迟删除处理
+ * @param data
  */
 const getApiBackList = (data) => {
   let list = [];
@@ -366,10 +367,9 @@ const getApiBackList = (data) => {
           const messageId = linkData.result.message_id.toString();
           const chatType = linkData.result.chat.type;
           list.push([chatId, messageId, chatType]);
-        } else {
         }
       } catch (error) {}
     }
   }
-  return list
-}
+  return list;
+};

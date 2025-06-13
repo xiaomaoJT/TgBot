@@ -547,10 +547,17 @@ const processData = (userMessage) => {
           disable_web_page_preview: true,
         };
 
-        linkBot({
+        // 对警告消息进行延迟删除
+        let delList = getApiBackList([{
           method: "post",
           payload: payload,
-        });
+        }])
+        try {
+          if (delList.length && delList[0][2] == "supergroup") {
+            createDelayedTriggerWithParams(delList);
+          }
+        } catch (error) {}
+
 
         //强杀广告 - 直接ban
         let banKeyWords = getSensitiveAndBanWords("ban");
