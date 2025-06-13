@@ -56,11 +56,15 @@
 ```text
 主体响应脚本
 
-doPost -- TG消息接收函数
-processData -- 消息处理函数
+doPost -- TG消息接收函数｜主入口函数
+processData -- 消息处理函数｜消息处理核心站
 processReplyWord -- 关键字处理函数
-pushDataToKing -- 消息推送函数
-deleteClockTriggers、getClockTriggersNum、cyclicDeleteTrigger、createDelayedTriggerWithParams、executeAfterDelay - 消息触发器、机器人消息自动删除相关函数
+pushDataToKing -- 私人消息推送函数
+deleteClockTriggers -- 消息触发器删除函数
+getClockTriggersNum -- 获取触发器数量
+cyclicDeleteTrigger -- 触发器循环执行函数
+createDelayedTriggerWithParams -- 触发器生成函数
+executeAfterDelay -- 消息触发器执行函数
 ```
 
 
@@ -95,6 +99,7 @@ getKeyWords -- 关键字列表构建函数
 getCacheData -- 关键字缓存函数
 getCacheAuthorityList -- 权限列表缓存函数
 setStorage -- 消息存储函数
+getApiBackList -- 批量执行TG连通并返回消息体
 ```
 
 
@@ -105,12 +110,15 @@ setStorage -- 消息存储函数
 群管逻辑脚本
 
 getUnBanUser -- 解禁用户函数
-deleteUserMessage、deleteMessageApi -- 删除信息相关函数
-getPermissionList - 获取管理员列表
+deleteUserMessage -- 消息删除处理函数
+deleteMessageApi -- 消息删除函数
+getPermissionList - 获取管理员列表函数
 getBanUser -- 封禁用户函数
+getUnBanUser -- 解禁用户函数
+releaseUser -- 解禁用户ID函数
 getRestrictUser -- 禁言用户函数
 getReply -- 主动回复函数
-setBanOrSensitiveWords - 设置敏感词
+setBanOrSensitiveWords - 设置敏感词函数
 ```
 
 
@@ -136,6 +144,7 @@ getWeatherApi -- 天气查询
 getHotList -- 热榜查询
 getHoroscopeList -- 星座运势
 getDouBan -- 豆瓣电影查询
+getChatterboxUser -- 话痨排行榜
 ```
 
 
@@ -149,10 +158,18 @@ getDouBan -- 豆瓣电影查询
 
 getString -- api内容处理函数
 isApi -- api响应逻辑函数
-getNowDate、getUnixTime、getNowDate、isSameDay -- 日期处理相关函数
+getNowDate -- 当前日期格式化函数
+getUnixTime -- 获取unix时间戳函数
+isSameDay -- 判断时间是否是今天
 checkSensitiveDFA -- 敏感词过滤函数
 getMessageType -- 获取消息类型
 sortByTotalDescending -- 对象排序函数
-getSensitiveWords、setSensitiveWords、setSensitiveAndBanWords、getLastRowInColumn -- 敏感词处理相关函数
+getSensitiveWords -- 获取敏感词（解密）函数
+getSensitiveAndBanWords -- 获取敏感词函数
+setSensitiveWords -- 敏感词加密函数
+setSensitiveAndBanWords -- 新增敏感词函数
+getLastRowInColumn -- 获取工作表最后一行行标
+getFilteredColumnMessageIdValues -- 获取指定列消息ID数据
+getFilteredColumnUserIdValues -- 获取指定列用户ID数据
 ```
 
