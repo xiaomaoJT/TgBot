@@ -10,7 +10,7 @@
  * # 微信公众号 【小帽集团】
  * # Tg频道频道：https://t.me/xiaomaoJT
  *
- * 正式版 V1.54 - updateTime@20250605
+ * 正式版 V1.69 - updateTime@20250613
 
  *
  * 源码开发不易，使用引用请注明出处！
@@ -108,7 +108,7 @@
 ```
 
 
-###### 🚗 第三步：新建 Google 表格
+###### 🚗 第三步：新建 Google 表格（[初始化数据表 介绍](https://github.com/xiaomaoJT/TgBot/blob/main/Apps%20Script/MaoBot%40OfficialVersion/DB/COURSE.md)）
 
 ```text
 1⃣️ 左上角新建，选择Google 表格即可。
@@ -188,11 +188,18 @@ https://api.telegram.org/bot 你的tg机器人Token /setWebhook?url=你的web应
 3、群聊内赋予机器人管理权限。
 4、google表格内容会随群聊或机器人私聊自动捕捉信息并实时写入⚠️【私聊表格必须有新数据写人✅】
 
-🚨代码错误排查
+🚨代码错误基础排查
 1、打开Google Apps Script
 2、左侧菜单打开 脚本执行
 3、查看允许日志及报错提示
 4、根据提示再问题追踪
+
+🚨代码错误运行排查
+1、打开Google Apps Script
+2、选中 MaoBot.gs 文件
+3、注释代码 第52行 ➡️ return; 改为 // return;
+4、运行代码
+5、查看报错排错 或 提供报错截图反馈XiaoMao群聊
 ```
 
 ------
@@ -365,15 +372,17 @@ XiaoMaoBot捕捉到用户讯息
 >
 > 此补充内容**自更新日期[**20250326**] 版本号V1.31 起**。
 >
-> *新增机器人消息定时删除*
+> *新增机器人消息定时删除 - 默认60秒*
 >
-> *// 缓存过期时间（秒）- 180分钟*
+> 新增自动回复缓存参数
 >
-> *var* cacheExpirationInSeconds = 180 * 60;
->
-> *// 是否强制缓存刷新 -- 启用后将无视缓存实时获取数据*
->
-> *var* cacheExpirationStatus = true;
+> > *// 缓存过期时间（秒）- 180分钟*
+> >
+> > *var* cacheExpirationInSeconds = 180 * 60;
+> >
+> > *// 是否强制缓存刷新 -- 启用后将无视缓存实时获取数据*
+> >
+> > *var* cacheExpirationStatus = true;
 
 ------
 
@@ -408,6 +417,8 @@ XiaoMaoBot捕捉到用户讯息
 > 1、敏感词算法优化，针对「非绝杀类」敏感词，3小时内连续触发3次自动激活用户封禁操作。
 >
 > 2、ban算法优化，针对「群聊类型」主动封禁操作，将自动移除封禁用户24小时内所有发言。
+>
+> 3、自**更新日期[20250613]版本号V1.69**起，敏感词拦截后机器人提示消息支持自动延迟删除。
 
 
 

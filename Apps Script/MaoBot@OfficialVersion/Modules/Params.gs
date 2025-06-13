@@ -56,9 +56,9 @@ var cacheExpirationStatus = true;
  * +++++++++ 系统默认通用参数·无需改动 +++++++++
  */
 
-// 管理员ID列表
+// 管理员ID列表 -- 无需填写，可由系统自动获取群管列表
 var PermissionReleaseList = [];
-// 用于过滤需要排除捕捉的群组信息
+// 用于过滤需要排除捕捉的群组信息 - 无需填写，可从Google EXEC 「authority_management」表直接填写
 var forGotList = [];
 // 用于判断消息类型 - inlinekey board回调 or 主动消息
 // 1 callback | 2 new member | 3 left member
