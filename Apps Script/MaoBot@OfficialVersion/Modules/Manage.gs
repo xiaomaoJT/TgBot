@@ -152,10 +152,12 @@ const getUnBanUser = (userJson) => {
       reply_markup: JSON.stringify(keyboardFollowManageParams),
       disable_web_page_preview: true,
     };
-    linkBot({
-      method: "post",
-      payload: payloadPostData2,
-    });
+    deleteMessageFeedback([
+      {
+        method: "post",
+        payload: payloadPostData2,
+      },
+    ]);
 
     return "操作成功！";
   } else if (userJson.chat.type == "private") {
@@ -238,10 +240,12 @@ const getUnBanUser = (userJson) => {
               reply_markup: JSON.stringify(keyboardFollowManageParams),
               disable_web_page_preview: true,
             };
-            linkBot({
-              method: "post",
-              payload: payloadPostData2,
-            });
+            deleteMessageFeedback([
+              {
+                method: "post",
+                payload: payloadPostData2,
+              },
+            ]);
           } else {
             returnText = "出错了，封禁功能仅限来自群聊类型消息喔！";
             return returnText;
@@ -315,10 +319,12 @@ const releaseUser = (userJson, userId) => {
       reply_markup: JSON.stringify(keyboardFollowManageParams),
       disable_web_page_preview: true,
     };
-    linkBot({
-      method: "post",
-      payload: payloadPostData2,
-    });
+    deleteMessageFeedback([
+      {
+        method: "post",
+        payload: payloadPostData2,
+      },
+    ]);
     return "操作成功！";
   } else if (userJson.chat.type == "private") {
     return "Bot用户解禁功能仅限群聊类型消息喔！";
@@ -381,10 +387,12 @@ const getBanUser = (userJson) => {
       reply_markup: JSON.stringify(keyboardFollowManageParams),
       disable_web_page_preview: true,
     };
-    linkBot({
-      method: "post",
-      payload: payloadPostData2,
-    });
+    deleteMessageFeedback([
+      {
+        method: "post",
+        payload: payloadPostData2,
+      },
+    ]);
     deleteUserMessage(userJson, 4);
 
     return "操作成功！";
@@ -469,11 +477,12 @@ const getBanUser = (userJson) => {
               reply_markup: JSON.stringify(keyboardFollowManageParams),
               disable_web_page_preview: true,
             };
-            linkBot({
-              method: "post",
-              payload: payloadPostData2,
-            });
-
+            deleteMessageFeedback([
+              {
+                method: "post",
+                payload: payloadPostData2,
+              },
+            ]);
             deleteUserMessage(userJson);
           } else {
             returnText = "出错了，用户封禁功能仅支持来自群聊类型消息喔！";
@@ -566,10 +575,12 @@ const getRestrictUser = (userJson) => {
       reply_markup: JSON.stringify(keyboardFollowManageParams),
       disable_web_page_preview: true,
     };
-    linkBot({
-      method: "post",
-      payload: payloadPostData2,
-    });
+    deleteMessageFeedback([
+      {
+        method: "post",
+        payload: payloadPostData2,
+      },
+    ]);
     deleteUserMessage(userJson, 2);
 
     return "操作成功！";
@@ -655,10 +666,12 @@ const getRestrictUser = (userJson) => {
               reply_markup: JSON.stringify(keyboardFollowManageParams),
               disable_web_page_preview: true,
             };
-            linkBot({
-              method: "post",
-              payload: payloadPostData2,
-            });
+            deleteMessageFeedback([
+              {
+                method: "post",
+                payload: payloadPostData2,
+              },
+            ]);
             deleteUserMessage(userJson);
           } else {
             returnText = "出错了，用户限制功能仅支持来自群聊类型消息喔！";
