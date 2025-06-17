@@ -479,11 +479,12 @@ function getFilteredColumnUserIdValues(UserID, GroupID) {
       disable_web_page_preview: true,
     };
 
-    try {
-      linkBot({
+    // 发起请求并对警告消息进行延迟删除
+    deleteMessageFeedback([
+      {
         method: "post",
         payload: payloadPostData2,
-      });
-    } catch (e) {}
+      },
+    ]);
   }
 }

@@ -353,23 +353,30 @@ const getApiBackList = (data) => {
   let list = [];
   for (let i = 0; i < data.length; i++) {
     const e = data[i];
-    if (e.payload.hasOwnProperty("reply_to_message_id")) {
-      try {
-        let linkData = linkBot(e);
-        setStorage(e, "MESSAGEBACK");
-        linkData = JSON.parse(linkData);
-        if (
-          linkData?.result?.reply_to_message?.chat &&
-          linkData.result.message_id &&
-          linkData.result.chat.type
-        ) {
-          const chatId = linkData.result.reply_to_message.chat.id.toString();
-          const messageId = linkData.result.message_id.toString();
-          const chatType = linkData.result.chat.type;
-          list.push([chatId, messageId, chatType]);
-        }
-      } catch (error) {}
-    }
+    try {
+      let linkData = linkBot(e);
+      setStorage(e, "MESSAGEBACK");
+      linkData = JSON.parse(linkData);
+      const chatId = linkData.result.reply_to_message ? linkData.result.reply_to_message.chat.id.toString() : linkData.result.chat.id.toString();
+      const messageId = linkData.result.message_id.toString();
+      const chatType = linkData.result.chat.type;
+      list.push([chatId, messageId, chatType]);
+    } catch (error) {}
   }
   return list;
+};
+
+/**
+ * 延迟删除消息反馈 - 群组
+ * @param data []
+ */
+const deleteMessageFeedback = (data = []) => {
+  if (data.length) {
+    let list = getApiBackList(data);
+    try {
+      if (list.length && list[0][2] == "supergroup") {
+        createDelayedTriggerWithParams(list);
+      }
+    } catch (error) {}
+  }
 };

@@ -21,10 +21,12 @@ const apiReply = (id, useJson) => {
     reply_markup: JSON.stringify(keyboardFollowParams),
     disable_web_page_preview: true,
   };
-  linkBot({
-    method: "post",
-    payload: payloadPostData,
-  });
+  deleteMessageFeedback([
+    {
+      method: "post",
+      payload: payloadPostData,
+    },
+  ]);
 };
 
 /**

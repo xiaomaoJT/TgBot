@@ -132,14 +132,7 @@ const doPost = async (e) => {
       userMessage.message.entities[0].type == "bold")
   ) {
     if (payloadStatus) {
-      if (data.length) {
-        let list = getApiBackList(data);
-        try {
-          if (list.length && list[0][2] == "supergroup") {
-            createDelayedTriggerWithParams(list);
-          }
-        } catch (error) {}
-      }
+      deleteMessageFeedback(data);
     } else {
       linkBot(data);
       setStorage(data, "MESSAGEBACK");
@@ -548,16 +541,12 @@ const processData = (userMessage) => {
         };
 
         // 对警告消息进行延迟删除
-        let delList = getApiBackList([{
-          method: "post",
-          payload: payload,
-        }])
-        try {
-          if (delList.length && delList[0][2] == "supergroup") {
-            createDelayedTriggerWithParams(delList);
-          }
-        } catch (error) {}
-
+        deleteMessageFeedback([
+          {
+            method: "post",
+            payload: payload,
+          },
+        ]);
 
         //强杀广告 - 直接ban
         let banKeyWords = getSensitiveAndBanWords("ban");
@@ -617,10 +606,12 @@ const processData = (userMessage) => {
               reply_markup: JSON.stringify(keyboardParams),
               disable_web_page_preview: true,
             };
-            linkBot({
-              method: "post",
-              payload: payloadPostData2,
-            });
+            deleteMessageFeedback([
+              {
+                method: "post",
+                payload: payloadPostData2,
+              },
+            ]);
           } catch (e) {}
         }
       }
@@ -681,7 +672,7 @@ const processReplyWord = (key, useId, userJson) => {
       "<a href='http://mp.weixin.qq.com/mp/homepage?__biz=MzI3MjE3NTc4OA==&hid=1&sn=69f77280608382e9ab1e6afac8c2a881&scene=18#wechat_redirect'><b>点击查看 👈</b></a>";
     returnHtmlReply.state = true;
   } else {
-    let dfa = checkSensitiveDFA(key,userJson);
+    let dfa = checkSensitiveDFA(key, userJson);
     if (dfa.wordLength > 0) {
       returnHtmlReply.dfa = dfa;
       returnHtmlReply.htmlReply = null;
@@ -914,7 +905,7 @@ const processReplyWord = (key, useId, userJson) => {
             "<b>🕹 来自XiaoMaoBot的消息：</b>" +
             "\n" +
             "\n" +
-            releaseUser(userJson,getString(key, isApi(commandWord, key).api));
+            releaseUser(userJson, getString(key, isApi(commandWord, key).api));
           returnHtmlReply.state = true;
           break;
         default:
