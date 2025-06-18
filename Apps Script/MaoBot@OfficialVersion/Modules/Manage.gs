@@ -33,6 +33,7 @@ const deleteUserMessage = (params, type = 1) => {
     let messageUserID = params.reply_to_message.from.id.toString();
     let messageChatID = params.reply_to_message.chat.id.toString();
     let messageNowID = params.reply_to_message.message_id.toString();
+    payloadDeletePostData.chat_id = messageChatID;
     payloadDeletePostData.method = "deleteMessages";
     // @ts-ignore
     delete payloadDeletePostData["message_id"];
@@ -40,6 +41,7 @@ const deleteUserMessage = (params, type = 1) => {
       messageNowID,
       ...getFilteredColumnMessageIdValues(messageUserID, messageChatID),
     ]
+    message_ids = [...new Set(message_ids.map(String))]
     payloadDeletePostData.message_ids = JSON.stringify(message_ids);
   } else {
     payloadDeletePostData.chat_id = params.reply_to_message.chat.id.toString();
