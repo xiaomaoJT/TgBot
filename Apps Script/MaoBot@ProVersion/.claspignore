@@ -1,0 +1,20 @@
+# clasp 推送范围
+#
+# ✅ 推送范围其实已经由 .clasp.json 的 "rootDir": "./dist" 限定了，
+#    clasp 只会推 dist/ 里的产物，这里不用再写任何 **/* 之类的排除/放行规则。
+#
+# ⚠️⚠️ 别加 `**/*`：踩过一次，它按 gitignore 语义把 dist/ 整个目录一起排除了，
+#    结果是 clasp push 认为「本地没有可推的文件 → 已是最新」，直接输出
+#        Script is already up to date.
+#    —— 退出码 0、显示成功，但线上一个字节都没变。
+#    当时症状：改了 Commands / Deploy / Params / Triggers 四个文件，push 完线上纹丝不动。
+#
+# 下面这些只是兜底，防止哪天有人把 rootDir 改了导致误推本地文件：
+# Tests/**
+# Tools/**
+# DB/**
+# deploy/**
+# node_modules/**
+# *.md
+# .clasp.json*
+# package*.json

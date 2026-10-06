@@ -1,0 +1,63 @@
+{
+  "version": "1.2.0",
+  "note": "新增频道监听与热更新",
+  "generatedAt": "2026-09-30T16:12:17.392Z",
+  "files": [
+    {
+      "name": "Params",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Params.gs"
+    },
+    {
+      "name": "Utils",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Utils.gs"
+    },
+    {
+      "name": "Core",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Core.gs"
+    },
+    {
+      "name": "Telegram",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Telegram.gs"
+    },
+    {
+      "name": "UI",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/UI.gs"
+    },
+    {
+      "name": "Api",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Api.gs"
+    },
+    {
+      "name": "AI",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/AI.gs"
+    },
+    {
+      "name": "Channel",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Channel.gs"
+    },
+    {
+      "name": "Deploy",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Deploy.gs"
+    },
+    {
+      "name": "Commands",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Commands.gs"
+    },
+    {
+      "name": "Manage",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Manage.gs"
+    },
+    {
+      "name": "Triggers",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/Triggers.gs"
+    },
+    {
+      "name": "MaoBot",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/Modules/MaoBot.gs"
+    },
+    {
+      "name": "appsscript",
+      "url": "https://raw.githubusercontent.com/example/maobot/main/Apps%20Script/MaoBot@ProVersion/appsscript.json"
+    }
+  ]
+}

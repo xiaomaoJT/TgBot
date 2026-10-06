@@ -1,0 +1,116 @@
+# ============================================================================
+#  MaoBot ProVersion · CI + 热更新（clasp 路线）
+# ----------------------------------------------------------------------------
+#  ⚠️ GitHub 只会读取【仓库根目录】下的 .github/workflows/。
+#     如果你的仓库结构不是 "Apps Script/MaoBot@ProVersion"，请同步修改下面的
+#     WORKDIR 与 paths。
+#
+#  需要配置的 Secret：
+#    CLASPRC_JSON  —— 本地执行 `clasp login` 后，把 ~/.clasprc.json 的内容
+#                     （整个 JSON 文件，不是路径）作为 Secret 存进来。
+#
+#  做两件事：
+#    ① test    —— 每次 push / PR 都跑 Tests/run.sh（不需要任何密钥）
+#    ② deploy  —— 只在 main 分支且配置了 CLASPRC_JSON 时执行：
+#                 跑测试 → 生成 dist/ → clasp push → clasp deploy
+#                 → 刷新 deploy/manifest.json 并提交回去（供 /push 指令使用）
+# ============================================================================
+name: MaoBot Pro
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Apps Script/MaoBot@ProVersion/**"
+      - ".github/workflows/maobot-pro.yml"
+  pull_request:
+    paths:
+      - "Apps Script/MaoBot@ProVersion/**"
+  workflow_dispatch:
+
+env:
+  WORKDIR: Apps Script/MaoBot@ProVersion
+
+jobs:
+  test:
+    name: 冒烟测试
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: 跑测试套件
+        working-directory: ${{ env.WORKDIR }}
+        run: bash Tests/run.sh
+
+  deploy:
+    name: 推送并发布
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 需要 push 回 manifest，不能用默认的只读 token
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 检查是否配置了 clasp 凭据
+        id: cred
+        run: |
+          if [ -n "${{ secrets.CLASPRC_JSON }}" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::未配置 CLASPRC_JSON，跳过部署（只跑测试）。"
+          fi
+
+      - name: 安装依赖
+        if: steps.cred.outputs.ok == 'true'
+        working-directory: ${{ env.WORKDIR }}
+        run: npm install
+
+      - name: 写入 clasp 凭据
+        if: steps.cred.outputs.ok == 'true'
+        run: printf '%s' "${{ secrets.CLASPRC_JSON }}" > "$HOME/.clasprc.json"
+
+      - name: 生成 dist/
+        if: steps.cred.outputs.ok == 'true'
+        working-directory: ${{ env.WORKDIR }}
+        run: npm run build
+
+      - name: clasp push
+        if: steps.cred.outputs.ok == 'true'
+        working-directory: ${{ env.WORKDIR }}
+        run: npx clasp push --force
+
+      - name: 建版本并发布部署
+        if: steps.cred.outputs.ok == 'true'
+        working-directory: ${{ env.WORKDIR }}
+        run: npx clasp deploy --description "CI ${{ github.sha }}"
+
+      - name: 刷新在线热更新清单
+        if: steps.cred.outputs.ok == 'true'
+        working-directory: ${{ env.WORKDIR }}
+        run: npm run manifest
+
+      - name: 提交清单（供 /push 指令使用）
+        if: steps.cred.outputs.ok == 'true'
+        working-directory: ${{ env.WORKDIR }}
+        run: |
+          if git diff --quiet -- deploy/manifest.json; then
+            echo "清单无变化，跳过提交。"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deploy/manifest.json
+          # [skip ci] 防止这次提交再触发一轮 workflow
+          git commit -m "chore(maobot): 刷新热更新清单 [skip ci]"
+          git push origin HEAD:main
