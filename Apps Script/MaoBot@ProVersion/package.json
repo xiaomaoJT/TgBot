@@ -1,0 +1,31 @@
+{
+  "name": "maobot-pro",
+  "version": "1.2.0",
+  "private": true,
+  "description": "MaoBot ProVersion —— Google Apps Script 版 Telegram 机器人（富消息 / 临时消息 / 多模型 AI / 频道监听）",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/maobot"
+  },
+  "scripts": {
+    "build": "node Tools/build.js",
+    "bundle": "node Tools/bundle.js",
+    "config": "node Tools/setup-config.js",
+    "keep": "node Tools/keep-remote-values.js",
+    "manifest": "node Tools/make-manifest.js",
+    "release": "npm run build && npm run manifest",
+    "push": "bash Tools/push.sh",
+    "deploy": "bash Tools/push.sh --deploy",
+    "verify": "node Tools/verify-push.js",
+    "login": "clasp login",
+    "open": "clasp open-script",
+    "test": "bash Tests/run.sh",
+    "check": "node Tools/check-webapp.js"
+  },
+  "devDependencies": {
+    "@google/clasp": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

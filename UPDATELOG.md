@@ -39,9 +39,77 @@
 
 > 本仓自2022年9月10日起 已持续更新 ***176*** 次
 
-> ***最新更新时间 2025.06.18 14:45***
+> ***最新更新时间 2026.09.30***
 
 
+
++ **20260930 · MaoBot@ProVersion（结构性重构）**
+
+  * > 新增 `MaoBot@ProVersion` 目录，官方版 `MaoBot@OfficialVersion` 完整保留、未做改动，两版可并存回滚。
+
+  * > **修复真实缺陷**：入群/退群检测使用早已被 Bot API 移除的 `new_chat_participant` / `left_chat_participant` 字段 —— 官方版的入群欢迎、退群欢送从未真正生效过；现已改用 `new_chat_members` / `left_chat_member`。
+
+  * > **修复真实缺陷**：回调按钮从不调用 `answerCallbackQuery`，用户点击后按钮会一直转圈到超时；现已全部补上应答。
+
+  * > **修复真实缺陷**：关键字命中后仍会继续走到兜底分支，导致用户额外收到一条"未匹配到内容"。
+
+  * > **修复真实缺陷**：`setStorage` 用 `spreadSheet.getLastRow()` 取写入行号，该值是电子表格所有工作表的最大行号，其他表更长时消息会写错行。
+
+  * > **修复真实缺陷**：`getUnixTime` 内部 `date.getseconds()` 拼写错误，秒数小于 10 时得到 NaN。
+
+  * > **修复真实缺陷**：`isApi` 用 `indexOf` 模糊匹配指令，消息中只要出现 `/ban` 三个字符就会误触发管理指令；现改为要求以指令前缀开头，并支持 `/cmd@BotName`。
+
+  * > **修复真实缺陷**：混用 `getActiveSpreadsheet()` 与 `openById()`，脚本未绑定表格时前者返回 null，`doPost` 直接抛异常导致消息无响应。
+
+  * > **修复真实缺陷**：第三方返回文本未做 HTML 转义，内容含 `<` `&` 时 Telegram 返回 400，整条回复静默丢失。
+
+  * > **修复真实缺陷**：`cacheExpirationStatus = true` 时每轮先清缓存再读，等于缓存永久失效，每条消息都全量扫表。
+
+  * > **修复真实缺陷**：敏感词 DFA 每收到一条消息就重建 Trie 树，词库越大越慢；现改为结果缓存，仅词库变化时重建。
+
+  * > **修复真实缺陷**：回复超过 4096 字符直接发送失败；现自动切分为多条发送。
+
+  * > **修复真实缺陷**：收到 `inline_query` / `my_chat_member` 等非常规 update 时 `hasOwnProperty` 抛异常。
+
+  * > **修复真实缺陷**：无 `update_id` 去重，Telegram 重推时机器人重复回复同一条消息。
+
+  * > **架构改进**：消息自动删除从"每条消息创建一个一次性触发器"（受 GAS 20 触发器硬限制，官方版 README 已列为已知缺陷）改为「1 个分钟级调度器 + 任务队列表」，触发器数量恒为 1，并把同一会话的删除合并为一次 `deleteMessages` 批量调用。
+
+  * > **架构改进**：指令从"单一 switch 的 20+ 分支 + 三处同步修改"改为声明式注册表，帮助菜单与 Telegram 命令面板自动同步。
+
+  * > **架构改进**：新增 `UI.gs` 统一消息外观层（卡片 DSL + 统一转义 + 自动分段 + 键盘构造），替代原版的字符串硬拼。
+
+  * > **架构改进**：新增 `Telegram.gs` 覆盖 60+ 个官方 API 方法（原版仅约 12 个）。
+
+  * > **接入官方能力**：命令面板 `setMyCommands`、菜单按钮、`answerCallbackQuery`、消息原地编辑翻页、内联模式、表情回应、置顶、邀请链接、入群审批、频道身份封禁、话题群、批量删除、Webhook 自管理。
+
+  * > **失效接口处理**：移除已停服的 `v1.apigpt.cn`（ChatGPT）、已下线需密钥的 vvhan 热榜/星座/豆瓣/骚话、不稳定的 jxcxin 蓝奏解析、已停止的 jijidown 音乐、不可靠的 s.nfangbian 短链、以及内容不合规的 wpon 随机视频；改为**多源故障转移**方案，任一源失效自动切换。
+
+  * > **新增功能**：`/help` `/menu` `/id` `/ping` `/weather` `/hot` `/ai` `/ip` `/phone` `/hitokoto` `/dujitang` `/qinghua` `/fortune` `/dice` `/coin` `/roll` `/calc` `/tr` `/short` `/qr` `/img` `/t` `/file` `/info` `/stat` `/top` `/rules` `/report`，以及管理面板 `/manage` `/warn` `/invite` `/settings` `/purge` 和维护指令 `/health` `/webhook` `/sync` `/reload` `/word`。
+
+  * > **新增数据表**：`chat_settings`（群级功能开关）、`warn_records`（警告记录）、`error_log`（错误日志）、`task_queue`（任务队列）。运行 `initDatabase()` 自动创建，**不覆盖已有数据**，旧表结构与官方版 100% 兼容。
+
+  * > **新增运维能力**：`onBotInit()` 一键初始化、`diagnose()` 运行诊断、`setupWebhook()` 一键绑定、`/health` 机器人自检、轮询模式兜底 `switchToPolling()`。
+
+  * > **新增 `appsscript.json`**（原项目缺失），明确 Web 应用访问权限与 OAuth 作用域。
+
+  * > **新增本地测试**：`Tests/run.sh`（模拟 GAS 运行时，80 项断言，不联网、不消耗配额）。
+
++ **20260930 · MaoBot@ProVersion（能力扩展可行性调研）**
+
+  * > 新增 `ROADMAP.md`：对照**当前热门 Telegram Bot** 的功能版图与 **Google Apps Script 2026 官方配额表**，给出可落地的能力扩展清单与优先级排序。
+
+  * > **重要发现：重构时参照的 Bot API 版本已过时**。真实最新为 **10.3（2026-08-24）**。其中两项官方原生能力可直接简化现有代码：
+    - **Rich Messages（10.1 起）** —— `sendRichMessage` + `rich_message.markdown`（GFM 语法），支持**真表格**、多级标题、列表/任务列表、分隔线、脚注、数学公式、折叠详情。限制 32,768 字符 / 500 块 / 表格 20 列。**GFM 无 MarkdownV2 那 18 个转义字符**，现有 `esc()` 负担大幅下降。10.3 补充表格内按钮、紧凑表格、可折叠引用、文件块。
+    - **临时消息 Ephemeral（10.2 起）** —— 群内**仅指定用户可见**的回复。**可替代 `sendEphemeral()` + `scheduleAutoDelete()` + `runScheduler()` + `task_queue` 这一整套自动删除机制**，使任务队列收窄为纯定时任务。注意：非回调触发的场景要求机器人是群管理员。
+
+  * > 同步梳理 9.4～10.3 其余可用能力：按钮 `style` 红绿配色与 `disabled` 禁用态、`date_time` 本地化时间实体、`setChatMemberTag` 成员标签、`sendMessageDraft` 流式输出与「用户可掐断」、Poll 大改（多正确项/重新投票/乱序/用户加选项）、Guest Mode 免入群响应、Communities 社区、`deleteMessageReaction` 表情清理。
+
+  * > **明确 GAS 能力边界**：真正的天花板是「每日总运行时长 90 分钟」（消费级）而非 UrlFetch 20,000 次/天，换算约 **日均 4,500 条消息**。结论：适合日均 3,000 条以内的社群，大群须迁移 Cloudflare Workers / VPS。单次 UrlFetch 超时为独立约束（60 秒），影响 AI 接口设计。
+
+  * > **点明 GAS 独有优势**（其他 Bot 框架需自行搭建的部分）：`HtmlService` 免费用作 **Telegram Mini App 托管**（注意 `script.google.com` 在境内不可达）、Gemini API 免费额度（1,500 次/天）、`LanguageApp.translate` 官方翻译 5,000 次/天、Gmail 100 收件人/天、Calendar 5,000 事件/天、Docs/Slides 250 份/天。其中 **RSS 订阅推送**是 GAS 最强项，也是当前最大功能缺口。
+
+  * > 优先级建议：P0 接 Rich Messages、临时消息替换自动删除、`/tr` 换 Google 翻译、`/ai` 换 Gemini + 流式；P1 按钮配色与禁用态、`date_time` 实体、RSS 推送、`/remind` 用户入口。
 
 + **20250618**
 

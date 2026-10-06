@@ -1,0 +1,25 @@
+# 本地构建产物（由 Tools/build.js 生成，不要提交）
+dist/
+
+# 单文件合并版（由 Tools/bundle.js 生成，用于手工粘贴进 GAS）
+dist-bundle/
+
+# clasp 的本地配置（含你的 scriptId，不要提交）
+.clasp.json
+
+# 依赖
+node_modules/
+
+# ⚠️ 私密配置
+#    真实密钥（表格 ID / Bot Token / 主人 ID / Gemini Key / Webhook 地址）集中放在
+#    Modules/Secrets.gs，运行时由 Tools/build.js 摊平进 dist/Secrets.gs，只推到你的
+#    【私有】GAS 项目。它已被 git 排除，绝不进公开仓库。
+#    Modules/Params.gs 现在只保留空占位（已可安全提交）。
+#    别人 clone 后：复制 Modules/Secrets.gs.example → Modules/Secrets.gs 并填自己的值。
+Modules/Secrets.gs
+
+# macOS 垃圾文件
+.DS_Store
+
+# 元数据产生的 manifest 是构建产物，但为了让 /push 能取到，
+# 这里**不忽略** deploy/manifest.json

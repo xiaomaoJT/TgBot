@@ -1,0 +1,20 @@
+{
+  "scriptId": "把这里替换成你的 Apps Script 项目 ID",
+  "rootDir": "./dist",
+  "deploymentId": "",
+  "filePushOrder": [
+    "Params.gs",
+    "Utils.gs",
+    "Core.gs",
+    "Telegram.gs",
+    "UI.gs",
+    "Api.gs",
+    "AI.gs",
+    "Channel.gs",
+    "Deploy.gs",
+    "Commands.gs",
+    "Manage.gs",
+    "Triggers.gs",
+    "MaoBot.gs"
+  ]
+}
