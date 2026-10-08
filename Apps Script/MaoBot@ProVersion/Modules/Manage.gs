@@ -1285,6 +1285,195 @@ function handleJoinRequestCallback(ctx, parts) {
 }
 
 /* ============================================================================
+ * 八·壹、权限名单管理（/auth）：群组屏蔽列表 & 管理员列表
+ * ==========================================================================*/
+
+/**
+ * /auth —— 管理 authority_management 中的两张名单（仅 Bot 主人）：
+ *   群组屏蔽列表（第 3 行）：入群申请与群消息不再推送给主人
+ *   管理员列表（第 4 行）：手动维护的管理员 ID（注：权限校验当前仍以 Telegram 官方
+ *                         getChatAdministrators 自动获取为准，此表为可视化/备用名单）
+ * 子命令：list 查看（带跳转）｜add 新增｜del 删除｜edit 修改
+ */
+function cmdAuth(ctx, args) {
+  if (!ctx.isKing) {
+    return uiCard({
+      status: "warn",
+      icon: "🔒",
+      title: "仅 Bot 主人可用",
+      body: ["/auth 用于管理「群组屏蔽列表」与「管理员列表」。"],
+    });
+  }
+
+  var listType = String((args && args[0]) || "").toLowerCase();
+  var op = String((args && args[1]) || "list").toLowerCase();
+  var isBlock =
+    listType === "block" || listType === "屏蔽" || listType === "屏蔽列表";
+  var isAdmin =
+    listType === "admin" || listType === "管理员" || listType === "管理员列表";
+
+  if (!isBlock && !isAdmin) {
+    return uiUsage(
+      "/auth",
+      "/auth [block|admin] [list|add|del|edit] [参数]",
+      [
+        "/auth block list",
+        "/auth block add -1001234567890",
+        "/auth admin list",
+        "/auth admin add 959711390",
+      ]
+    );
+  }
+
+  var rowIndex = isBlock ? 3 : 4;
+  var label = isBlock ? "群组屏蔽列表" : "管理员列表";
+  var kind = isBlock ? "group" : "user";
+  var list = authorityRowValues(rowIndex);
+
+  /* ---- 查看 ---- */
+  if (op === "list" || op === "ls" || op === "查看" || op === "show") {
+    var body = [
+      uiKV("名单", label, "📋"),
+      uiKV("条目数", String(list.length), "🔢"),
+    ];
+    if (list.length) {
+      body.push("");
+      for (var i = 0; i < list.length; i++) {
+        var link = resolveJumpLink(kind, list[i]);
+        var line = i + 1 + ". <code>" + esc(list[i]) + "</code>";
+        if (link) line += ' <a href="' + escAttr(link) + '">打开 ↗</a>';
+        body.push(line);
+      }
+    } else {
+      body.push("");
+      body.push(
+        "<i>" +
+          (isBlock
+            ? "列表为空：所有群的入群申请与群消息都会推送给主人。"
+            : "列表为空。") +
+          "</i>"
+      );
+    }
+    body.push("");
+    body.push(
+      "<i>/auth " +
+        (isBlock ? "block" : "admin") +
+        " add &lt;ID&gt; 新增 · del &lt;ID&gt; 删除 · edit &lt;旧&gt; &lt;新&gt; 修改</i>"
+    );
+    return uiCard({
+      icon: isBlock ? "🚫" : "🛡",
+      title: label + "（查看）",
+      body: body,
+    });
+  }
+
+  /* ---- 新增 ---- */
+  if (op === "add" || op === "新增" || op === "加") {
+    var addId = String((args && args[2]) || "").trim();
+    if (!addId)
+      return uiUsage(
+        "/auth " + (isBlock ? "block" : "admin") + " add",
+        "请附带 ID",
+        ["/auth " + (isBlock ? "block" : "admin") + " add -1001234567890"]
+      );
+    if (list.indexOf(addId) !== -1)
+      return uiCard({
+        status: "ok",
+        icon: isBlock ? "🚫" : "🛡",
+        title: "已存在",
+        body: ["<code>" + esc(addId) + "</code> 已在" + label + "中。"],
+      });
+    list.push(addId);
+    var okA = setAuthorityRowValues(rowIndex, list);
+    return uiCard({
+      status: okA ? "ok" : "warn",
+      icon: isBlock ? "🚫" : "🛡",
+      title: okA ? "已新增" : "写入失败",
+      body: [
+        "<code>" + esc(addId) + "</code>" + (okA ? " 已加入" + label + "。" : ""),
+        okA && isBlock
+          ? "该群的入群申请与群消息不再推送给主人。"
+          : "",
+      ].filter(Boolean),
+    });
+  }
+
+  /* ---- 删除 ---- */
+  if (op === "del" || op === "delete" || op === "rm" || op === "删除" || op === "移除") {
+    var delId = String((args && args[2]) || "").trim();
+    if (!delId)
+      return uiUsage(
+        "/auth " + (isBlock ? "block" : "admin") + " del",
+        "请附带 ID",
+        ["/auth " + (isBlock ? "block" : "admin") + " del -1001234567890"]
+      );
+    var di = list.indexOf(delId);
+    if (di === -1)
+      return uiCard({
+        status: "ok",
+        icon: isBlock ? "🚫" : "🛡",
+        title: "不在列表中",
+        body: ["<code>" + esc(delId) + "</code> 不在" + label + "中。"],
+      });
+    list.splice(di, 1);
+    var okD = setAuthorityRowValues(rowIndex, list);
+    return uiCard({
+      status: okD ? "ok" : "warn",
+      icon: isBlock ? "🚫" : "🛡",
+      title: okD ? "已删除" : "写入失败",
+      body: [
+        "<code>" + esc(delId) + "</code>" + (okD ? " 已从" + label + "移除。" : ""),
+      ].filter(Boolean),
+    });
+  }
+
+  /* ---- 修改 ---- */
+  if (op === "edit" || op === "modify" || op === "修改" || op === "改") {
+    var oldId = String((args && args[2]) || "").trim();
+    var newId = String((args && args[3]) || "").trim();
+    if (!oldId || !newId)
+      return uiUsage(
+        "/auth " + (isBlock ? "block" : "admin") + " edit",
+        "请附带 旧ID 新ID",
+        [
+          "/auth " +
+            (isBlock ? "block" : "admin") +
+            " edit -1001234567890 -1009876543210",
+        ]
+      );
+    var ei = list.indexOf(oldId);
+    if (ei === -1)
+      return uiCard({
+        status: "warn",
+        icon: isBlock ? "🚫" : "🛡",
+        title: "未找到旧值",
+        body: ["<code>" + esc(oldId) + "</code> 不在" + label + "中。"],
+      });
+    list[ei] = newId;
+    var okE = setAuthorityRowValues(rowIndex, list);
+    return uiCard({
+      status: okE ? "ok" : "warn",
+      icon: isBlock ? "🚫" : "🛡",
+      title: okE ? "已修改" : "写入失败",
+      body: [
+        "<code>" +
+          esc(oldId) +
+          "</code> → <code>" +
+          esc(newId) +
+          "</code>" +
+          (okE ? " 已更新。" : ""),
+      ].filter(Boolean),
+    });
+  }
+
+  return uiUsage(
+    "/auth",
+    "/auth [block|admin] [list|add|del|edit] [参数]",
+    ["/auth block list", "/auth block add -1001234567890", "/auth admin list"]
+  );
+}
+
+/* ============================================================================
  * 九、其它公共工具
  * ==========================================================================*/
 
