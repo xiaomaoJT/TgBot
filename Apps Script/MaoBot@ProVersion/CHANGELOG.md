@@ -1,6 +1,6 @@
 # 📝 MaoBot · ProVersion 更新日志（Changelog）
 
-> 版本说明：这里的日期是「能力落地的日期」，不是 Google Apps Script 的部署版本号（GAS 部署版本号是 `@数字`，当前线上为 `@811`）。
+> 版本说明：这里的日期是「能力落地的日期」，不是 Google Apps Script 的部署版本号（GAS 部署版本号是 `@数字`，当前线上为 `@814`）。
 > 每次改完代码都要 `bash Tools/push.sh --deploy` 才会生成新的 `@版本` 并真正生效。
 
 ---
@@ -26,6 +26,23 @@
 - `node Tools/build.js` → 15 个模块、约 11853 行
 - `node Tests/check-dupes.js Modules` → 515 处顶格声明、无重复
 - `bash Tests/run.sh` → 365 项冒烟测试全绿
+
+---
+
+## 2026-10-08 · 修复：`/auth` 参数解析 + 进 /help
+
+### 🐞 修复 1：`/auth block list` / `/auth admin list` 报「参数不正确」
+- **根因**：指令分发层 `runCommand` 给 handler 传的是**字符串** `parsed.args`（如 `"block list"`），而 `cmdAuth` 当**数组**用（`args[0]`/`args[1]` 取到的是字符串首字符 `"b"`/`"l"`），导致 `listType`/`op` 永远不匹配子命令，回退到 `uiUsage` 卡片。
+- **修复**：`cmdAuth` 入口增加对「字符串参数」的兼容——`typeof args === "string"` 时按空白拆成数组（`"block list"` → `["block","list"]`）。与其他多词指令（`/ch`、`/word`、`/ban` 等）的约定一致。
+
+### 📖 修复 2：`/auth` 未出现在 `/help`
+- **根因**：`/help` 由 `COMMANDS` 注册表自动生成，但 `helpVisibleCommands()` 过滤掉了**所有 `level:"owner"` 指令**，而 `/auth` 标记为 owner。
+- **修复**：给指令定义新增可选 `help` 字段；`helpVisibleCommands()` 改为「owner 默认不展示，但显式 `help:true` 的纳入」。`/auth` 已标记 `help:true`，现在出现在 `/help` 的「管理」分类下（Describe 与用法自动同步）。
+- **审计结论**：非 owner 指令均已通过注册表自动进入 `/help`，无遗漏；默认隐藏的 11 个 owner 指令为 `broadcast` + 维护类（`health`/`webhook`/`sync`/`reload`/`push`/`word`/`kw`/`db`/`king`/`mode`），按设计不面向普通用户展示。
+
+### 改动文件
+- `Modules/Manage.gs`：`cmdAuth()` 入口参数归一化（字符串→数组）。
+- `Modules/Commands.gs`：`/auth` 加 `help:true`；`helpVisibleCommands()` 放宽 owner 过滤。
 
 ---
 

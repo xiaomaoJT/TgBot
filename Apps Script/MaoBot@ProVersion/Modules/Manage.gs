@@ -1305,6 +1305,11 @@ function cmdAuth(ctx, args) {
     });
   }
 
+  // 兼容分发层传入的「字符串」参数：拆成数组（/auth block list → ["block","list"]）
+  if (typeof args === "string") {
+    args = args.trim().length ? args.trim().split(/\s+/) : [];
+  }
+
   var listType = String((args && args[0]) || "").toLowerCase();
   var op = String((args && args[1]) || "list").toLowerCase();
   var isBlock =
