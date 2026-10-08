@@ -957,20 +957,58 @@ function handleMyChatMember(mcm) {
   }
 }
 
+/**
+ * 解析可跳转链接：
+ *  - 群组：优先用公开用户名 https://t.me/<username>，否则导出主邀请链接
+ *  - 用户：优先用公开用户名，否则 tg://user?id=<id>（App 内深链）
+ * 解析失败返回 ""（调用方决定是否展示）。
+ */
+function resolveJumpLink(kind, id) {
+  var cid = String(id);
+  try {
+    var chat = tg("getChat", { chat_id: cid });
+    if (chat && chat.username) return "https://t.me/" + chat.username;
+  } catch (e) {
+    /* 忽略，继续走兜底 */
+  }
+  if (kind === "group") {
+    try {
+      var ex = tg("exportChatInviteLink", { chat_id: cid });
+      if (ex && ex.invite_link) return ex.invite_link;
+    } catch (e) {
+      /* 无权限或私群无链接，返回空 */
+    }
+    return "";
+  }
+  return "tg://user?id=" + cid;
+}
+
 function handleJoinRequest(req) {
   try {
     var chat = req.chat || {};
     var user = req.from || {};
+
+    // 🚫 已在「群组屏蔽列表」的群，不再把入群申请推送给主人
+    if (getIgnoredChatIds().indexOf(String(chat.id)) !== -1) return;
+
     var name = userNameOf(user);
 
+    // 🔗 群组跳转链接：优先公开用户名，否则（仅群组）导出主邀请链接
+    var groupLink = resolveJumpLink("group", chat.id);
+
     if (KingId) {
+      var groupLine =
+        "<b>群组：</b>" + esc(chat.title || "(未命名)") +
+        (groupLink ? ' <a href="' + escAttr(groupLink) + '">打开 ↗</a>' : "") +
+        "\n<b>群组 ID：</b><code>" + esc(String(chat.id)) + "</code>";
+
       tg(
         "sendMessage",
         {
           chat_id: KingId,
           text:
             "<b>🚪 新的入群申请</b>\n\n" +
-            uiKV("群组", chat.title || "") +
+            groupLine +
             "\n" +
             uiKV("申请人", name + (user.username ? " @" + user.username : "")) +
             "\n" +

@@ -653,6 +653,54 @@ function getIgnoredChatIds() {
   });
 }
 
+/**
+ * 读取 authority_management 指定行的「值列表」（从第 2 列开始，跳过第 1 列标签）。
+ * @param {number} rowIndex 1-based 行号（屏蔽列表=3，管理员列表=4）
+ */
+function authorityRowValues(rowIndex) {
+  var data = readSheet(SHEET.authority);
+  if (data.length < rowIndex) return [];
+  var row = data[rowIndex - 1];
+  var list = [];
+  for (var c = 1; c < row.length; c++) {
+    var v = String(row[c] || "").trim();
+    if (v) list.push(v);
+  }
+  return list;
+}
+
+/**
+ * 写回 authority_management 指定行的值列表（第 2 列起），并失效相关缓存。
+ * @param {number} rowIndex 1-based 行号
+ * @param {Array<string>} ids 值列表
+ */
+function setAuthorityRowValues(rowIndex, ids) {
+  var sheet = getSheetOrNull(SHEET.authority);
+  if (!sheet) return false;
+  var vals = [];
+  for (var i = 0; i < ids.length; i++) {
+    var v = String(ids[i] || "").trim();
+    if (v) vals.push(v);
+  }
+  try {
+    // 先清空该行第 2 列之后的旧值（最多 50 列），再写入新值，避免残留
+    sheet.getRange(rowIndex, 2, 1, 50).clearContent();
+    if (vals.length) sheet.getRange(rowIndex, 2, 1, vals.length).setValues([vals]);
+    cacheDrop(["authorityList", "authorityAdmins"]);
+    return true;
+  } catch (e) {
+    logError("setAuthorityRowValues:" + rowIndex, e);
+    return false;
+  }
+}
+
+/** 管理员列表（authority_management 第 4 行），带缓存 */
+function getAdminList() {
+  return cached("authorityAdmins", cfg("cache.ttlSeconds", 10800), function () {
+    return authorityRowValues(4);
+  });
+}
+
 /* ============================================================================
  * 五、诊断入口（在 GAS 编辑器里手动运行）
  * ==========================================================================*/

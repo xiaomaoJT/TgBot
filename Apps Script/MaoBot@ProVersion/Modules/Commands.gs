@@ -144,6 +144,18 @@ const COMMANDS = [
     handler: cmdSettingsPanel },
   { cmd: "broadcast", alias: ["bc"], cat: "管理", level: "owner", menu: false,
     desc: "向所有已知会话广播消息（仅 Bot 主人）", handler: cmdBroadcast },
+  { cmd: "auth", alias: ["authority", "权限"], cat: "管理", level: "owner", menu: false,
+    desc: "权限名单管理：群组屏蔽列表 / 管理员列表 的查看·新增·修改·删除",
+    usage: "/auth [block|admin] [list|add|del|edit] [参数]",
+    examples: [
+      "/auth block list（查看屏蔽群，带跳转）",
+      "/auth block add -1001234567890",
+      "/auth block del -1001234567890",
+      "/auth block edit -1001234567890 -1009876543210",
+      "/auth admin list（查看管理员，带跳转）",
+      "/auth admin add 959711390",
+    ],
+    handler: cmdAuth },
 
   /* ---- 频道监听 ---- */
   { cmd: "ch", alias: ["channel", "pd"], cat: "频道", level: "admin", menu: true,

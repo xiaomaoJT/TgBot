@@ -5,6 +5,30 @@
 
 ---
 
+## 2026-10-08 · 入群申请屏蔽指令 /auth + 通知加群组跳转
+
+### 🚫 新增：`/auth` 权限名单管理（仅 Bot 主人）
+统一管理 `authority_management` 表里的两张名单，支持 **查看（带跳转）/ 新增 / 修改 / 删除**：
+- `/auth block list|add|del|edit` —— **群组屏蔽列表**（第 3 行）：被屏蔽的群，其入群申请与群消息都不再推送给主人。
+- `/auth admin list|add|del|edit` —— **管理员列表**（第 4 行）：手动维护管理员 ID（可视化/备用；权限校验仍以 Telegram 官方 `getChatAdministrators` 自动获取为准）。
+
+### 🔔 入群申请通知增强
+- 通知卡片现在额外展示 **群组 ID**，并附 **可跳转链接**（公开群用 `https://t.me/<username>`，私有群自动导出主邀请链接；用户用 `tg://user?id=<id>`）。
+- `handleJoinRequest` 接入「群组屏蔽列表」：被屏蔽的群不再推送入群申请。
+
+### 改动文件
+- `Modules/MaoBot.gs`：`handleJoinRequest` 跳过屏蔽群 + 展示群组 ID/跳转；新增 `resolveJumpLink()` 辅助。
+- `Modules/Triggers.gs`：新增 `authorityRowValues()` / `setAuthorityRowValues()` / `getAdminList()`（读写第 3/4 行，写后失效缓存）。
+- `Modules/Manage.gs`：新增 `cmdAuth()` 处理器。
+- `Modules/Commands.gs`：注册 `/auth`（别名 authority / 权限，owner 级）。
+
+### 验证
+- `node Tools/build.js` → 15 个模块、约 11853 行
+- `node Tests/check-dupes.js Modules` → 515 处顶格声明、无重复
+- `bash Tests/run.sh` → 365 项冒烟测试全绿
+
+---
+
 ## 2026-10-06 · 密钥外移 Secrets.gs（可安全开源）+ 仓库清理
 
 把仓库变得可以放心推到公开平台：
