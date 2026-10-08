@@ -144,7 +144,7 @@ const COMMANDS = [
     handler: cmdSettingsPanel },
   { cmd: "broadcast", alias: ["bc"], cat: "管理", level: "owner", menu: false,
     desc: "向所有已知会话广播消息（仅 Bot 主人）", handler: cmdBroadcast },
-  { cmd: "auth", alias: ["authority", "权限"], cat: "管理", level: "owner", menu: false,
+  { cmd: "auth", alias: ["authority", "权限"], cat: "管理", level: "owner", menu: false, help: true,
     desc: "权限名单管理：群组屏蔽列表 / 管理员列表 的查看·新增·修改·删除",
     usage: "/auth [block|admin] [list|add|del|edit] [参数]",
     examples: [
@@ -433,10 +433,11 @@ function cmdStart(ctx) {
   ].join("\n");
 }
 
-/** 帮助菜单可见指令（过滤掉 owner 专属） */
+/** 帮助菜单可见指令：默认全部纳入（展示不放开权限，执行仍由 checkLevel 鉴权）；
+ *  仅当某条显式标记 help:false 时才隐藏（当前无此类指令）。 */
 function helpVisibleCommands() {
   return COMMANDS.filter(function (c) {
-    return c.level !== "owner";
+    return c.help !== false;
   });
 }
 
