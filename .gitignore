@@ -1,3 +1,6 @@
 modelTest.gs
 mao.gs
 backup
+
+# macOS 垃圾
+.DS_Store
