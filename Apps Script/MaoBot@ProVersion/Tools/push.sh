@@ -35,6 +35,23 @@ say()  { printf '%s\n' "$*"; }
 step() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 die()  { printf '\n\033[31m✖ %s\033[0m\n' "$*" >&2; exit 1; }
 
+# 把版本号挂到某个固定版本部署上（带重试 + 以 deployments 复核为准）。
+# 用局部变量 v 捕获版本号，避免 set -u 下任何作用域歧义。
+bump_one() {
+  local dep="$1"
+  local v="${VER:-}"
+  local a now
+  for a in 1 2 3; do
+    $CLASP update-deployment "$dep" -V "$v" >/dev/null 2>&1 || true
+    now="$($CLASP deployments 2>/dev/null | grep -E 'AKfycb' || true)"
+    if printf '%s' "$now" | grep -q "@$v"; then
+      return 0
+    fi
+    [ "$a" != "3" ] && sleep 3
+  done
+  return 1
+}
+
 # ---------------------------------------------------------------- 前置检查
 
 step "① 环境检查"
@@ -163,20 +180,23 @@ if [ "$DO_DEPLOY" = "1" ]; then
   step "⑧ 发版：把新版本挂到所有「固定版本」部署上"
 
   DESC="push $(date '+%Y-%m-%d %H:%M')"
-  VER="${VER:-}"   # 防御：下面的 while 里会引用 $VER，别让它处在"未定义"状态
+  VER="${VER:-}"   # 防御：下面的循环里会引用 $VER，别让它处在"未定义"状态
 
-  # 代理环境下 clasp 偶尔退出非 0 但版本其实已创建；用重试 + 解析版本号兜底。
+  # 代理环境下 clasp 偶尔退出非 0（"Premature close"）但版本其实已创建；
+  # 命令替换里的 grep 匹配不到号会让整条管道(pipefail)失败，若不加 || true，
+  # 这条赋值语句本身返回非零会触发 set -e 直接杀掉脚本。
+  # 加 || true 后交给下面的重试（最多 3 次）+ 空值兜底，绝不误杀。
   for attempt in 1 2 3; do
-    VER="$( { $CLASP version "$DESC" 2>/dev/null || true; } | grep -oE 'version [0-9]+|[0-9]+' | grep -oE '[0-9]+' | tail -1 )"
+    VER="$( { $CLASP version "$DESC" 2>/dev/null || true; } | grep -oE 'version [0-9]+|[0-9]+' | grep -oE '[0-9]+' | tail -1 )" || true
     [ -n "$VER" ] && break
     [ "$attempt" != "3" ] && say "  （第 ${attempt} 次建版本未解析到号，重试…）" && sleep 3
   done
 
-  if [ -z "$VER" ]; then
+  if [ -z "${VER:-}" ]; then
     say "  ⚠️ 没能创建/解析版本号，跳过自动发版。"
     say "     请到 GAS 界面「部署 → 管理部署 → ✏️ 编辑 → 版本选最新 → 部署」。"
   else
-    say "  已创建版本 $VER"
+    say "  已创建版本 ${VER:-}"
     # @HEAD 的部署本来就跟随 HEAD，不需要动；只处理固定版本的
     TARGETS="$(printf '%s\n' "$DEP_LIST" | grep -E 'AKfycb' | grep -vE '@HEAD' \
       | grep -oE 'AKfycb[A-Za-z0-9_-]{20,}' )"
@@ -185,42 +205,28 @@ if [ "$DO_DEPLOY" = "1" ]; then
     else
       # 重试挂版本：clasp 在代理下常回 "Premature close" 但仍成功，
       # 不要靠输出里的 "Redeployed" 判断，统一以「deployments 复核」为准。
-      bump_one() {
-        local dep="$1"
-        for a in 1 2 3; do
-          $CLASP update-deployment "$dep" -V "$VER" >/dev/null 2>&1 || true
-          DEP_NOW="$($CLASP deployments 2>/dev/null | grep -E 'AKfycb' || true)"
-          if printf '%s' "$DEP_NOW" | grep -q "@${VER}"; then
-            return 0
-          fi
-          [ "$a" != "3" ] && sleep 3
-        done
-        return 1
-      }
-      while read -r dep; do
+      for dep in $TARGETS; do
         [ -z "$dep" ] && continue
         if bump_one "$dep"; then
-          say "  ✅ ${dep:0:16}… 已更新到版本 $VER（/exec 地址不变）"
+          say "  ✅ ${dep:0:16}… 已更新到版本 ${VER:-}（/exec 地址不变）"
         else
-          say "  ⚠️ ${dep:0:16}… 重试后仍没挂上，请到 GAS「部署 → 管理部署 → ✏️ 编辑 → 版本选 $VER → 部署」"
+          say "  ⚠️ ${dep:0:16}… 重试后仍没挂上，请到 GAS「部署 → 管理部署 → ✏️ 编辑 → 版本选 ${VER:-} → 部署」"
         fi
-      done <<EOF
-$TARGETS
-EOF
+      done
 
       # ---- 复核：clasp 偶尔"报成功但没真挂上"（2026-10-05 实际踩到过，
       #      导致线上跑的还是旧快照，把"代码没生效"误判成"方案无效"）。
       DEP_NOW="$($CLASP deployments 2>/dev/null | grep -E 'AKfycb' || true)"
-      if printf '%s' "$DEP_NOW" | grep -q "@${VER}"; then
-        say "  ✅ 复核通过：固定版本部署已指向 @${VER}"
+      if printf '%s' "$DEP_NOW" | grep -q "@${VER:-}"; then
+        say "  ✅ 复核通过：固定版本部署已指向 @${VER:-}"
       else
         say "  ⚠️ 复核发现没挂上（仍指向旧版本），自动重试…"
-        printf '%s\n' "$TARGETS" | while read -r dep; do
+        for dep in $TARGETS; do
           [ -z "$dep" ] && continue
           if bump_one "$dep"; then
-            say "     ✅ 重试成功：${dep:0:16}… → @${VER}"
+            say "     ✅ 重试成功：${dep:0:16}… → @${VER:-}"
           else
-            say "     ❌ 重试仍失败，请到 GAS 手动挂版本 $VER"
+            say "     ❌ 重试仍失败，请到 GAS 手动挂版本 ${VER:-}"
           fi
         done
       fi

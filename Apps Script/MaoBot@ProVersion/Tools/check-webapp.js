@@ -84,11 +84,16 @@ function remoteParams() {
       cwd: tmp,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
-    for (const ext of ['js', 'gs']) {
-      const p = path.join(tmp, 'Params.' + ext);
-      if (fs.existsSync(p)) return fs.readFileSync(p, 'utf8');
+    // ⭐ 外置密钥架构：真实 token 在 Secrets.gs（PROJECT_SECRETS.BOTID），
+    //    Params.gs 只有 `var BOTID = ""` 占位。两个文件都读，避免「拿不到线上 BOTID」。
+    let buf = '';
+    for (const name of ['Params', 'Secrets']) {
+      for (const ext of ['js', 'gs']) {
+        const p = path.join(tmp, name + '.' + ext);
+        if (fs.existsSync(p)) buf += '\n' + fs.readFileSync(p, 'utf8');
+      }
     }
-    return '';
+    return buf;
   } catch (e) {
     return '';
   } finally {
@@ -99,6 +104,26 @@ function remoteParams() {
 function pick(src, re) {
   const m = String(src).match(re);
   return m ? m[1] : '';
+}
+
+/** 从（可能含外置 Secrets 的）代码里抽 BOTID，兼容三种写法。 */
+function extractToken(src) {
+  // ① 直接字面量：var BOTID = "..." 或 BOTID = "..."（无 var）
+  let t = pick(src, /BOTID\s*=\s*"([^"]+)"/);
+  if (t) return t;
+  // ② 对象属性：BOTID: "..."（PROJECT_SECRETS 里）
+  t = pick(src, /BOTID\s*:\s*"([^"]+)"/);
+  if (t) return t;
+  // ③ 间接赋值：BOTID = PROJECT_SECRETS.BOTID → 再解析对象
+  const ref = pick(src, /BOTID\s*=\s*([A-Za-z_$][\w$]*)\.BOTID/);
+  if (ref) {
+    const obj = pick(src, new RegExp(ref + '\\s*=\\s*\\{([\\s\\S]*?)\\}'));
+    if (obj) {
+      const inner = pick(obj, /BOTID\s*:\s*"([^"]+)"/);
+      if (inner) return inner;
+    }
+  }
+  return '';
 }
 
 /* ---------- 探测 ---------- */
@@ -137,9 +162,9 @@ function explain(post, get) {
 
   /* ---- ① Telegram 那边怎么说（真相来源） ---- */
   const params = remoteParams();
-  const token = pick(params, /var\s+BOTID\s*=\s*"([^"]*)"/);
+  const token = extractToken(params);
   if (!token) {
-    bad('拿不到线上 BOTID');
+    bad('拿不到线上 BOTID（请确认 Params.gs / Secrets.gs 是否已 push 到 GAS）');
     process.exit(1);
   }
 
