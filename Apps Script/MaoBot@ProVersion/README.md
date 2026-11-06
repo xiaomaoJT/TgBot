@@ -9,7 +9,7 @@
 >
 > 原版目录**完整保留、未做任何改动**，两个版本可并存、可随时回滚。
 
-**当前规模**：15 个模块（含 Secrets.gs）· 约 12888 行 · 421 项冒烟测试全绿 · 539 处顶层声明 0 重复
+**当前规模**：15 个模块（含 Secrets.gs）· 约 12888 行 · 424 项冒烟测试全绿 · 539 处顶层声明 0 重复
 
 ---
 
@@ -592,7 +592,7 @@ uiCard({
 **管理指令**（群管理员 / Bot 主人）
 
 `/manage` `/ban` `/unban` `/mute` `/kick` `/warn` `/warns` `/resetwarn`
-`/pin` `/unpin` `/purge` `/invite` `/settings` `/broadcast`
+`/pin` `/unpin` `/purge` `/invite` `/settings` `/broadcast` `/auth` 权限管理(增删查屏蔽/管理员) `/say`(别名 send/msg，主人代发)
 
 **频道指令**（群管理员 / Bot 主人）
 
@@ -603,6 +603,7 @@ uiCard({
 
 `/health` 运行自检 · `/webhook` 查看绑定 · `/sync` 同步命令菜单
 `/reload` 清缓存 · `/word` 敏感词增删查 · `/push` 热更新
+`/apicheck` API 可用性自检 · `/kw` 关键词表查看 · `/db` 数据表查看 · `/king` 主人身份 · `/mode` 运行模式
 
 **自动化能力**
 

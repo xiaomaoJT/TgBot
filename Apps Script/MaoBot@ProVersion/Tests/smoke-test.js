@@ -314,6 +314,19 @@ ok(helpAll.indexOf("全部功能") !== -1, "帮助卡片可渲染");
 ok(buildHelpText("查询", 0).indexOf("天气") !== -1, "分类帮助可渲染");
 ok(helpTotalPages("") >= 1, "帮助分页计算正常");
 
+// ★ owner 指令展示面：/say 必须出现在 /help（展示不放开权限），但不进原生斜杠菜单
+//   帮助是多页分页（每页 8 条），聚合所有分页再断言
+var helpFull = "";
+for (var hp = 0; hp < helpTotalPages(""); hp++) helpFull += buildHelpText("", hp);
+ok(helpFull.indexOf("/say") !== -1, "★ 主人指令 /say 出现在 /help（全部分页）");
+ok(helpFull.indexOf("/broadcast") !== -1, "★ 主人指令 /broadcast 出现在 /help（全部分页）");
+var menuCmds = [];
+callsOf("setMyCommands").forEach(function (c) {
+  (c.body.commands || []).forEach(function (x) { menuCmds.push(x.command); });
+});
+ok(menuCmds.indexOf("say") === -1 && menuCmds.indexOf("broadcast") === -1,
+  "★ 主人指令(/say,/broadcast)不进原生斜杠菜单（避免暴露给普通用户）", "菜单共 " + menuCmds.length + " 条");
+
 section("⑯① 中英文切换（i18n）");
 setCurrentLang("zh");
 ok(L("中文", "English") === "中文", "★ L() 默认返回中文");
