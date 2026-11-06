@@ -353,6 +353,29 @@ cmdLang({ chatId: "111222", userId: "111222", isGroup: false, userName: "u" }, "
 ok(getLang({ chatId: "111222" }) === "zh", "★ /lang zh 切回中文");
 setCurrentLang("zh");
 
+section("⑯② 功能面板：返回主菜单修复（不再报未知分类）");
+function noUnknown() {
+  return callsOf("answerCallbackQuery").every(function (c) { return c.body.text !== "未知分类"; });
+}
+resetCalls();
+handleCallback({ chatId: "111222", userId: "111222", isGroup: false, userName: "u", chatType: "private", messageId: 10, callbackId: "CB1", callbackData: cbPack(["menu", "query"]) });
+var edit1 = callsOf("editMessageText");
+ok(edit1.length === 1, "★ 进入子菜单 query 触发消息原地编辑");
+ok(edit1.length && edit1[0].body.text.indexOf("查询") !== -1, "★ 子菜单展示查询工具内容");
+ok(noUnknown(), "★ 进入子菜单不报未知分类");
+
+resetCalls();
+handleCallback({ chatId: "111222", userId: "111222", isGroup: false, userName: "u", chatType: "private", messageId: 10, callbackId: "CB2", callbackData: cbPack(["menu", "main"]) });
+var edit2 = callsOf("editMessageText");
+ok(edit2.length === 1, "★ 点『返回主菜单』触发消息原地编辑（重绘主菜单）");
+ok(edit2.length && edit2[0].body.text.indexOf("功能面板") !== -1, "★ 返回后重绘为功能面板主菜单");
+ok(noUnknown(), "★ 返回主菜单不再报『未知分类』");
+
+resetCalls();
+handleCallback({ chatId: "111222", userId: "111222", isGroup: false, userName: "u", chatType: "private", messageId: 10, callbackId: "CB3", callbackData: cbPack(["menu", "zzz_unknown"]) });
+ok(callsOf("editMessageText").length === 1, "★ 未知子分类稳妥回落主菜单（不卡死）");
+ok(noUnknown(), "★ 未知子分类不报未知分类");
+
 section("⑰ 运行自检");
 resetCalls();
 const health = cmdHealth({ chatId: "777777", userId: "777777", isGroup: false, isKing: true, userName: "主人" });

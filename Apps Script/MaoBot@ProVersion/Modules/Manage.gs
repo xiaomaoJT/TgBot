@@ -1063,6 +1063,15 @@ function handleCallback(ctx) {
 }
 
 function handleMenuCallback(ctx, cat) {
+  // 返回主菜单：首次进入为空、点「◀️ 返回主菜单」为 "main"、未知分类一律稳妥回落，
+  // 避免出现「未知分类」导致按钮点不动（之前 main 未处理即报错）。
+  if (!cat || cat === "main") {
+    var root = cmdMenu(ctx);
+    tgEditText(ctx.chatId, ctx.messageId, root.text, { reply_markup: root.markup });
+    tgAnswerCallback(ctx.callbackId, "");
+    return;
+  }
+
   var map = {
     query: {
       title: "🔍 查询工具",
@@ -1101,7 +1110,11 @@ function handleMenuCallback(ctx, cat) {
 
   var cfgItem = map[cat];
   if (!cfgItem) {
-    tgAnswerCallback(ctx.callbackId, "未知分类");
+    // 未知子分类：不报错，稳妥回落主菜单，避免按钮卡死
+    logInfo("menu-unknown", cat);
+    var fallback = cmdMenu(ctx);
+    tgEditText(ctx.chatId, ctx.messageId, fallback.text, { reply_markup: fallback.markup });
+    tgAnswerCallback(ctx.callbackId, "");
     return;
   }
 
