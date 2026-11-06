@@ -52,6 +52,7 @@
 - `Modules/AI.gs` / `Api.gs`：HTTP 超时分级；热榜迁移；`carrier()` 死逻辑删除。
 - `Modules/Commands.gs` / `I18n.gs`：注册 9 个新指令 + 英文文案。
 - `Tests/gas-mock.js` / `Tests/smoke-test.js`：mock 加 `fetchAll`、新增 32 项测试（审核入群/新指令/API 体检/超时分级等）。
+- `Tools/push.sh`：修复 `--deploy` 在代理环境下因 `set -e` 遇 clasp 非零退出而中断、导致固定版本部署没自动挂新版本的问题；改为「建版本 + 挂版本 + 复核」均带重试，且统一以 `deployments` 复核为准，不再依赖脆弱的 "Redeployed" 字样匹配。
 
 ### 验证
 - `node Tools/build.js` → 15 个模块、约 12655 行

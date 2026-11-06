@@ -164,7 +164,13 @@ if [ "$DO_DEPLOY" = "1" ]; then
 
   DESC="push $(date '+%Y-%m-%d %H:%M')"
   VER="${VER:-}"   # 防御：下面的 while 里会引用 $VER，别让它处在"未定义"状态
-  VER="$( { $CLASP version "$DESC" 2>/dev/null || true; } | grep -oE 'version [0-9]+|[0-9]+' | grep -oE '[0-9]+' | tail -1 )"
+
+  # 代理环境下 clasp 偶尔退出非 0 但版本其实已创建；用重试 + 解析版本号兜底。
+  for attempt in 1 2 3; do
+    VER="$( { $CLASP version "$DESC" 2>/dev/null || true; } | grep -oE 'version [0-9]+|[0-9]+' | grep -oE '[0-9]+' | tail -1 )"
+    [ -n "$VER" ] && break
+    [ "$attempt" != "3" ] && say "  （第 ${attempt} 次建版本未解析到号，重试…）" && sleep 3
+  done
 
   if [ -z "$VER" ]; then
     say "  ⚠️ 没能创建/解析版本号，跳过自动发版。"
@@ -177,23 +183,26 @@ if [ "$DO_DEPLOY" = "1" ]; then
     if [ -z "$TARGETS" ]; then
       say "  没有「固定版本」部署（全部 @HEAD），push 完就已经生效。"
     else
+      # 重试挂版本：clasp 在代理下常回 "Premature close" 但仍成功，
+      # 不要靠输出里的 "Redeployed" 判断，统一以「deployments 复核」为准。
+      bump_one() {
+        local dep="$1"
+        for a in 1 2 3; do
+          $CLASP update-deployment "$dep" -V "$VER" >/dev/null 2>&1 || true
+          DEP_NOW="$($CLASP deployments 2>/dev/null | grep -E 'AKfycb' || true)"
+          if printf '%s' "$DEP_NOW" | grep -q "@${VER}"; then
+            return 0
+          fi
+          [ "$a" != "3" ] && sleep 3
+        done
+        return 1
+      }
       while read -r dep; do
         [ -z "$dep" ] && continue
-        say "  挂到 ${dep:0:16}… …"
-        # clasp 3 的正确用法：update-deployment <deploymentId> -V <版本号>
-        # （旧写法「redeploy <id> <version>」在 3.x 会报 too many arguments）
-        # 按**输出**判断而不是退出码：clasp 偶尔会退出 0 但没真正改成功
-        OUT="$($CLASP update-deployment "$dep" -V "$VER" 2>&1)"
-        if printf '%s' "$OUT" | grep -q "Redeployed"; then
-          say "    ✅ 已更新到版本 $VER（/exec 地址不变）"
+        if bump_one "$dep"; then
+          say "  ✅ ${dep:0:16}… 已更新到版本 $VER（/exec 地址不变）"
         else
-          OUT2="$($CLASP redeploy "$dep" -V "$VER" 2>&1)"
-          if printf '%s' "$OUT2" | grep -q "Redeployed"; then
-            say "    ✅ 已更新到版本 $VER（/exec 地址不变）"
-          else
-            say "    ⚠️ 没能自动更新（clasp 说：$(printf '%s' "$OUT$OUT2" | head -1)）"
-            say "       请到 GAS「部署 → 管理部署 → ✏️ 编辑 → 版本选 $VER → 部署」"
-          fi
+          say "  ⚠️ ${dep:0:16}… 重试后仍没挂上，请到 GAS「部署 → 管理部署 → ✏️ 编辑 → 版本选 $VER → 部署」"
         fi
       done <<EOF
 $TARGETS
@@ -201,7 +210,6 @@ EOF
 
       # ---- 复核：clasp 偶尔"报成功但没真挂上"（2026-10-05 实际踩到过，
       #      导致线上跑的还是旧快照，把"代码没生效"误判成"方案无效"）。
-      #      所以发完版一定回头看一眼 deployment 后面的 @版本号。
       DEP_NOW="$($CLASP deployments 2>/dev/null | grep -E 'AKfycb' || true)"
       if printf '%s' "$DEP_NOW" | grep -q "@${VER}"; then
         say "  ✅ 复核通过：固定版本部署已指向 @${VER}"
@@ -209,12 +217,10 @@ EOF
         say "  ⚠️ 复核发现没挂上（仍指向旧版本），自动重试…"
         printf '%s\n' "$TARGETS" | while read -r dep; do
           [ -z "$dep" ] && continue
-          RETRY="$($CLASP update-deployment "$dep" -V "$VER" 2>&1 || true)"
-          if printf '%s' "$RETRY" | grep -q "Redeployed"; then
+          if bump_one "$dep"; then
             say "     ✅ 重试成功：${dep:0:16}… → @${VER}"
           else
-            say "     ❌ 重试仍失败：$(printf '%s' "$RETRY" | head -1)"
-            say "        请到 GAS「部署 → 管理部署 → ✏️ 编辑 → 版本选 ${VER} → 部署」"
+            say "     ❌ 重试仍失败，请到 GAS 手动挂版本 $VER"
           fi
         done
       fi
