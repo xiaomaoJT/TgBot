@@ -117,7 +117,7 @@ var I18N_CMD_EN = {
   dujitang:  { desc: "A bowl of poisonous chicken soup" },
   qinghua:   { desc: "Random cheesy pick-up line" },
   fortune:   { desc: "Draw today's fortune" },
-  dice:      { desc: "Roll a dice" },
+  dice:      { desc: "Roll a dice (native animated dice)" },
   coin:      { desc: "Flip a coin" },
   roll:      { desc: "Generate a random number", usage: "/roll [min-max]", examples: ["/roll", "/roll 1-6"] },
 
@@ -172,6 +172,23 @@ var I18N_CMD_EN = {
   king:      { desc: "Private push toggle (mute when too noisy)", usage: "/king [off|private|group|all|reset]" },
   mode:      { desc: "View / switch access mode (polling or webhook)", usage: "/mode or /mode polling|webhook" },
   lang:      { desc: "Switch bot language (zh / en)", usage: "/lang [zh|en]" },
+
+  /* ⭐ 2026-11 补齐：auth 此前漏登记，英文模式下会回落中文 */
+  auth:      { desc: "Manage block list & admin list (owner only)", usage: "/auth [block|admin] [list|add|del|edit] [args]" },
+
+  /* ⭐ 2026-11 新增指令 */
+  slot:      { desc: "Spin the slot machine 🎰" },
+  darts:     { desc: "Throw a dart 🎯" },
+  bowl:      { desc: "Go bowling 🎳" },
+  basket:    { desc: "Shoot a basket 🏀" },
+  goal:      { desc: "Take a penalty kick ⚽" },
+  "8ball":   { desc: "Magic 8-Ball: let fate decide", usage: "/8ball <your question>" },
+  choose:    { desc: "Can't decide? Let the bot pick", usage: "/choose <A> <B> [more...]" },
+  gift:      { desc: "List available Telegram gifts (read-only)" },
+  encode:    { desc: "Base64 / URL / Morse encode & decode (local)", usage: "/encode <b64e|b64d|url|unurl|morse|rev> <text>" },
+  poll:      { desc: "Start a native Telegram poll / quiz", usage: "/poll <question> | <A> | <B> [--quiz n] [--public] [--members]" },
+  topic:     { desc: "Forum topics: create / close / reopen / delete", usage: "/topic new <name> | /topic close|reopen|del [threadID]" },
+  apicheck:  { desc: "Health-check all external APIs & Bot API capabilities (probed from GAS servers)" },
 };
 
 /** 取某指令的英文描述（回落中文原表） */

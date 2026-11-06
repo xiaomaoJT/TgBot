@@ -122,6 +122,33 @@ var CONFIG = {
       "👏 <b>欢迎 {name}</b> 加入 <b>{chat}</b>！\n" +
       "本群第 <b>{count}</b> 位成员，有问题可直接发指令 <code>/help</code> 查看功能。",
     leftText: "👋 <b>{name}</b> 离开了群聊，江湖再见。",
+    // ⭐ 入群验证开启时也照常发欢迎（原实现会 return 跳过欢迎）。
+    //    设 false 可恢复「只验证、不欢迎」的旧行为。
+    withVerify: true,
+  },
+
+  /* ---- 入群事件（审核通过 / 隐藏成员 / 大群）---- */
+  join: {
+    // new_chat_members 与 chat_member 双通道去重窗口（秒）
+    dedupeSeconds: 120,
+  },
+
+  /* ---- 表情回应更新（Bot API 7.0+）---- */
+  reaction: {
+    pushToKing: false, // 默认不打扰；开 true 会把群里的新表情回应推给主人
+  },
+
+  /* ---- HTTP 客户端 ---- */
+  http: {
+    timeoutSeconds: 8, // ⭐ GAS 单请求上限 60s / 脚本 6min，外部接口必须设超时
+    strictTls: false, // 部分小站证书不全，默认沿用旧行为；需要严格校验时改 true
+  },
+
+  /* ---- 安全 ---- */
+  security: {
+    // Webhook 来源校验：setWebhook 带 secret_token，doPost 校验
+    // X-Telegram-Bot-Api-Secret-Token。设 false 可完全关闭。
+    webhookSecret: true,
   },
 
   /* ---- 指令 ---- */
@@ -177,6 +204,7 @@ var CONFIG = {
     dailyQuota: 1200, // 全局每日调用上限（本地保护，防止把免费额度烧光）
     limits: {}, // 按模型覆盖上限，如 { gemini: 800, groq: 500 }
     timeoutMs: 500, // 触发 AI 前的"正在输入"提示时长
+    timeoutSeconds: 60, // ⭐ 大模型推理的 HTTP 超时（普通外部接口只有 8 秒）
 
     /* ---- 工作类任务（摘要 / 代码 / 看图 / 群聊总结）---- */
     taskProvider: "", // 指定干活用的模型；看图必须选支持视觉的（gemini 支持）

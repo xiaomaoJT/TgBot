@@ -1420,6 +1420,160 @@ section("㉛ 数据表自动补建");
 }
 
 /* ============================================================ */
+section("㉜ 审核入群欢迎（chat_member 通道）+ Webhook 来源校验");
+
+setChatSetting("-1001234567890", "welcome", "on");
+setChatSetting("-1001234567890", "verify", "off");
+CONFIG.welcome.withVerify = true;
+
+function mkChatMember(oldStatus, newStatus, uid, opts) {
+  const o = opts || {};
+  const u = { id: uid, is_bot: !!o.isBot, first_name: o.name || "新成员" };
+  return {
+    update_id: nextUpdateId(),
+    chat_member: {
+      chat: { id: -1001234567890, type: "supergroup", title: "测试群" },
+      from: { id: 777777, is_bot: false, first_name: "群管理员" },
+      date: Math.floor(Date.now() / 1000),
+      old_chat_member: { status: oldStatus, user: u },
+      new_chat_member: { status: newStatus, user: u },
+      via_join_request: !!o.viaJoinRequest,
+    },
+  };
+}
+function welcomeCount() {
+  return callsOf("sendMessage").filter(
+    (c) => c.body && String(c.body.text || "").indexOf("欢迎") !== -1
+  ).length;
+}
+
+/* 核心场景：管理员在 Telegram 原生界面点「同意」，只下发 chat_member */
+resetCalls();
+post(mkChatMember("left", "member", 881001, { viaJoinRequest: true }));
+ok(welcomeCount() === 1, "★ 审核通过入群（left→member）会发欢迎语", "实际=" + welcomeCount());
+
+/* 双通道去重：紧接着来一条 new_chat_members 服务消息，不能重复欢迎 */
+resetCalls();
+post({
+  update_id: nextUpdateId(),
+  message: {
+    message_id: 99001,
+    date: Math.floor(Date.now() / 1000),
+    from: { id: 777777, is_bot: false, first_name: "群管理员" },
+    chat: { id: -1001234567890, type: "supergroup", title: "测试群" },
+    new_chat_members: [{ id: 881001, is_bot: false, first_name: "新成员" }],
+  },
+});
+ok(welcomeCount() === 0, "★ 双通道去重：同一用户 120s 内不重复欢迎", "实际=" + welcomeCount());
+
+/* 非入群的状态变化不能误发欢迎 */
+resetCalls();
+post(mkChatMember("member", "administrator", 881002));
+ok(welcomeCount() === 0, "★ member→administrator 不误发欢迎");
+
+/* 机器人自己不欢迎 */
+resetCalls();
+post(mkChatMember("left", "member", 881003, { isBot: true }));
+ok(welcomeCount() === 0, "★ bot 成员变化不触发欢迎");
+
+/* verify 打开时 welcome 也能共存（原实现会 return 跳过欢迎） */
+setChatSetting("-1001234567890", "verify", "on");
+resetCalls();
+post(mkChatMember("left", "member", 881004, { viaJoinRequest: true }));
+ok(welcomeCount() === 1, "★ 开启入群验证时仍会发欢迎（不再互相排斥）");
+setChatSetting("-1001234567890", "verify", "off");
+
+/* Webhook 来源校验 */
+const wsec = webhookSecret();
+ok(typeof wsec === "string" && wsec.length >= 32 && /^[A-Za-z0-9_-]+$/.test(wsec),
+  "★ webhookSecret 生成合法且稳定的密钥");
+ok(webhookSecret() === wsec, "★ webhookSecret 幂等（不会每次换导致 Telegram 校验失败）");
+ok(guardWebhook({}) === true, "★ 无 headers 的本地请求放行（冒烟测试兼容）");
+const propsRef = PropertiesService.getScriptProperties();
+propsRef.setProperty("mb_webhook_secret_active", "1");
+ok(guardWebhook({ headers: { "X-Telegram-Bot-Api-Secret-Token": wsec } }) === true,
+  "★ 密钥正确时放行");
+ok(guardWebhook({ headers: { "x-telegram-bot-api-secret-token": "forged" } }) === false,
+  "★ 伪造密钥的请求被拒绝（防 owner 提权）");
+ok(guardWebhook({ headers: { Host: "script.google.com" } }) === false,
+  "★ 不带密钥头的请求被拒绝");
+propsRef.deleteProperty("mb_webhook_secret_active");
+
+/* ============================================================ */
+section("㉝ 2026-11 新增能力（原生动画 / 投票 / 编码 / 接口体检）");
+
+const NEW_CMDS = [
+  "slot", "darts", "bowl", "basket", "goal", "8ball", "choose", "gift",
+  "encode", "poll", "topic", "apicheck",
+];
+NEW_CMDS.forEach((c) => {
+  ok(!!findCommand(c), "★ /" + c + " 已注册进 COMMANDS");
+});
+ok(!!findCommand("apicheck") && findCommand("apicheck").level === "owner",
+  "★ /apicheck 是 owner 级（避免被刷接口）");
+ok(!!findCommand("topic") && findCommand("topic").level === "admin",
+  "★ /topic 是 admin 级");
+
+/* 所有指令都必须有英文 desc，避免英文模式回落中文 */
+const missingEn = COMMANDS.filter((c) => !I18N_CMD_EN[c.cmd] || !I18N_CMD_EN[c.cmd].desc)
+  .map((c) => c.cmd);
+ok(missingEn.length === 0, "★ 全部指令都有英文描述（i18n 无遗漏）", missingEn.join(","));
+
+/* /dice 改用 Telegram 原生动画 */
+resetCalls();
+post(mkUpdate("/dice", { chatType: "private" }));
+ok(callsOf("sendDice").length === 1, "★ /dice 走原生 sendDice 动画");
+ok(callsOf("sendDice")[0].body.emoji === "🎲", "★ /dice emoji 正确");
+resetCalls();
+post(mkUpdate("/slot", { chatType: "private" }));
+ok(callsOf("sendDice").length === 1 && callsOf("sendDice")[0].body.emoji === "🎰",
+  "★ /slot 发送老虎机动画");
+
+/* /poll 参数解析 */
+resetCalls();
+post(mkUpdate("/poll 今晚吃什么 | 火锅 | 烧烤", { chatType: "private" }));
+const pollCall = lastOf("sendPoll");
+ok(!!pollCall, "★ /poll 调用了 sendPoll");
+ok(pollCall && pollCall.body.question === "今晚吃什么" && pollCall.body.options.length === 2,
+  "★ /poll 问题与选项解析正确");
+resetCalls();
+post(mkUpdate("/poll 1+1=? | 2 | 3 --quiz 1", { chatType: "private" }));
+const quizCall = lastOf("sendPoll");
+ok(quizCall && quizCall.body.type === "quiz" && quizCall.body.correct_option_id === 0,
+  "★ /poll --quiz 正确项索引解析正确");
+
+/* /encode 往返 */
+const encOut = apiEncode("b64e 你好");
+const b64 = (String(encOut).match(/<code class=\"language-text\">([^<]*)<\/code>/) || [])[1] || "";
+ok(b64.length > 0, "★ /encode b64e 有输出");
+const decOut = String(apiEncode("b64d " + b64));
+ok(decOut.indexOf("你好") !== -1, "★ /encode b64d 能还原中文");
+ok(String(apiEncode("morse SOS")).indexOf("... --- ...") !== -1, "★ /encode morse 转换正确");
+
+/* 本地娱乐：确定性 & 不越界 */
+const b1 = String(apiEightBall("今天重构吗"));
+const b2 = String(apiEightBall("今天重构吗"));
+ok(b1 === b2 && b1.indexOf("答案之书") !== -1, "★ /8ball 同一天同一问题答案稳定");
+const ch = String(apiChoose("火锅 烧烤 日料"));
+ok(/火锅|烧烤|日料/.test(ch), "★ /choose 结果来自候选项");
+ok(String(apiChoose("")).indexOf("用法") !== -1, "★ /choose 缺参数给用法提示");
+
+/* /apicheck 输出体检报告（mock 下全部不可达，但不该抛异常） */
+let checkOut = "";
+try { checkOut = String(apiCheck()); } catch (e) { checkOut = "ERR:" + e.message; }
+ok(checkOut.indexOf("ERR") === -1, "★ /apicheck 不抛异常", checkOut.slice(0, 80));
+ok(checkOut.indexOf("接口体检报告") !== -1, "★ /apicheck 输出报告卡片");
+ok(API_PROBES.length >= 10, "★ 体检覆盖全部主要外部端点", "数量=" + API_PROBES.length);
+
+/* HTTP 超时：普通接口 8s，AI 单独 60s */
+resetCalls();
+httpText("https://example.com/probe");
+const extFetch = EXT_CALLS[EXT_CALLS.length - 1];
+ok(extFetch && typeof extFetch === "object", "★ httpText 正常发出请求");
+ok(cfg("http.timeoutSeconds", 8) === 8 && cfg("ai.timeoutSeconds", 60) === 60,
+  "★ 普通接口与 AI 使用不同超时");
+
+/* ============================================================ */
 console.log("\n" + "=".repeat(46));
 console.log("通过 " + PASS + " 项，失败 " + FAIL + " 项");
 console.log("=".repeat(46));

@@ -35,7 +35,10 @@ function httpText(url, opts) {
     var res = UrlFetchApp.fetch(url, {
       muteHttpExceptions: true,
       followRedirects: true,
-      validateHttpsCertificates: false,
+      // ⭐ timeoutSeconds 官方默认 360s（= 整个脚本上限）。一个外部接口挂掉
+      //    就能把 doPost 拖到 Telegram 判超时重推，必须显式压到 8 秒。
+      timeoutSeconds: cfg("http.timeoutSeconds", 8),
+      validateHttpsCertificates: cfg("http.strictTls", false),
       headers: o.headers || { "User-Agent": "Mozilla/5.0 (compatible; MaoBot/2.0)" },
     });
     var code = res.getResponseCode();
@@ -67,7 +70,8 @@ function httpPostJson(url, body, opts) {
       payload: JSON.stringify(body || {}),
       muteHttpExceptions: true,
       followRedirects: true,
-      validateHttpsCertificates: false,
+      timeoutSeconds: cfg("http.timeoutSeconds", 8),
+      validateHttpsCertificates: cfg("http.strictTls", false),
       headers: o.headers || {},
     });
     var code = res.getResponseCode();
@@ -98,7 +102,10 @@ function httpCallEx(url, opts) {
       method: o.method || "get",
       muteHttpExceptions: true,
       followRedirects: true,
-      validateHttpsCertificates: false,
+      // AI 推理慢，调用方可通过 opts.timeoutSeconds 覆盖（默认仍是 8s 的快超时）
+      timeoutSeconds:
+        o.timeoutSeconds !== undefined ? o.timeoutSeconds : cfg("http.timeoutSeconds", 8),
+      validateHttpsCertificates: cfg("http.strictTls", false),
       headers: o.headers || {},
     };
     if (o.contentType) params.contentType = o.contentType;
@@ -130,6 +137,7 @@ function httpPostJsonEx(url, body, opts) {
     contentType: "application/json",
     payload: JSON.stringify(body || {}),
     headers: o.headers || {},
+    timeoutSeconds: o.timeoutSeconds,
   });
 }
 
@@ -281,16 +289,21 @@ function apiDujitang() {
 }
 
 /* ----------------------------------------------------------------------------
- * 三、热榜（imsyy 主源 + vvhan 备源）
+ * 三、热榜（imsyy 主源 + 60s 备源 + vvhan 末位兜底）
+ *
+ * ⭐ 2026-11-06 实测：imsyy / vvhan 在当前网络下 TLS 握手直接失败（已下线或需密钥），
+ *    而 60s 开源项目（https://github.com/vikiboss/60s）的 /v2/<平台> 正常返回
+ *    { code:200, data:[{title, hot_value, link}] }。故把它提为第二数据源。
+ *    发 /apicheck 可在 GAS 服务器侧复测三者的真实可用性。
  * --------------------------------------------------------------------------*/
 
 var HOT_PLATFORMS = {
-  weibo: { name: "微博热搜", imsyy: "weibo", vvhan: "wbHot" },
-  zhihu: { name: "知乎热榜", imsyy: "zhihu", vvhan: "zhihuHot" },
-  baidu: { name: "百度热搜", imsyy: "baidu", vvhan: "baiduRD" },
-  bilibili: { name: "B站热门", imsyy: "bilibili", vvhan: "bili" },
-  douyin: { name: "抖音热点", imsyy: "douyin", vvhan: "douyinHot" },
-  toutiao: { name: "头条热榜", imsyy: "toutiao", vvhan: "" },
+  weibo: { name: "微博热搜", imsyy: "weibo", s60: "weibo", vvhan: "wbHot" },
+  zhihu: { name: "知乎热榜", imsyy: "zhihu", s60: "zhihu", vvhan: "zhihuHot" },
+  baidu: { name: "百度热搜", imsyy: "baidu", s60: "baidu", vvhan: "baiduRD" },
+  bilibili: { name: "B站热门", imsyy: "bilibili", s60: "bili", vvhan: "bili" },
+  douyin: { name: "抖音热点", imsyy: "douyin", s60: "douyin", vvhan: "douyinHot" },
+  toutiao: { name: "头条热榜", imsyy: "toutiao", s60: "toutiao", vvhan: "" },
   ithub: { name: "IT之家", imsyy: "ithome", vvhan: "itInfo" },
   sspai: { name: "少数派", imsyy: "sspai", vvhan: "ssPai" },
   juejin: { name: "掘金", imsyy: "juejin", vvhan: "" },
@@ -365,7 +378,37 @@ function apiHot(platform, page) {
     }
   }
 
-  // ---- 源 2：vvhan（可能需密钥，作为容错）----
+  // ---- 源 2：60s 开源热榜 API（2026-11-06 实测可用）----
+  if (meta.s60) {
+    var s = httpJson("https://60s.viki.moe/v2/" + meta.s60);
+    if (s && (s.code === 200 || s.code === "200") && Array.isArray(s.data) && s.data.length) {
+      items = s.data.map(function (el) {
+        var hot = el.hot_value
+          ? " <code>" + esc(clip(String(el.hot_value), 12)) + "</code>"
+          : "";
+        var title = clip(String(el.title || ""), 60);
+        return (el.link ? aLink(el.link, title) : esc(title)) + hot;
+      });
+      var pgS = paginate(items, page, 10);
+      return {
+        text: uiCard({
+          icon: "🔥",
+          title: meta.name,
+          subtitle: "共 " + pgS.total + " 条 · 第 " + (pgS.page + 1) + "/" + pgS.totalPages + " 页",
+          body: pgS.slice.map(function (t, i) {
+            return uiItem(t, pgS.page * 10 + i + 1);
+          }),
+          footer: uiSource("60s 开源热榜 API"),
+        }),
+        markup: kb([
+          pagerRow(["hot", key], pgS.page, pgS.totalPages),
+          [btn("🔄 刷新", ["hot", key, "p", pgS.page])],
+        ]),
+      };
+    }
+  }
+
+  // ---- 源 3：vvhan（历史上已下线并要求密钥，仅作末位兜底）----
   if (meta.vvhan) {
     var v = httpJson("https://api.vvhan.com/api/hotlist/" + meta.vvhan);
     if (v && v.success && Array.isArray(v.data) && v.data.length) {
@@ -673,12 +716,21 @@ function apiPhone(phone) {
   }
 
   var prefix3 = p.slice(0, 3);
-  var prefix4 = parseInt(p.slice(0, 4), 10);
+  var prefix4 = p.slice(0, 4);
 
+  /** 3 位号段未命中时，用 4 位前缀兜一次（主要是 17x 虚拟运营商） */
   function carrier() {
-    // 号段归属会随时间调整，这里用"区间判定 + 常见前缀兜底"
-    if (/^17[0-9]$|^14[0-9]$|^16[0-9]$/.test(prefix3.slice(0, 2) + "0")) return null;
-    return null;
+    var mvno = {
+      "1700": "中国电信 · 虚拟运营商", "1701": "中国电信 · 虚拟运营商",
+      "1702": "中国电信 · 虚拟运营商",
+      "1703": "中国移动 · 虚拟运营商", "1704": "中国移动 · 虚拟运营商",
+      "1705": "中国移动 · 虚拟运营商", "1706": "中国移动 · 虚拟运营商",
+      "1707": "中国联通 · 虚拟运营商", "1708": "中国联通 · 虚拟运营商",
+      "1709": "中国联通 · 虚拟运营商", "1710": "中国联通 · 虚拟运营商",
+      "1711": "中国联通 · 虚拟运营商", "1718": "中国联通 · 虚拟运营商",
+      "1719": "中国联通 · 虚拟运营商",
+    };
+    return mvno[prefix4] || null;
   }
 
   var map = {
@@ -697,7 +749,7 @@ function apiPhone(phone) {
     "190": "中国电信", "191": "中国电信", "193": "中国电信", "199": "中国电信",
     "192": "中国广电", "162": "中国联通", "165": "中国移动", "167": "中国联通",
   };
-  var c = map[prefix3] || carrier() || "未知运营商";
+  var c = map[prefix3] || carrier() || "未知运营商（新号段）";
 
   return uiCard({
     icon: "📱",
@@ -709,5 +761,388 @@ function apiPhone(phone) {
       "",
       "<i>归属地精确到市需要付费接口，本项目未内置（原版使用的免费接口已失效且需自备密钥）。</i>",
     ],
+  });
+}
+
+/* ============================================================================
+ * 十、2026-11 新增能力（对照 Bot API 10.3 / 2026-08-24）
+ *
+ *  设计原则：
+ *    · 优先用 Telegram 原生能力（动画、投票、话题、礼物），不依赖第三方小站；
+ *    · 第三方接口一律走故障转移，挂了要有明确降级而不是「服务不可用」；
+ *    · 娱乐类尽量零外部依赖，永不失效；
+ *    · 新增的 /apicheck 把「接口到底还能不能用」变成一条指令的事。
+ * ==========================================================================*/
+
+/* ---- 10.1 原生动画骰子（sendDice）-------------------------------------- */
+
+var NATIVE_DICE_EMOJI = {
+  dice: { emoji: "🎲", max: 6, label: "掷骰子" },
+  darts: { emoji: "🎯", max: 6, label: "掷飞镖" },
+  bowl: { emoji: "🎳", max: 6, label: "保龄球" },
+  basket: { emoji: "🏀", max: 5, label: "投篮" },
+  goal: { emoji: "⚽", max: 5, label: "点球" },
+  slot: { emoji: "🎰", max: 64, label: "老虎机" },
+};
+
+/**
+ * Telegram 原生动画骰子：结果由 Telegram 服务端生成、带动画、无法伪造，
+ * 比原来的本地纯文本「点数：4」有意思得多。不可用时自动降级为文字。
+ */
+function apiNativeDice(ctx, kind) {
+  var meta = NATIVE_DICE_EMOJI[String(kind || "dice")] || NATIVE_DICE_EMOJI.dice;
+  var payload = { chat_id: ctx.chatId, emoji: meta.emoji };
+  if (ctx.threadId) payload.message_thread_id = ctx.threadId;
+
+  var sent = tg("sendDice", payload, { silent: true });
+  if (sent) return null; // 已由 Telegram 自己发出，deliverResult 收到 null 不再补发
+
+  var n = randInt(1, meta.max);
+  return uiCard({
+    icon: meta.emoji,
+    title: L(meta.label + "（本地模拟）", meta.label),
+    body: ["<b>点数：" + n + "</b>", "", "<i>原生动画不可用，已降级为文字结果。</i>"],
+  });
+}
+
+/* ---- 10.2 纯本地娱乐（零外部依赖）-------------------------------------- */
+
+/* ⚠️ 存 [中,英] 原文对，不要在这里直接调 L()：
+ *    顶层 var 在文件加载时求值，那时 __CUR_LANG__ 恒为中文，英文模式会失效。 */
+var EIGHT_BALL_ANSWERS = [
+  ["毫无疑问，去做吧。", "Yes, definitely."],
+  ["时机正好，别犹豫。", "The timing is right — go for it."],
+  ["大概率可行，但先想清楚退路。", "Likely, but plan your exit first."],
+  ["迹象不错。", "Signs point to yes."],
+  ["现在别问，先去睡一觉。", "Ask again after some sleep."],
+  ["信息还不够，再查查。", "Not enough information yet."],
+  ["换个思路会更好。", "Try a different angle."],
+  ["别抱太大期望。", "Don't count on it."],
+  ["风险偏高，建议缓一缓。", "Too risky — wait."],
+  ["我的答案是不。", "My answer is no."],
+];
+
+/** 答案之书：同一个问题同一天答案稳定，避免反复刷指令刷出想要的答案 */
+function apiEightBall(args) {
+  var q = String(args || "").trim();
+  if (!q) {
+    return uiUsage("/8ball", "/8ball <你犹豫的问题>", ["/8ball 今天适合重构吗"]);
+  }
+  var h = Math.abs(hashSeed(q + todayStr()));
+  var pair = EIGHT_BALL_ANSWERS[h % EIGHT_BALL_ANSWERS.length];
+  var answer = L(pair[0], pair[1]);
+  return uiCard({
+    icon: "🎱",
+    title: L("答案之书", "Magic 8-Ball"),
+    subtitle: clip(esc(q), 42),
+    body: [uiQuote(answer), "", "<i>" + L("同一个问题当天答案固定，仅供娱乐。", "Same question, same answer for the day. Just for fun.") + "</i>"],
+    footer: L("纯本地生成，不发送任何内容到外部", "Generated locally, nothing is sent anywhere"),
+  });
+}
+
+/** 选择困难症救星 */
+function apiChoose(args) {
+  var parts = String(args || "")
+    .split(/[|｜,，、\s]+/)
+    .map(function (x) { return x.trim(); })
+    .filter(Boolean);
+  if (parts.length < 2) {
+    return uiUsage("/choose", "/choose <选项A> <选项B> [更多…]", ["/choose 火锅 烧烤 日料"]);
+  }
+  if (parts.length > 20) parts = parts.slice(0, 20);
+  var picked = pickOne(parts);
+  return uiCard({
+    icon: "🤔",
+    title: L("帮你选好了", "Let me decide"),
+    subtitle: L("共 " + parts.length + " 个选项", parts.length + " choices"),
+    body: ["<b>👉 " + esc(picked) + "</b>", "", uiKV(L("候选", "Options"), esc(parts.join(" / ")))],
+    footer: L("别纠结了，就它吧", "Stop overthinking. Go."),
+  });
+}
+
+/* ---- 10.3 编码小工具（零外部依赖）-------------------------------------- */
+
+var MORSE_TABLE = {
+  A: ".-", B: "-...", C: "-.-.", D: "-..", E: ".", F: "..-.", G: "--.",
+  H: "....", I: "..", J: ".---", K: "-.-", L: ".-..", M: "--", N: "-.",
+  O: "---", P: ".--.", Q: "--.-", R: ".-.", S: "...", T: "-", U: "..-",
+  V: "...-", W: ".--", X: "-..-", Y: "-.--", Z: "--..",
+  "0": "-----", "1": ".----", "2": "..---", "3": "...--", "4": "....-",
+  "5": ".....", "6": "-....", "7": "--...", "8": "---..", "9": "----.",
+};
+
+function textToMorse(text) {
+  return String(text || "")
+    .toUpperCase()
+    .split("")
+    .map(function (ch) {
+      if (ch === " ") return "/";
+      return MORSE_TABLE[ch] || "";
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
+function apiEncode(args) {
+  var s = String(args || "").trim();
+  var m = s.match(/^(b64e|b64d|url|unurl|morse|rev)\s+([\s\S]+)$/i);
+  if (!m) {
+    return uiUsage(
+      "/encode",
+      "/encode <b64e|b64d|url|unurl|morse|rev> <文本>",
+      ["/encode b64e 你好", "/encode morse SOS", "/encode url a b&c"]
+    );
+  }
+  var op = m[1].toLowerCase();
+  var v = m[2];
+  var out = "";
+  try {
+    if (op === "b64e") {
+      out = Utilities.base64Encode(Utilities.newBlob(v).getBytes());
+    } else if (op === "b64d") {
+      out = Utilities.newBlob(Utilities.base64Decode(v)).getDataAsString();
+    } else if (op === "url") {
+      out = encodeURIComponent(v);
+    } else if (op === "unurl") {
+      out = decodeURIComponent(v);
+    } else if (op === "morse") {
+      out = textToMorse(v) || L("（没有可转换的字符，仅支持 A-Z / 0-9）", "(only A-Z / 0-9 supported)");
+    } else {
+      out = v.split("").reverse().join("");
+    }
+  } catch (e) {
+    return uiFail(L("转换失败", "Conversion failed"), [esc(String(e.message || e))]);
+  }
+  return uiCard({
+    icon: "🔡",
+    title: L("编码 / 转换", "Encode / Decode"),
+    subtitle: uiMono(op),
+    body: [uiCode(clip(out, 1200), "text")],
+    footer: L("纯本地计算，不上传任何内容", "Computed locally, uploaded to nowhere"),
+  });
+}
+
+/* ---- 10.4 原生投票（sendPoll，Bot API 10.0 起支持 members_only）--------- */
+
+function apiPoll(ctx, args) {
+  var raw = String(args || "").trim();
+  if (!raw) {
+    return uiUsage(
+      "/poll",
+      "/poll <问题> | <选项A> | <选项B> [| 更多] [--public] [--quiz 正确项序号] [--members]",
+      ["/poll 今晚吃什么 | 火锅 | 烧烤 | 日料", "/poll 1+1=? | 2 | 3 --quiz 1"]
+    );
+  }
+  var isQuiz = /--quiz/i.test(raw);
+  var membersOnly = /--members/i.test(raw);
+  var anonymous = !/--public/i.test(raw);
+  var qm = raw.match(/--quiz\s+(\d+)/i);
+  var correct = qm ? Number(qm[1]) - 1 : -1;
+
+  var body = raw.replace(/--[a-z]+\s*\d*/gi, "").trim();
+  var parts = body.split(/\s*[|｜]\s*/).map(function (x) { return x.trim(); }).filter(Boolean);
+  if (parts.length < 3) {
+    return uiWarn(L("至少需要一个问题和两个选项", "Need a question and at least two options"), [
+      L("示例：/poll 今晚吃什么 | 火锅 | 烧烤", "e.g. /poll Dinner? | Pizza | Sushi"),
+    ]);
+  }
+
+  var p = {
+    chat_id: ctx.chatId,
+    question: clip(parts[0], 300),
+    options: parts.slice(1, 11).map(function (x) { return clip(x, 100); }),
+    is_anonymous: anonymous,
+    type: isQuiz ? "quiz" : "regular",
+  };
+  if (isQuiz && correct >= 0 && correct < p.options.length) p.correct_option_id = correct;
+  if (membersOnly) p.members_only = true; // Bot API 10.0+
+  if (ctx.threadId) p.message_thread_id = ctx.threadId;
+
+  var r = tg("sendPoll", p, { silent: true });
+  if (r) return null;
+  return uiFail(L("投票发送失败", "Failed to send poll"), [
+    L("请确认机器人在群里、且有发送投票的权限。", "Make sure the bot is in the chat and allowed to send polls."),
+  ]);
+}
+
+/* ---- 10.5 论坛话题管理（Bot API 6.3+）---------------------------------- */
+
+function apiTopic(ctx, args) {
+  if (!ctx.isGroup) return uiWarn(L("该指令仅在群聊中可用", "Group only"));
+  var s = String(args || "").trim();
+  var m = s.match(/^(new|create|close|reopen|del|delete)\s*([\s\S]*)$/i);
+  if (!m) {
+    return uiUsage(
+      "/topic",
+      "/topic new <话题名> ｜ /topic close|reopen|del [话题ID]",
+      ["/topic new 资源分享", "/topic close 128"]
+    );
+  }
+  var op = m[1].toLowerCase();
+  var rest = String(m[2] || "").trim();
+  var chatId = ctx.chatId;
+
+  if (op === "new" || op === "create") {
+    if (!rest) return uiUsage("/topic", "/topic new <话题名>", ["/topic new 资源分享"]);
+    var created = tg("createForumTopic", { chat_id: chatId, name: clip(rest, 128) }, { silent: true });
+    if (!created) return uiFail(L("话题创建失败", "Failed to create topic"), [
+      L("请确认：① 是超级群且开启了「话题」；② 机器人是管理员且有管理话题权限。",
+        "Need a forum-enabled supergroup and an admin bot with topic rights."),
+    ]);
+    return uiCard({
+      icon: "🗂",
+      title: L("话题已创建", "Topic created"),
+      body: [uiKV(L("名称", "Name"), esc(rest)), uiKV(L("话题 ID", "Thread ID"), String(created.message_thread_id))],
+    });
+  }
+
+  var tid = Number((rest.match(/\d+/) || [])[0] || ctx.threadId || 0);
+  if (!tid) {
+    return uiUsage("/topic", "/topic close|reopen|del <话题ID>（或直接在话题里发指令）", ["/topic close 128"]);
+  }
+  var method = op === "close" ? "closeForumTopic" : op === "reopen" ? "reopenForumTopic" : "deleteForumTopic";
+  var ok = tg(method, { chat_id: chatId, message_thread_id: tid }, { silent: true });
+  if (!ok) {
+    return uiFail(L("操作失败", "Operation failed"), [
+      L("话题可能不存在，或机器人缺少「管理话题」权限。", "Topic not found, or bot lacks topic management rights."),
+    ]);
+  }
+  var labels = { close: L("已关闭", "Closed"), reopen: L("已重新开启", "Reopened"), del: L("已删除", "Deleted"), delete: L("已删除", "Deleted") };
+  return uiCard({
+    icon: "🗂",
+    title: L("话题操作完成", "Topic updated"),
+    body: [uiKV(L("话题 ID", "Thread ID"), String(tid)), uiKV(L("状态", "Status"), labels[op] || L("完成", "Done"))],
+  });
+}
+
+/* ---- 10.6 Telegram 礼物清单（getAvailableGifts，只读、不产生费用）-------- */
+
+function apiGifts() {
+  var r = tg("getAvailableGifts", {}, { silent: true });
+  var gifts = r && r.gifts ? r.gifts : [];
+  if (!gifts.length) {
+    return uiWarn(L("暂时没有可赠送的礼物", "No gifts available right now"), [
+      L("该接口需要 Bot API 8.0+，且礼物会随活动上下架。", "Requires Bot API 8.0+; gifts rotate with campaigns."),
+    ]);
+  }
+  return uiCard({
+    icon: "🎁",
+    title: L("当前可用的 Telegram 礼物", "Available Telegram Gifts"),
+    subtitle: L("共 " + gifts.length + " 款 · 仅展示，不产生任何费用", gifts.length + " items · read-only"),
+    body: gifts.slice(0, 12).map(function (g) {
+      return uiItem(
+        uiMono(clip(String(g.id || "?"), 28)) +
+          " · ⭐" + esc(String(g.star_count == null ? "?" : g.star_count))
+      );
+    }),
+    footer: L("发送礼物需消耗 Telegram Stars，本指令只做查询", "Sending gifts costs Stars; this only lists them"),
+  });
+}
+
+/* ---- 10.7 外部接口体检（/apicheck，仅 Bot 主人）------------------------- */
+
+var API_PROBES = [
+  { name: "天气 · wttr.in", url: "https://wttr.in/Beijing?format=j1", needle: "current_condition" },
+  { name: "天气备 · 爱思路", url: "https://query.asilu.com/weather/baidu/?city=beijing", needle: "" },
+  { name: "一言 · hitokoto", url: "https://v1.hitokoto.cn/?encode=json", needle: "hitokoto" },
+  { name: "情话 · uomg", url: "https://api.uomg.com/api/rand.qinghua?format=json", needle: "" },
+  { name: "毒鸡汤 · btstu", url: "https://api.btstu.cn/yan/api.php?charset=utf-8&encode=text", needle: "" },
+  { name: "热榜主 · imsyy", url: "https://api-hot.imsyy.top/weibo", needle: "" },
+  { name: "热榜备 · 60s", url: "https://60s.viki.moe/v2/weibo", needle: "code" },
+  { name: "热榜末 · vvhan", url: "https://api.vvhan.com/api/hotlist/wbHot", needle: "" },
+  { name: "短链 · is.gd", url: "https://is.gd/create.php?format=simple&url=https%3A%2F%2Fexample.com", needle: "" },
+  { name: "短链备 · v.gd", url: "https://v.gd/create.php?format=simple&url=https%3A%2F%2Fexample.com", needle: "" },
+  { name: "IP · ip-api", url: "http://ip-api.com/json/8.8.8.8?lang=zh-CN", needle: "status" },
+  { name: "翻译 · MyMemory", url: "https://api.mymemory.translated.net/get?q=hi&langpair=en%7Czh", needle: "responseData" },
+  { name: "二维码 · qrserver", url: "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=t", needle: "" },
+  { name: "随机图 · picsum", url: "https://picsum.photos/seed/t/100/60", needle: "" },
+];
+
+/** 并发探测全部外部端点（GAS fetchAll 一次发出，避免 14 次串行把 webhook 拖死） */
+function apiProbe() {
+  var timeout = cfg("apicheck.timeoutSeconds", 6);
+  var reqs = API_PROBES.map(function (p) {
+    return {
+      url: p.url,
+      muteHttpExceptions: true,
+      followRedirects: true,
+      timeoutSeconds: timeout,
+      validateHttpsCertificates: cfg("http.strictTls", false),
+    };
+  });
+
+  var t0 = Date.now();
+  var responses = null;
+  try {
+    if (typeof UrlFetchApp.fetchAll === "function") responses = UrlFetchApp.fetchAll(reqs);
+  } catch (e) {
+    responses = null;
+  }
+  // 老环境 / 本地 mock 没有 fetchAll 时顺序降级
+  if (!responses) {
+    responses = reqs.map(function (r) {
+      return httpCallEx(r.url, r);
+    });
+    return API_PROBES.map(function (p, i) {
+      var x = responses[i] || {};
+      var ok = !!x.ok && (!p.needle || String(x.text || "").indexOf(p.needle) !== -1);
+      return { name: p.name, ok: ok, code: x.code || 0, ms: Date.now() - t0 };
+    });
+  }
+
+  var total = Date.now() - t0;
+  return API_PROBES.map(function (p, i) {
+    var code = 0;
+    var text = "";
+    try {
+      code = responses[i].getResponseCode();
+      text = responses[i].getContentText() || "";
+    } catch (e) {
+      code = 0;
+    }
+    var ok = code >= 200 && code < 400 && (!p.needle || text.indexOf(p.needle) !== -1);
+    return { name: p.name, ok: ok, code: code, ms: total };
+  });
+}
+
+/** /apicheck —— 在 GAS 服务器侧实测「接口到底还能不能用」 */
+function apiCheck() {
+  var rows = apiProbe();
+  var good = rows.filter(function (r) { return r.ok; }).length;
+
+  var me = null;
+  try { me = tgGetMe(); } catch (e) {}
+  var caps = [
+    L("富消息", "Rich") + " " + (tgCapOk("rich") ? "✅" : "⛔"),
+    L("草稿", "Draft") + " " + (tgCapOk("draft") ? "✅" : "⛔"),
+    L("临时消息", "Ephemeral") + " " + (tgCapOk("ephemeral") ? "✅" : "⛔"),
+  ].join(" · ");
+
+  var body = [
+    uiSection(L("外部接口", "External endpoints"), "🌐"),
+    "",
+  ].concat(rows.map(function (r) {
+    return uiItem(
+      (r.ok ? "✅ " : "❌ ") + esc(r.name) +
+        "  <code>" + (r.code || "—") + "</code>" +
+        (r.ok ? "" : "  <i>" + L("不可达", "unreachable") + "</i>")
+    );
+  }));
+  body.push("");
+  body.push(uiSection(L("Bot API 能力", "Bot API capabilities"), "🤖"));
+  body.push(uiKV(L("机器人", "Bot"), me ? "@" + String(me.username || me.first_name || "") : L("不可达", "unreachable")));
+  body.push(uiKV(L("基准版本", "Baseline"), "10.3 (2026-08-24)"));
+  body.push(uiKV(L("能力探测", "Probed"), caps));
+  body.push(uiKV(L("Webhook 校验", "Webhook guard"), cfg("security.webhookSecret", true) ? L("已开启", "on") : L("已关闭", "off")));
+
+  return uiCard({
+    status: good === rows.length ? "ok" : "warn",
+    icon: "🩺",
+    title: L("接口体检报告", "API Health Check"),
+    subtitle: L("可用 " + good + " / " + rows.length + " · 耗时约 " + (rows[0] ? rows[0].ms : 0) + " ms",
+      good + "/" + rows.length + " reachable · " + (rows[0] ? rows[0].ms : 0) + " ms"),
+    body: body,
+    footer: L("结果来自 GAS 服务器网络，与本地网络可能不同；失效项会自动走故障转移。",
+      "Probed from GAS servers; results may differ from your local network."),
   });
 }

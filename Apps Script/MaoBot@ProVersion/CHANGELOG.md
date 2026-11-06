@@ -1,7 +1,62 @@
 # 📝 MaoBot · ProVersion 更新日志（Changelog）
 
-> 版本说明：这里的日期是「能力落地的日期」，不是 Google Apps Script 的部署版本号（GAS 部署版本号是 `@数字`，当前线上为 `@814`）。
+> 版本说明：这里的日期是「能力落地的日期」，不是 Google Apps Script 的部署版本号（GAS 部署版本号是 `@数字`，当前线上为 `@815`）。
 > 每次改完代码都要 `bash Tools/push.sh --deploy` 才会生成新的 `@版本` 并真正生效。
+
+---
+
+## 2026-11-06 · 入群欢迎修复 + API 审计 + 新功能
+
+> 当前线上为 `@814` 之后（本次重新部署会生成新版本）。规模同步更新为：15 个模块（含 Secrets.gs）· 约 12655 行 · 408 项冒烟测试全绿 · 537 处顶层声明 0 重复。
+
+### 🐞 核心修复：审核通过入群不发欢迎语
+- **根因**：Telegram 在「需审核的公开群、隐藏成员大群」场景下**不保证**下发 `new_chat_members` 服务消息；可靠通道是 `chat_member` 更新（`left → member`，且 `via_join_request=true`）。本 Bot 的 `setWebhook` 订阅了 `chat_member`，但 `handleUpdate()` 里**根本没有分发分支**，导致这类入群被静默丢弃。
+- **修复**：
+  1. `handleUpdate()` 新增 `chat_member` 分支 → `handleChatMemberUpdate()`；
+  2. 入群欢迎/入群验证改为**双通道**：`new_chat_members`（普通入群）与 `chat_member`（审核/隐藏成员入群）都会触发，并用 `chatId:userId` 缓存做 **30 分钟去重**，避免重复欢迎；
+  3. 自入群（机器人被拉进群）改在 `chat_member` 通道处理（`via_join_request`/自己加入都覆盖），`new_chat_members` 不再承担机器人自入群判断；
+  4. 新增 `getChatMemberSafe()` 兜底（无 `getChatMemberCount` 时回退到 `getChatAdministrators` 计数），避免隐藏成员群取人数时报错；
+  5. 欢迎语支持 `{name}/{chat}/{count}` 占位符，并清理注入字符。
+- **注意**：`chat_member` 仅在机器人是群管理员时才下发。若不加 Bot 为管理员，审核入群仍不会触发（这是 Telegram 限制，非代码问题）。
+
+### 🔒 安全加固：Webhook 来源校验
+- 匿名 `/exec` 端点 + 无签名校验，理论上可被伪造 owner 指令。新增 `WEBHOOK_SECRET_TOKEN`（存 `Params.gs`，默认随机生成一次）：`setupWebhook()` 调 `setWebhook` 时带上 `secret_token`；`doPost` 校验请求头 `X-Telegram-Bot-Api-Secret-Token`，不匹配直接返回 200 空响应（避免伪造 update 触发逻辑）。自动启用，不影响现有部署。
+
+### 🧰 缺陷修补（审计确认的确定性 bug）
+- `uiKV` 改用 `esc()` 转义，修复群名/昵称含 `<` 时消息发送失败；
+- `sendStorage` 群聊链接在 `-100` 私有群回退到 `tg://chat?chat_id=`，不再生成无效 `t.me/+chatId` 链接（此前会 404）；
+- `getDFA` 改用 `cacheDrop` 命名空间失效（原本调不存在的 `cacheDropCache()`），敏感词/违禁词缓存真正刷新；
+- `handleJoin` 退群提示默认值（`left`）从 `welcome.enabled` 误读改为 `cfg("welcome.leftEnabled")`；
+- `/menu` 标题字符串拼接 bug（`BRAND.name || "Bot" + " 功能面板"` 优先级错误）修正；
+- 删除 `Api.gs` 中 `carrier()` 死逻辑（永远返回 `null`，掩盖号段归属）；
+- 全局 HTTP 超时：所有 `UrlFetchApp` 调用加 `timeoutSeconds`（普通 8s、AI 推理 30s），避免外部接口挂掉拖死整个 webhook（GAS 默认 360s）。
+
+### 🔧 维护：热榜接口迁移
+- 原热榜备源 `vvhan` 已彻底不可达；主源 `api-hot.imsyy.top` 也不稳定。改用 **`60s.viki.moe`** 作为主源，覆盖 微博/知乎/百度/B站/抖音/头条/微信/网易/36氪/IT之家，并附 `vvhan`/`imsyy` 备源回退。实测可用。
+
+### ✨ 新增功能（实用 + 娱乐）
+- **`/apicheck`**（owner）：一键体检全部外部端点（天气/一言/热榜/短链/IP/二维码/翻译/AI 等），输出哪些可用、哪些挂了，方便排障。
+- **`/topic <标题>`**（admin，仅超级群）：用 `createForumTopic` 快速建话题。
+- **`/poll <问题> ~选项1 ~选项2 [--quiz 正确答案序号]`**：发投票/测验（原生 `sendPoll`，支持匿名/多选/测验）。
+- **`/slot` / `/darts` / `/bowl` / `/goal`**（娱乐）：原生 `sendDice` 动画（老虎机/飞镖/保龄球/进球），无需外部接口。
+- **`/choose <项1> <项2> ...`**（娱乐）：帮做选择，同一天结果稳定。
+- **`/8ball <问题>`**（娱乐）：魔法八号球，按「问题+日期」稳定给出答案。
+- **`/encode <b64e|b64d|morse> <文本>`**（工具）：Base64 / 摩尔斯互转，无外部依赖。
+
+### 改动文件
+- `Modules/MaoBot.gs`：`handleUpdate` 加 `chat_member` 分支；`handleMyChatMember` 新增；`doPost` 加 secret token 校验；`sendStorage` 链接修复。
+- `Modules/Manage.gs`：`handleJoin`（双通道欢迎+验证+去重）、`getChatMemberSafe`、退群默认修复。
+- `Modules/Params.gs`：`welcome.leftEnabled`、新增 `webhook.secretToken`、热榜源迁移配置。
+- `Modules/Triggers.gs`：`setupWebhook` 写入 `secret_token`。
+- `Modules/UI.gs`：`uiKV` 改用 `esc()`。
+- `Modules/AI.gs` / `Api.gs`：HTTP 超时分级；热榜迁移；`carrier()` 死逻辑删除。
+- `Modules/Commands.gs` / `I18n.gs`：注册 9 个新指令 + 英文文案。
+- `Tests/gas-mock.js` / `Tests/smoke-test.js`：mock 加 `fetchAll`、新增 32 项测试（审核入群/新指令/API 体检/超时分级等）。
+
+### 验证
+- `node Tools/build.js` → 15 个模块、约 12655 行
+- `node Tests/check-dupes.js Modules` → 537 处顶格声明、无重复
+- `bash Tests/run.sh` → 408 项冒烟测试全绿
 
 ---
 

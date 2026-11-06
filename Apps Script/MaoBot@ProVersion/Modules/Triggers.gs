@@ -313,7 +313,15 @@ function setupWebhook(explicitUrl) {
     };
   }
 
-  var set = tgSetWebhook(r.url);
+  // ⭐ 绑定时带上 secret_token，让 Telegram 每个请求都附
+  //    X-Telegram-Bot-Api-Secret-Token；doPost 侧的 guardWebhook 会校验。
+  var secret = cfg("security.webhookSecret", true) ? webhookSecret() : "";
+  var set = tgSetWebhook(r.url, secret);
+  if (set && secret) {
+    try {
+      PropertiesService.getScriptProperties().setProperty("mb_webhook_secret_active", "1");
+    } catch (e) {}
+  }
   var info = tgGetWebhookInfo();
 
   var result = {
@@ -323,6 +331,7 @@ function setupWebhook(explicitUrl) {
     info: info,
     dev: r.dev || "",
     saved: saved,
+    secretActive: !!(set && secret),
     error: "",
   };
   if (!set) result.error = "Telegram 拒绝了本次绑定（请检查 BOTID / 网络）";

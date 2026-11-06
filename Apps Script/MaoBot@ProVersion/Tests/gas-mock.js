@@ -97,6 +97,12 @@ function mockResponse(text, code) {
 }
 
 const UrlFetchApp = {
+  /** GAS 官方支持并发批请求；mock 里顺序执行即可，语义一致 */
+  fetchAll(requests) {
+    return (requests || []).map((r) =>
+      typeof r === "string" ? this.fetch(r) : this.fetch(r.url, r)
+    );
+  },
   fetch(url, params) {
     const u = String(url);
     const opt = params || {};

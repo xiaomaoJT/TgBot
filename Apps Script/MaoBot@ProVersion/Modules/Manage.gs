@@ -18,7 +18,7 @@
 function chatSettingDefaults() {
   return {
     welcome: cfg("welcome.enabled", false) ? "on" : "off", // 入群欢迎
-    left: cfg("welcome.enabled", false) ? "on" : "off", // 退群提示
+    left: cfg("welcome.leftEnabled", cfg("welcome.enabled", false)) ? "on" : "off", // 退群提示（可独立开关）
     verify: cfg("verify.enabled", false) ? "on" : "off", // 入群验证
     antiflood: cfg("antiFlood.enabled", false) ? "on" : "off", // 反刷屏
     filter: "on", // 敏感词过滤
@@ -148,10 +148,24 @@ function buildDFA(words) {
   return root;
 }
 
-function getDFA() {
+/**
+ * ⭐ 性能修复：把 DFA 与「绝杀词表」一次性缓存成同一个模型。
+ * 原实现 getDFA() 有缓存，但 detectWords() 里每次都重新 getWordList("ban")
+ * 读整张敏感词表 + base64 解码，活跃群里每条消息都多一次表格读取。
+ * 复用已有的 "sensitiveWordsMap" 缓存键，所有 /word 失效点无需改动。
+ */
+function getSensitiveModel() {
   return cached("sensitiveWordsMap", cfg("cache.ttlSeconds", 10800), function () {
-    return buildDFA(getAllWords());
+    var banMap = {};
+    getWordList("ban").forEach(function (w) {
+      banMap[w.toLowerCase()] = true;
+    });
+    return { dfa: buildDFA(getAllWords()), banMap: banMap };
   });
+}
+
+function getDFA() {
+  return getSensitiveModel().dfa;
 }
 
 /** 需要跳过的干扰字符（防止 "广@告" 绕过） */
@@ -174,13 +188,10 @@ function detectWords(text) {
   var content = String(text || "");
   if (!content) return { words: [], hasBan: false };
 
-  var root = getDFA();
+  var model = getSensitiveModel();
+  var root = model.dfa;
+  var banMap = model.banMap || {};
   var ignore = ignoreCharMap();
-  var banList = getWordList("ban");
-  var banMap = {};
-  banList.forEach(function (w) {
-    banMap[w.toLowerCase()] = true;
-  });
 
   var found = [];
   var hasBan = false;
@@ -391,6 +402,69 @@ function antiFloodCheck(ctx) {
  * 五、入群 / 退群
  * ==========================================================================*/
 
+/**
+ * 入群事件去重（new_chat_members / chat_member 双通道共用）。
+ *
+ * Telegram 在「审核通过入群」等场景可能只发 chat_member，也可能两个都发；
+ * 加上 Telegram 自身会重推 update，所以需要一个短 TTL 的按「群+用户」去重。
+ * CacheService 没有原子 CAS，但 GAS 单请求串行 + 120s 窗口足以覆盖重推。
+ * 缓存不可用时宁可重复欢迎，也绝不漏发。
+ */
+function claimJoinEvent(chatId, userId) {
+  var key = "join:" + chatId + ":" + userId;
+  try {
+    // 去重属于正确性机制，不受「性能缓存开关」影响，始终走 CacheService
+    var store = cacheStore();
+    if (store.get(key)) return false;
+    store.put(key, "1", cfg("join.dedupeSeconds", 120));
+    return true;
+  } catch (e) {
+    return true;
+  }
+}
+
+/**
+ * 统一的「新成员入群」处理：欢迎 + 验证。
+ *
+ * ⭐ 修复：原实现里 verify 打开时直接 return，导致 welcome 永远发不出来。
+ *    现在两者可共存（默认都发），可用 welcome.withVerify=false 恢复旧行为。
+ *    欢迎文本里的 {name} 改为正确转义（原来是先把 <>& 删掉，昵称会变形）。
+ */
+function welcomeNewMembers(ctx, members, opts) {
+  var o = opts || {};
+  var humans = (members || []).filter(function (m) {
+    return m && !m.is_bot && m.id;
+  });
+  var names = humans
+    .map(function (m) {
+      return [m.first_name || "", m.last_name || ""].join("");
+    })
+    .filter(Boolean);
+  if (!names.length) return false;
+
+  var doVerify = isChatFeatureOn(ctx.chatId, "verify") && o.skipVerify !== true;
+  var doWelcome =
+    isChatFeatureOn(ctx.chatId, "welcome") &&
+    (!doVerify || cfg("welcome.withVerify", true));
+
+  if (doWelcome) {
+    var count = tgGetMemberCount(ctx.chatId);
+    var text = getChatSetting(ctx.chatId, "welcomeText", cfg("welcome.text", ""));
+    var rendered = String(text)
+      .replace(/\{name\}/g, esc(names.join("、")))
+      .replace(/\{chat\}/g, esc(ctx.chatTitle || ""))
+      .replace(/\{count\}/g, count === null ? "?" : String(count));
+    sendCard(ctx, rendered);
+  }
+
+  if (doVerify) {
+    humans.forEach(function (m) {
+      requestVerify(ctx, m);
+    });
+  }
+  return doWelcome || doVerify;
+}
+
 function handleJoin(ctx) {
   var members = get(ctx.message, "new_chat_members", []) || [];
   // 机器人自己加入群聊
@@ -412,44 +486,20 @@ function handleJoin(ctx) {
           uiItem("管理员发送 " + uiCmd("/manage") + " 打开管理面板"),
           "",
           "<i>建议把我设为管理员，否则无法执行封禁/禁言/删消息等操作。</i>",
+          "<i>⭐ 管理员审核入群也需要我保持管理员身份，否则收不到入群事件、无法发欢迎。</i>",
         ],
       })
     );
     return true;
   }
 
-  var names = members
-    .filter(function (m) {
-      return !m.is_bot;
-    })
-    .map(function (m) {
-      return [m.first_name || "", m.last_name || ""].join("");
-    })
-    .filter(Boolean);
+  // ★ 与 chat_member 通道去重：审核入群时 Telegram 可能两条都发
+  var fresh = members.filter(function (m) {
+    return !m.is_bot && m.id && claimJoinEvent(ctx.chatId, m.id);
+  });
+  if (!fresh.length) return false;
 
-  if (!names.length) return false;
-
-  var count = tgGetMemberCount(ctx.chatId);
-
-  // 入群验证
-  if (isChatFeatureOn(ctx.chatId, "verify")) {
-    members.forEach(function (m) {
-      if (m.is_bot) return;
-      requestVerify(ctx, m);
-    });
-    return true;
-  }
-
-  // 入群欢迎
-  if (isChatFeatureOn(ctx.chatId, "welcome")) {
-    var text = getChatSetting(ctx.chatId, "welcomeText", cfg("welcome.text", ""));
-    var rendered = String(text)
-      .replace(/\{name\}/g, esc(names.join("、").replace(/[<>&]/g, "")))
-      .replace(/\{chat\}/g, esc(ctx.chatTitle || ""))
-      .replace(/\{count\}/g, count === null ? "?" : String(count));
-    sendCard(ctx, rendered);
-  }
-  return true;
+  return welcomeNewMembers(ctx, fresh, { source: "new_chat_members" });
 }
 
 function handleLeave(ctx) {

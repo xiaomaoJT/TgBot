@@ -49,7 +49,7 @@ cd "Apps Script/MaoBot@ProVersion"
 
 node Tools/build.js              # 摊平模块，检查行数/模块数
 node Tests/check-dupes.js Modules   # 顶层声明查重（这条最容易被忽略）
-bash Tests/run.sh                # 365 项冒烟测试
+bash Tests/run.sh                # 408 项冒烟测试
 ```
 
 三条都通过再提 PR。**特别是 `check-dupes`**——GAS 的静默覆盖 bug 几乎都是从这里漏进去的，线上表现为「某个功能忽然不响应」，极难排查。

@@ -39,6 +39,15 @@ function uiKV(label, value, icon) {
   return (icon ? icon + " " : "") + "<b>" + esc(label) + "：</b>" + esc(value);
 }
 
+/**
+ * 键值行（值已是安全的 HTML，不再转义）。
+ * ⚠️ 只在值由 aLink()/uiMono() 等本文件助手生成时使用，
+ *    直接拼用户输入会形成 HTML 注入。
+ */
+function uiKVRaw(label, rawHtml, icon) {
+  return (icon ? icon + " " : "") + "<b>" + esc(label) + "：</b>" + String(rawHtml == null ? "" : rawHtml);
+}
+
 /** 列表项 */
 function uiItem(text, index) {
   var prefix = index === undefined ? THEME.bullet : index + ".";

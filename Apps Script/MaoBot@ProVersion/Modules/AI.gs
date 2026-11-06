@@ -546,7 +546,10 @@ function aiCallGeminiProvider(p, messages, system, opt) {
     encodeURIComponent(model) +
     ":generateContent";
 
-  var r = httpPostJsonEx(url, body, { headers: { "x-goog-api-key": aiKeyOf(p) } });
+  var r = httpPostJsonEx(url, body, {
+    headers: { "x-goog-api-key": aiKeyOf(p) },
+    timeoutSeconds: cfg("ai.timeoutSeconds", 60),
+  });
 
   if (r.code === 0) return { ok: false, error: "网络不可达（检查代理）" };
 
@@ -610,7 +613,10 @@ function aiCallOpenAICompat(p, messages, system, opt) {
     headers["X-Title"] = BRAND.name || "MaoBot";
   }
 
-  var r = httpPostJsonEx(endpoint + "/chat/completions", body, { headers: headers });
+  var r = httpPostJsonEx(endpoint + "/chat/completions", body, {
+    headers: headers,
+    timeoutSeconds: cfg("ai.timeoutSeconds", 60),
+  });
 
   if (r.code === 0) return { ok: false, error: "网络不可达（检查代理）" };
 

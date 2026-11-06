@@ -48,6 +48,11 @@ function doPost(e) {
       return htmlOk("no payload");
     }
 
+    // ⭐ 来源校验：appsscript.json 的 Web App 是 ANYONE_ANONYMOUS，
+    //    不校验的话任何人都能 POST 一个伪造的 owner 消息来提权。
+    //    返回 200 只是为了别让 Telegram 无休止重推，内容一律不处理。
+    if (!guardWebhook(e)) return htmlOk("forbidden");
+
     try {
       update = JSON.parse(e.postData.contents);
     } catch (err) {
@@ -65,6 +70,85 @@ function doPost(e) {
   }
   // 必须尽快、且以 200（而非 302）返回，否则 Telegram 会判定投递失败并重推
   return htmlOk("ok");
+}
+
+/**
+ * 生成 / 读取 Webhook 密钥。只存脚本属性，绝不写进代码或仓库。
+ * 字符集严格限定 Telegram 允许的 A-Z a-z 0-9 _ -。
+ */
+function webhookSecret() {
+  var KEY = "mb_webhook_secret";
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var saved = props.getProperty(KEY);
+    if (saved) return String(saved);
+
+    var salt =
+      typeof Utilities !== "undefined" && typeof Utilities.getUuid === "function"
+        ? Utilities.getUuid()
+        : String(Math.random()) + String(Date.now());
+    var seed = String(BOTID || "maobot") + "|" + salt + "|" + String(Date.now());
+    var h1 = 0x811c9dc5;
+    var h2 = 0x01000193;
+    for (var i = 0; i < seed.length; i++) {
+      var c = seed.charCodeAt(i);
+      h1 = (h1 ^ c) * 16777619 >>> 0;
+      h2 = (h2 + c * (i + 7)) >>> 0;
+    }
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+    var n = h1;
+    var out = "";
+    for (var k = 0; k < 40; k++) {
+      n = (n * 1103515245 + h2 + k * 12345) >>> 0;
+      out += alphabet.charAt(n % alphabet.length);
+    }
+    props.setProperty(KEY, out);
+    return out;
+  } catch (e) {
+    logError("webhookSecret", e);
+    return "";
+  }
+}
+
+/**
+ * Webhook 请求来源校验。
+ *
+ * 迁移策略（避免「部署完还没重新 setWebhook」就把机器人弄哑）：
+ *   · 尚未启用 → 放行本次，并自动用密钥重新 setWebhook 一次，随后置启用标记；
+ *   · 已启用   → 请求必须带匹配的 X-Telegram-Bot-Api-Secret-Token，否则丢弃；
+ *   · 没有 headers（本地冒烟测试 / GAS 未透传）→ 放行，真实 HTTP 请求必有头；
+ *   · 校验层自身异常 → 一律放行，绝不因安全组件故障影响可用性。
+ */
+function guardWebhook(e) {
+  if (!cfg("security.webhookSecret", true)) return true;
+  try {
+    var headers = e && e.headers;
+    if (!headers) return true;
+
+    var props = PropertiesService.getScriptProperties();
+    var active = props.getProperty("mb_webhook_secret_active") === "1";
+    var secret = webhookSecret();
+    if (!secret) return true;
+
+    var got = "";
+    Object.keys(headers).forEach(function (k) {
+      if (String(k).toLowerCase() === "x-telegram-bot-api-secret-token") {
+        got = String(headers[k] || "");
+      }
+    });
+
+    if (active) return got === secret;
+
+    var info = tgGetWebhookInfo() || {};
+    if (info.url && tgSetWebhook(info.url, secret)) {
+      props.setProperty("mb_webhook_secret_active", "1");
+      logInfo("guardWebhook", "已自动启用 Webhook 密钥校验");
+    }
+    return true;
+  } catch (err) {
+    logError("guardWebhook", err);
+    return true;
+  }
 }
 
 /**
@@ -208,7 +292,10 @@ function handleUpdate(update) {
       || get(update, "callback_query.message.chat.id")
       || get(update, "channel_post.chat.id")
       || get(update, "edited_message.chat.id")
-      || get(update, "my_chat_member.chat.id");
+      || get(update, "my_chat_member.chat.id")
+      || get(update, "chat_member.chat.id")
+      || get(update, "message_reaction.chat.id")
+      || get(update, "chat_join_request.chat.id");
     setCurrentLang(getLang({ chatId: __chat }));
   } catch (e) {
     setCurrentLang(DEFAULT_LANG);
@@ -248,6 +335,18 @@ function handleUpdate(update) {
     return;
   }
 
+  /* ---- 3.5 群成员状态变化（★ 管理员审核通过入群走这里）---- */
+  if (update.chat_member) {
+    handleChatMember(update.chat_member);
+    return;
+  }
+
+  /* ---- 3.6 表情回应 ---- */
+  if (update.message_reaction) {
+    handleMessageReaction(update.message_reaction);
+    return;
+  }
+
   /* ---- 4. 入群申请 ---- */
   if (update.chat_join_request) {
     handleJoinRequest(update.chat_join_request);
@@ -268,6 +367,13 @@ function handleUpdate(update) {
   if (update.edited_message) {
     var eCtx = buildCtx(update.edited_message, "edited_message", update);
     if (cfg("storage.enabled", true)) saveStorage(eCtx, "消息编辑");
+    // ⭐ 修复：原来编辑消息只存表就返回，用户先发普通消息再编辑成敏感词
+    //    可以完全绕过管控。这里补跑安全过滤（不跑指令，避免编辑触发命令）。
+    try {
+      securityFilter(eCtx);
+    } catch (e) {
+      logError("edited_message:security", e);
+    }
     return;
   }
 
@@ -785,13 +891,16 @@ function pushToKing(ctx) {
   if (ctx.isPrivate) {
     chatLine = "来自 [私聊]";
   } else {
-    var link = get(ctx.chat, "username", "")
-      ? "https://t.me/" + ctx.chat.username
-      : ctx.isGroup && String(ctx.chatId).indexOf("-100") === 0
-      ? null
-      : null;
+    // ⭐ 修复：原来两个三元分支都返回 null（死代码），私有群永远没有跳转链接。
+    //    公开群用 @username；私有超级群用 https://t.me/c/<去掉 -100 前缀的 ID>。
+    var link = "";
+    if (get(ctx.chat, "username", "")) {
+      link = "https://t.me/" + ctx.chat.username;
+    } else if (String(ctx.chatId).indexOf("-100") === 0) {
+      link = "https://t.me/c/" + String(ctx.chatId).slice(4);
+    }
     chatLine =
-      (link ? aLink(link, "[群聊] " + ctx.chatTitle) : "[群聊] " + ctx.chatTitle) +
+      (link ? aLink(link, "[群聊] " + esc(ctx.chatTitle)) : "[群聊] " + esc(ctx.chatTitle)) +
       " · " +
       uiMono(ctx.chatId);
   }
@@ -802,7 +911,7 @@ function pushToKing(ctx) {
     uiKV("用户", fromName + (ctx.userNameKey ? " " + ctx.userNameKey : "")),
     uiKV("用户 ID", String(ctx.userId)),
     uiKV("类型", c.label),
-    uiKV("位置", chatLine),
+    uiKVRaw("位置", chatLine),
     uiKV("时间", nowStr()),
     "",
     uiSection("内容", "📝"),
@@ -910,6 +1019,99 @@ function handleChannelPost(post, kind) {
     }
   } catch (e) {
     logError("handleChannelPost", e);
+  }
+}
+
+/**
+ * ★ 群成员状态变化 —— 「管理员审核通过入群」的欢迎入口。
+ *
+ * 【为什么必须有这条通道】
+ *   Telegram 只在部分场景发 `message.new_chat_members` 服务消息；
+ *   在「公开群 + 需要管理员审核（join_by_request）」「隐藏成员」「大群」
+ *   等场景下，管理员点「同意」后用户是静默入群的，**不会**产生服务消息，
+ *   只会下发 `chat_member` 更新（old: left → new: member）。
+ *   官方 Update.chat_member 说明：机器人在该群必须是管理员，且必须
+ *   在 allowed_updates 里显式声明 —— 本项目两条都已满足。
+ *
+ * 【去重】new_chat_members 与 chat_member 可能同时到达，
+ *   用 claimJoinEvent() 保证同一用户 120 秒内只欢迎一次。
+ */
+function handleChatMember(cmu) {
+  try {
+    var chat = cmu.chat || {};
+    var nu = get(cmu, "new_chat_member", {}) || {};
+    var ou = get(cmu, "old_chat_member", {}) || {};
+    var user = nu.user || {};
+    var oldStatus = String(ou.status || "");
+    var newStatus = String(nu.status || "");
+
+    // 只认「从群外 → 群内」。restricted 也算入群（加入即被限制发言）。
+    var wasOut = oldStatus === "left" || oldStatus === "kicked" || oldStatus === "";
+    var isIn =
+      newStatus === "member" ||
+      newStatus === "restricted" ||
+      newStatus === "administrator" ||
+      newStatus === "creator";
+    if (!wasOut || !isIn) return;
+    if (user.is_bot || !user.id || !chat.id) return;
+
+    // 与 new_chat_members 服务消息互斥（先到先得）
+    if (!claimJoinEvent(chat.id, user.id)) return;
+
+    var pseudo = {
+      chatId: String(chat.id),
+      chatTitle: chat.title || "",
+      threadId: null,
+      isGroup: String(chat.id).indexOf("-") === 0,
+      isPrivate: false,
+      message: null,
+    };
+    welcomeNewMembers(pseudo, [user], {
+      viaJoinRequest: !!cmu.via_join_request,
+      source: "chat_member",
+    });
+  } catch (e) {
+    logError("handleChatMember", e);
+  }
+}
+
+/**
+ * 表情回应更新（Bot API 7.0+）。
+ * allowed_updates 里订阅了就必须有分支，否则会被 handleUpdate 末尾静默丢弃，
+ * 排查时连日志线索都没有。默认只记录；需要主人推送时开 reaction.pushToKing。
+ */
+function handleMessageReaction(mr) {
+  try {
+    var chat = mr.chat || {};
+    var user = mr.user || {};
+    var emojiOf = function (arr) {
+      return (arr || [])
+        .map(function (r) {
+          return r && (r.emoji || r.custom_emoji_id || r.type) ? r.emoji || r.type || "✨" : "";
+        })
+        .filter(Boolean)
+        .join(" ");
+    };
+    var nowEmoji = emojiOf(mr.new_reaction);
+    var oldEmoji = emojiOf(mr.old_reaction);
+    logInfo("reaction", [chat.id, mr.message_id, user.id, oldEmoji, "→", nowEmoji].join(" "));
+
+    if (cfg("reaction.pushToKing", false) && KingId && nowEmoji && nowEmoji !== oldEmoji) {
+      tg("sendMessage", {
+        chat_id: KingId,
+        text:
+          "<b>💬 新的表情回应</b>\n\n" +
+          uiKV("群组", esc(chat.title || String(chat.id))) +
+          "\n" +
+          uiKV("用户", esc(userNameOf(user) || String(user.id || ""))) +
+          "\n" +
+          uiKV("回应", esc(nowEmoji)),
+        parse_mode: "HTML",
+        link_preview_options: { is_disabled: true },
+      });
+    }
+  } catch (e) {
+    logError("handleMessageReaction", e);
   }
 }
 
