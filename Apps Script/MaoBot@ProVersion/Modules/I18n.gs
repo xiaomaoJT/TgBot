@@ -149,6 +149,7 @@ var I18N_CMD_EN = {
   invite:    { desc: "Generate a group invite link", usage: "/invite [duration] [uses]" },
   settings:  { desc: "Group feature toggles / edit rules", usage: "/settings | /settings rules <rules text>" },
   broadcast: { desc: "Broadcast to all known chats (owner only)" },
+  say:        { desc: "Send / reply as owner to a specific chat (owner only)", usage: "/say <target> <message> [re:<msgID>] [--raw] [--silent] [--pin]" },
 
   ch:        { desc: "Channel watch: history & keyword push", usage: "/ch [list|add|del|key|on|off|test|log]" },
 

@@ -181,6 +181,18 @@ const COMMANDS = [
     handler: cmdSettingsPanel },
   { cmd: "broadcast", alias: ["bc"], cat: "管理", level: "owner", menu: false,
     desc: "向所有已知会话广播消息（仅 Bot 主人）", handler: cmdBroadcast },
+  { cmd: "say", alias: ["send", "msg"], cat: "管理", level: "owner", menu: false, eph: true,
+    desc: "主人代发：向指定群/频道/用户发送或回复消息（仅 Bot 主人）",
+    usage: "/say <目标> <消息> [re:<消息ID>] [--raw] [--silent] [--pin]",
+    examples: [
+      "/say @testgroup 今晚 20:00 维护",
+      "/say -1001234567890 公告内容",
+      "/say @testgroup re:123 回复第 123 条消息",
+      "/say @testgroup --raw 纯文本（不包裹卡片）",
+      "/say @testgroup --silent 静默发送（不通知）",
+      "/say @testgroup --pin 发送后置顶",
+    ],
+    handler: cmdSay },
   { cmd: "auth", alias: ["authority", "权限"], cat: "管理", level: "owner", menu: false, help: true,
     desc: "权限名单管理：群组屏蔽列表 / 管理员列表 的查看·新增·修改·删除",
     usage: "/auth [block|admin] [list|add|del|edit] [参数]",
@@ -1277,6 +1289,211 @@ function cmdBroadcast(ctx, args) {
     uiKV("失败", String(fail), "❌"),
     uiKV("总计", String(chats.length), "📋"),
   ]);
+}
+
+/* ============================================================================
+ * 主人代发 —— /say（仅 Bot 主人）
+ * ----------------------------------------------------------------------------
+ * 主人私聊 bot，让 bot 把一条消息发到指定群聊 / 频道 / 用户，并可选择
+ * 回复对方的某条消息。默认包裹成一张"主人寄语"卡片，也支持 --raw 原样发送。
+ * ==========================================================================*/
+
+/**
+ * 解析 /say 的目标为 chat_id。
+ * 支持：me（发给自己）、显式 ID / @用户名 / t.me 链接（复用 channelResolve）、
+ *       以及回复一条转发消息时自动取来源（含频道/群/用户的转发，并尝试回复原消息）。
+ * @return {{chatId:string,title:string,source:string,replyTo:?number}|null}
+ */
+function sayResolveTarget(ctx, target) {
+  // ① 显式 me → 主人的私聊
+  if (target && /^me$/i.test(target)) {
+    return { chatId: String(KingId), title: "Bot 主人私聊", source: "me", replyTo: null };
+  }
+  // ② 显式目标：ID / @用户名 / t.me 链接（channelResolve 也顺带处理"回复转发消息"）
+  if (target) {
+    var r = channelResolve(ctx, target);
+    if (r) return { chatId: r.chatId, title: r.title, source: r.source, replyTo: null };
+    return null; // 显式目标但解析失败
+  }
+  // ③ 无目标：从被回复的转发消息取来源
+  var rp = ctx && ctx.reply ? ctx.reply : null;
+  if (rp) {
+    var fo = get(rp, "forward_origin", null);
+    if (fo) {
+      if (fo.type === "user") {
+        var u = fo.sender_user || {};
+        if (u.id) return { chatId: String(u.id), title: u.first_name || ("用户 " + u.id), source: "转发(用户)", replyTo: null };
+      } else if (fo.chat && fo.chat.id) {
+        return {
+          chatId: String(fo.chat.id),
+          title: fo.chat.title || fo.chat.username || "",
+          source: "转发(" + (fo.type || "chat") + ")",
+          replyTo: get(fo, "message_id", null),
+        };
+      }
+    }
+    var fc = get(rp, "forward_from_chat", null);
+    if (fc && fc.id) {
+      return {
+        chatId: String(fc.id),
+        title: fc.title || fc.username || "",
+        source: "转发(频道)",
+        replyTo: get(rp, "forward_from_message_id", null),
+      };
+    }
+    var ff = get(rp, "forward_from", null);
+    if (ff && ff.id) {
+      return { chatId: String(ff.id), title: ff.first_name || ("用户 " + ff.id), source: "转发(用户)", replyTo: null };
+    }
+  }
+  return null;
+}
+
+/**
+ * /say —— 主人代发 / 回复。
+ * 语法：/say <目标> <消息> [re:<消息ID>] [--raw] [--silent] [--pin]
+ *   <目标>  群组/频道/用户 ID、@用户名、t.me 链接、me，或留空（回复转发消息自动取来源）
+ *   re:<ID> 回复目标会话里的第 ID 条消息
+ *   --raw   不包裹卡片，原样发送（仍支持 HTML）
+ *   --silent 静默发送（不响铃通知成员）
+ *   --pin   发送后置顶（仅群/频道，需置顶权限）
+ */
+function cmdSay(ctx, args) {
+  var conf = cfg("say", {});
+  if (conf.enabled === false) {
+    return uiFail("功能已关闭", ["/say 已在配置中关闭（say.enabled = false）。"]);
+  }
+
+  var raw = String(args || "").trim();
+  if (!raw) {
+    return uiUsage("/say", "/say <目标> <消息> [re:<消息ID>] [--raw] [--silent] [--pin]", [
+      "目标支持：群组/频道/用户 ID、@用户名、t.me 链接、me（发给自己）",
+      "或回复一条转发自目标会话的消息（自动取来源）",
+      "/say @testgroup 今晚 20:00 维护",
+      "/say -1001234567890 公告内容",
+      "/say @testgroup re:123 回复第 123 条消息",
+      "/say @testgroup --raw 纯文本（不包裹卡片）",
+      "/say @testgroup --silent 静默发送（不通知）",
+      "/say @testgroup --pin 发送后置顶",
+    ]);
+  }
+
+  // ---- 解析 flag / reply / target / body ----
+  var rawFlag = false, silent = false, doPin = false, replyTo = null;
+  var rest = [];
+  raw.split(/\s+/).forEach(function (t) {
+    var low = t.toLowerCase();
+    if (low === "--raw" || low === "--plain") { rawFlag = true; return; }
+    if (low === "--silent" || low === "--notify-off") { silent = true; return; }
+    if (low === "--pin") { doPin = true; return; }
+    var rm = t.match(/^(?:re|reply):(\d+)$/i);
+    if (rm) { replyTo = parseInt(rm[1], 10); return; }
+    rest.push(t);
+  });
+
+  // 目标判定：第一个 token 若是合法目标（me / ID / @用户名 / t.me 链接）则取为目标，
+  // 否则回落到"回复转发消息自动取来源"，整段作为正文。
+  var target = null;
+  if (rest.length) {
+    var cand = rest[0];
+    if (/^me$/i.test(cand)) {
+      target = "me";
+      rest.shift();
+    } else if (channelResolve(ctx, cand)) {
+      target = cand;
+      rest.shift();
+    }
+  }
+  var body = rest.join(" ");
+  if (!body) {
+    return uiUsage("/say", "/say <目标> <消息> [re:<消息ID>] [--raw] [--silent] [--pin]", [
+      "消息内容不能为空。",
+    ]);
+  }
+
+  // ---- 解析目标 ----
+  var tgt = sayResolveTarget(ctx, target);
+  if (!tgt) {
+    return uiFail("无法解析目标", [
+      "目标：" + uiMono(target || "(空)"),
+      "支持 群组/频道/用户 ID、@用户名、t.me 链接、me；",
+      "或回复一条转发自目标会话的消息（自动取来源）。",
+    ]);
+  }
+
+  // ---- 取会话信息（标题 / 用户名），用于反馈与消息链接 ----
+  var ci = null;
+  try { ci = tgGetChat(tgt.chatId); } catch (e) { ci = null; }
+  var title = (ci && ci.title) ? ci.title : (tgt.title || String(tgt.chatId));
+  var username = ci && ci.username ? ci.username : "";
+
+  // ---- 组装消息（默认卡片，可 --raw 原样）----
+  var text;
+  if (rawFlag || conf.card === false) {
+    text = body; // 主人原文，支持 HTML
+  } else {
+    var parts = [];
+    if (conf.header) parts.push("<b>" + esc(conf.header) + "</b>");
+    if (conf.divider) parts.push(uiDiv());
+    parts.push(body); // 主人原文，支持 HTML
+    if (conf.divider) parts.push(uiDiv());
+    if (conf.footer) {
+      parts.push("<i>" + esc(String(conf.footer).replace(/\{bot\}/g, BRAND.name || "Bot")) + "</i>");
+    }
+    text = parts.join("\n");
+  }
+
+  // ---- 发送 ----
+  var payload = {
+    chat_id: tgt.chatId,
+    text: text,
+    parse_mode: "HTML",
+    link_preview_options: { is_disabled: !cfg("say.linkPreview", false) },
+  };
+  if (silent) payload.disable_notification = true;
+  // 回复目标：优先显式 re:<ID>，其次转发来源自带的原消息 ID
+  var finalReply = replyTo || (tgt.replyTo || null);
+  if (finalReply) payload.reply_to_message_id = finalReply;
+
+  var r = tg("sendMessage", payload, { silent: true, retry: 1 });
+  if (!r || !r.message_id) {
+    return uiFail("发送失败", [
+      "目标：" + esc(title),
+      "请确认：① 机器人是该会话成员；② 有发送消息权限；③ 目标 ID 正确。",
+      ci === null
+        ? "<i>⚠️ 连 getChat 都失败了，目标可能不存在或机器人从未接触过。</i>"
+        : "",
+    ].filter(Boolean));
+  }
+
+  // ---- 置顶（仅群 / 频道）----
+  if (doPin && /^-\d/.test(String(tgt.chatId))) {
+    tg("pinChatMessage", { chat_id: tgt.chatId, message_id: r.message_id }, { silent: true });
+  }
+
+  // ---- 消息链接 ----
+  var link = "";
+  if (username) link = "https://t.me/" + username + "/" + r.message_id;
+  else if (/^-100\d+$/.test(String(tgt.chatId))) {
+    link = "https://t.me/c/" + String(tgt.chatId).replace(/^-100/, "") + "/" + r.message_id;
+  }
+
+  var flags = [];
+  if (rawFlag || conf.card === false) flags.push("原样");
+  if (silent) flags.push("静默");
+  if (doPin) flags.push("置顶");
+  if (replyTo) flags.push("回复 #" + replyTo);
+
+  var body2 = [
+    uiKV("目标", title, "🎯"),
+    uiKV("chat_id", uiMono(String(tgt.chatId)), "🔢"),
+    flags.length ? uiKV("模式", flags.join("、"), "🧩") : null,
+    link
+      ? uiKVRaw("消息链接", aLink(link, "点此查看"), "🔗")
+      : uiKV("消息链接", "私聊 / 无公开链接", "🔗"),
+  ].filter(Boolean);
+
+  return uiOK("已发送", body2);
 }
 
 /* ============================================================================

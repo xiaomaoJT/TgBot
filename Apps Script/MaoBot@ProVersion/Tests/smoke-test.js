@@ -1574,6 +1574,79 @@ ok(cfg("http.timeoutSeconds", 8) === 8 && cfg("ai.timeoutSeconds", 60) === 60,
   "★ 普通接口与 AI 使用不同超时");
 
 /* ============================================================ */
+section("★ 主人代发 /say（owner-only）");
+
+function mkSayCtx(opts) {
+  const o = opts || {};
+  const uid = o.userId !== undefined ? o.userId : "777777"; // 默认 Bot 主人
+  return {
+    chatId: o.chatId || "111222",
+    isGroup: false,
+    isPrivate: true,
+    userId: uid,
+    userName: "主人",
+    text: o.text || "",
+    reply: o.reply || null,
+    threadId: null,
+    isKing: String(uid) === String(KingId),
+  };
+}
+
+// ① 缺参数 → 用法提示
+resetCalls();
+let sayOut = String(cmdSay(mkSayCtx({ text: "/say" }), ""));
+ok(sayOut.indexOf("/say") !== -1, "★ /say 无参数给用法提示");
+
+// ② 正常代发到 @用户名（默认卡片）
+resetCalls();
+sayOut = String(cmdSay(mkSayCtx({}), "@testgroup 今晚 20:00 维护"));
+let saySend = lastOf("sendMessage");
+ok(saySend && saySend.body.chat_id === "@testgroup", "★ /say @用户名 解析到正确目标");
+ok(saySend && saySend.body.text.indexOf("今晚 20:00 维护") !== -1, "★ /say 内容被保留");
+ok(saySend && saySend.body.text.indexOf("来自 Bot 主人的消息") !== -1, "★ /say 默认包裹主人卡片");
+ok(saySend && saySend.body.text.indexOf("代发") !== -1, "★ /say 卡片含页脚");
+ok(sayOut.indexOf("已发送") !== -1, "★ /say 返回成功卡片");
+
+// ③ --raw 原样发送（无卡片）
+resetCalls();
+cmdSay(mkSayCtx({}), "@testgroup --raw 纯文本一行");
+saySend = lastOf("sendMessage");
+ok(saySend && saySend.body.text === "纯文本一行", "★ /say --raw 不包裹卡片");
+
+// ④ re:<ID> 回复指定消息
+resetCalls();
+cmdSay(mkSayCtx({}), "@testgroup re:123 这是回复");
+saySend = lastOf("sendMessage");
+ok(saySend && saySend.body.reply_to_message_id === 123, "★ /say re:123 设置回复目标");
+
+// ⑤ --silent 静默发送
+resetCalls();
+cmdSay(mkSayCtx({}), "@testgroup --silent 静默公告");
+saySend = lastOf("sendMessage");
+ok(saySend && saySend.body.disable_notification === true, "★ /say --silent 关闭通知");
+
+// ⑥ me → 发给主人自己
+resetCalls();
+cmdSay(mkSayCtx({}), "me 给自己发一条测试");
+saySend = lastOf("sendMessage");
+ok(saySend && saySend.body.chat_id === String(KingId), "★ /say me 发到主人私聊");
+
+// ⑦ 非法目标 → 报错
+resetCalls();
+sayOut = String(cmdSay(mkSayCtx({}), "this_is_not_a_target 内容"));
+ok(sayOut.indexOf("无法解析目标") !== -1, "★ /say 非法目标报错");
+
+// ⑧ 回复转发消息 → 自动取来源 + 回复原消息
+resetCalls();
+const fwdCtx = mkSayCtx({
+  reply: { forward_origin: { type: "channel", chat: { id: -100999888777, title: "某频道" }, message_id: 88 } },
+});
+cmdSay(fwdCtx, "这是针对转发源的回复");
+saySend = lastOf("sendMessage");
+ok(saySend && saySend.body.chat_id === "-100999888777", "★ /say 回复转发消息取来源 chat_id");
+ok(saySend && saySend.body.reply_to_message_id === 88, "★ /say 回复转发消息带原 message_id");
+
+/* ============================================================ */
 console.log("\n" + "=".repeat(46));
 console.log("通过 " + PASS + " 项，失败 " + FAIL + " 项");
 console.log("=".repeat(46));
