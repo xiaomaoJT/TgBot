@@ -1783,9 +1783,16 @@ ok(appOut.indexOf("App免费兑换码") !== -1, "★ /app 标题为『App免费�
 ok(appOut.indexOf("App 免费兑换码") === -1, "★ /app 旧标题已移除");
 ok(appOut.indexOf("📱") === -1, "★ /app 已去掉 📱 图标");
 ok(appOut.indexOf("&lt;code&gt;") === -1, "★ /app <code> 标签未被二次转义");
-ok(appOut.indexOf("<code>CODE123</code>") !== -1, "★ /app 兑换码用真 <code> 标签渲染");
-ok(appOut.indexOf('<a href="https://apps.apple.com/redeem?code=CODE123"><code>CODE123</code></a>') !== -1,
-  "★ /app redeemUrl 套在兑换码上（点击直达兑换）");
+ok(appOut.indexOf('<a href="https://apps.apple.com/redeem?code=CODE123">CODE123</a>') !== -1,
+  "★ /app 兑换码文字本身即链接（Telegram 不支持 <a> 内嵌 <code>）");
+// 真实接口返回的 redeemUrl 带多个 & 参数：HTML 源码里应转义为 &amp;（Telegram 解析后还原成 &）
+resetCalls();
+const REAL_REDEEM = "https://apps.apple.com/redeem?ctx=offercodes&id=6833700925&code=REYA38R6LXWWYKY6HT";
+mockRoute("promo.app/api/promos/reveal", { code: "REYA38R6LXWWYKY6HT", redeemUrl: REAL_REDEEM });
+let appReal = String(apiApp("1 Y"));
+ok(appReal.indexOf('<a href="https://apps.apple.com/redeem?ctx=offercodes&amp;id=6833700925&amp;code=REYA38R6LXWWYKY6HT">REYA38R6LXWWYKY6HT</a>') !== -1,
+  "★ /app 真实多参数 redeemUrl 正确转义且套在兑换码上");
+mockRoute("promo.app/api/promos/reveal", { code: "CODE123", redeemUrl: "https://apps.apple.com/redeem?code=CODE123" }); // 还原
 ok((appOut.match(/\u200B/g) || []).length === 4, "★ /app 5 条之间有 4 处间隔");
 
 // ⑫ 快捷指令面板 / setMyCommands 注册回归

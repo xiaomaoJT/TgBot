@@ -590,12 +590,11 @@ function apiApp(args) {
     var title = appLink ? aLink(appLink, appName) : esc(appName);
     lines.push("<b>[" + (k + 1) + "] " + title + "</b>");
     // 兑换码：把 reveal 返回的 redeemUrl 直接套在兑换码上（点击直达兑换页）。
-    // ⚠️ 不能用 aLink(url, "<code>…</code>")：aLink 会把 <code> 一起 esc 成字面文本。
-    //    改用 aCode() 生成真 <code> 标签，再手动拼 <a href>，只 esc 内容与属性。
+    // ⚠️ Telegram 不支持 <a> 内嵌 <code>：实测同时嵌套时 text_link 实体会被丢弃，
+    //    只剩 code（2026-11-18 用真实 bot 发消息看 entities 证实）。二者不可兼得，
+    //    故兑换码文字本身做成可点击链接；无 redeemUrl 时才退回 <code> 等宽样式。
     if (code) {
-      var codeHtml = aCode(code);
-      if (redeem) codeHtml = '<a href="' + escAttr(redeem) + '">' + codeHtml + "</a>";
-      lines.push("🎟️ " + codeHtml);
+      lines.push("🎟️ " + (redeem ? aLink(redeem, code) : aCode(code)));
     } else {
       lines.push("🎟️ <i>暂未获取到兑换码</i>");
     }
