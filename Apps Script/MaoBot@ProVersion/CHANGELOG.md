@@ -11,7 +11,7 @@
 
 - **用户可见**：失败提示去掉品牌前缀；`/app` 描述与中英文 help 不再出现品牌字样；
   命令别名改为 `/freecode`、`/codes`。
-- **源码**：内部函数统一改为 `promo*` 前缀，配置键 `CONFIG.promo` → `CONFIG.promo`；
+- **源码**：内部函数统一改为 `promo*` 前缀，配置键改为 `CONFIG.promo`；
   第三方域名、cookie 键前缀、页面标识头改用轻量 ROT13（`promoDec()`）存放，运行时解码。
 - **文档**：CHANGELOG/README/功能概览里的品牌字样全部清除（历史条目同步净化）。
 - **提交记录**：重写历史里 2 条含品牌字样的 commit message（含正文），全仓库 `grep` 已 0 命中。
