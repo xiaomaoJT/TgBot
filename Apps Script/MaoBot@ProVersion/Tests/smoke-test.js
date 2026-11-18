@@ -1682,6 +1682,100 @@ saySend = lastOf("sendMessage");
 ok(saySend && saySend.body.chat_id === "-100999888777", "★ /say 回复转发消息取来源 chat_id");
 ok(saySend && saySend.body.reply_to_message_id === 88, "★ /say 回复转发消息带原 message_id");
 
+section("★ App 兑换码 /app（访客态）");
+
+// 构造与线上一致的 RSC 数据串：self.__next_f.push([1,"…"]) 内含 \" 转义的 promo 对象
+function mkPromo(id, name, isHot, codesLeft, total, platform, duration, offerType, createdAt) {
+  return '{\\"id\\":\\"' + id + '\\",\\"slug\\":\\"slug-' + id + '\\",\\"appId\\":\\"123\\",' +
+    '\\"appName\\":\\"' + name + '\\",\\"isHot\\":' + (isHot ? 'true' : 'false') + ',' +
+    '\\"codesLeft\\":' + codesLeft + ',\\"total\\":' + total + ',' +
+    '\\"platform\\":\\"' + platform + '\\",\\"duration\\":\\"' + duration + '\\",' +
+    '\\"offerType\\":\\"' + offerType + '\\",\\"createdAt\\":\\"' + createdAt + '\\",' +
+    '\\"redeemUrl\\":\\"https://apps.apple.com/app/id123\\",\\"noCode\\":false}';
+}
+const APPS = [
+  mkPromo("id1", "Alpha App", true, 100, 1000, "ios", "Lifetime", "free", "2026-11-16T20:51:23.274Z"),
+  mkPromo("id2", "Beta App", true, 200, 1000, "ios", "1 Month", "free", "2026-11-15T10:00:00.000Z"),
+  mkPromo("id3", "Gamma App", false, 300, 1000, "android", "Lifetime", "paid", "2026-11-14T08:00:00.000Z"),
+  mkPromo("id4", "Delta App", true, 400, 1000, "ios", "Lifetime", "free", "2026-11-13T06:00:00.000Z"),
+  mkPromo("id5", "Eps App", true, 500, 1000, "ios", "Lifetime", "free", "2026-11-12T04:00:00.000Z"),
+  mkPromo("id6", "Zeta App", true, 600, 1000, "ios", "Lifetime", "free", "2026-11-11T02:00:00.000Z"),
+];
+const APP_PAGE = 'self.__next_f.push([1,"' + APPS.join(',') + '"])';
+mockRoute("promo.app/zh-hans", APP_PAGE);
+mockRoute("promo.app/api/promos/reveal", { code: "CODE123", redeemUrl: "https://apps.apple.com/redeem?code=CODE123" });
+
+// ① 解析函数：对象数与字段
+const parsed = promoParsePromos(APP_PAGE);
+ok(parsed.length === 6, "★ /app 解析出 6 个 promo 对象");
+ok(parsed[0].codesLeft === 100 && parsed[0].total === 1000, "★ /app 解析含 codesLeft/total");
+ok(parsed[0].isHot === true, "★ /app 解析含 isHot 布尔");
+
+// ② 默认数量 5、仅热门
+resetCalls();
+let appOut = String(apiApp(""));
+ok(appOut.indexOf("Alpha App") !== -1, "★ /app 默认输出第 1 个热门 App");
+ok(appOut.indexOf("Gamma App") === -1, "★ /app Y 模式过滤非热门 App");
+ok(appOut.indexOf("已取 5/5") !== -1, "★ /app 默认取 5 个热门");
+ok((appOut.match(/📱 <b>/g) || []).length === 5, "★ /app 默认只渲染 5 条");
+
+// ③ 用户要求的展示字段
+ok(appOut.indexOf("100/1000") !== -1, "★ /app 展示 剩余/总数");
+ok(appOut.indexOf("2026/") !== -1, "★ /app 展示 上架时间(已格式化)");
+ok(appOut.indexOf("IOS") !== -1, "★ /app 展示 平台");
+ok(appOut.indexOf("Lifetime") !== -1, "★ /app 展示 权益时长");
+ok(appOut.indexOf("free") !== -1, "★ /app 展示 优惠类型");
+ok(appOut.indexOf("CODE123") !== -1, "★ /app 展示 兑换码");
+
+// ④ reveal 确实按 offerId 逐个请求
+const reveals = EXT_CALLS.filter((c) => c.url.indexOf("promos/reveal") !== -1);
+ok(reveals.length === 5, "★ /app 对 5 个 App 逐个 reveal");
+ok(reveals.length && reveals[0].body && reveals[0].body.offerId === "id1", "★ /app reveal 带正确 offerId");
+ok(reveals.length && reveals[0].headers && reveals[0].headers["x-promo-page"] === "install;d2.off", "★ /app reveal 带访客页头");
+
+// ⑤ /app 10 Y → 按数量（热门只有 4+1=... 这里热门 5 个，取 min(10,5)=5）
+resetCalls();
+appOut = String(apiApp("10 Y"));
+ok(appOut.indexOf("已取 5/5") !== -1, "★ /app 10 Y 取满可用热门 5 个");
+
+// ⑥ /app 20 N → 全部（含非热门），共 6 个，但上限 20 → 全取
+resetCalls();
+appOut = String(apiApp("20 N"));
+ok(appOut.indexOf("Gamma App") !== -1, "★ /app N 模式包含非热门 App");
+ok(appOut.indexOf("已取 6/6") !== -1, "★ /app N 模式取全部 6 个");
+
+// ⑦ 数量上限 20（构造 >20 个不会超；用解析后的 picks 上限验证：给 25 个也只取 20）
+resetCalls();
+const many = [];
+for (let i = 0; i < 25; i++) many.push(mkPromo("m" + i, "App" + i, true, 1, 1, "ios", "Lifetime", "free", "2026-11-01T00:00:00.000Z"));
+mockRoute("promo.app/zh-hans", 'self.__next_f.push([1,"' + many.join(',') + '"])');
+appOut = String(apiApp("999 Y"));
+ok(appOut.indexOf("已取 20/20") !== -1, "★ /app 数量上限 20 生效");
+mockRoute("promo.app/zh-hans", APP_PAGE); // 还原
+
+// ⑧ reveal 无码 → 降级显示，不崩
+resetCalls();
+mockRoute("promo.app/api/promos/reveal", { error: "rate limited" });
+appOut = String(apiApp("1 Y"));
+ok(appOut.indexOf("暂未获取到兑换码") !== -1, "★ /app reveal 无码时降级提示");
+ok(appOut.indexOf("已取 0/1") !== -1, "★ /app 无码时成功计数为 0");
+mockRoute("promo.app/api/promos/reveal", { code: "CODE123", redeemUrl: "https://apps.apple.com/redeem?code=CODE123" }); // 还原
+
+// ⑨ 列表页不可用 → 友好失败
+resetCalls();
+mockRoute("promo.app/zh-hans", "boom", 502);
+appOut = String(apiApp(""));
+ok(appOut.indexOf("获取失败") !== -1, "★ /app 列表页 502 返回友好失败");
+mockRoute("promo.app/zh-hans", APP_PAGE); // 还原
+
+// ⑩ 注册检查：/app 在命令表、有英文描述
+ok(COMMANDS.some((c) => c.cmd === "app"), "★ /app 已注册到命令表");
+ok(!!(I18N_CMD_EN.app && I18N_CMD_EN.app.desc), "★ /app 有英文描述");
+// /help 分页渲染，聚合所有页再断言（buildHelpText("",0) 只有第 1 页）
+let helpAllPages = "";
+for (let p = 0; p < helpTotalPages(""); p++) helpAllPages += buildHelpText("", p);
+ok(helpAllPages.indexOf("/app") !== -1, "★ /app 出现在 /help");
+
 /* ============================================================ */
 console.log("\n" + "=".repeat(46));
 console.log("通过 " + PASS + " 项，失败 " + FAIL + " 项");

@@ -37,7 +37,9 @@ function httpText(url, opts) {
       followRedirects: true,
       // ⭐ timeoutSeconds 官方默认 360s（= 整个脚本上限）。一个外部接口挂掉
       //    就能把 doPost 拖到 Telegram 判超时重推，必须显式压到 8 秒。
-      timeoutSeconds: cfg("http.timeoutSeconds", 8),
+      //    调用方可传 opts.timeoutSeconds 覆盖（如 /app 列表页用 12s）。
+      timeoutSeconds:
+        o.timeoutSeconds !== undefined ? o.timeoutSeconds : cfg("http.timeoutSeconds", 8),
       validateHttpsCertificates: cfg("http.strictTls", false),
       headers: o.headers || { "User-Agent": "Mozilla/5.0 (compatible; MaoBot/2.0)" },
     });
@@ -433,6 +435,186 @@ function apiHot(platform, page) {
   }
 
   return { text: apiFail(meta.name + " 获取"), markup: undefined };
+}
+
+/* ----------------------------------------------------------------------------
+ * 三·补、App 免费兑换码（/app）—— 纯访客态，无需登录
+ * ----------------------------------------------------------------------------
+ * 链路（2026-11-18 实测可用，匿名即可拿码）：
+ *   ① GET  {base}{listPath}  取 Next.js RSC 页面，从 self.__next_f.push([1,"…"]) 里
+ *      拼出数据串，解析出 promo 对象数组（含 isHot/codesLeft/total/createdAt 等）。
+ *   ② POST {base}{revealPath}  body={"offerId":id} + x-promo-page 头 → {code, redeemUrl}
+ *   实测不带任何 cookie 也返回 {"code":…,"guest":true}，故不维护登录态/访客 cookie。
+ * --------------------------------------------------------------------------*/
+
+/** 把 RSC 数据串里的 promo 对象解析成数组。入参是「已拼好的 full」或原始 HTML。 */
+function promoParsePromos(html) {
+  var text = String(html || "");
+  var full = "";
+  // ① 先尝试抽 self.__next_f.push([1,"…"]) 并拼接（页面里是 \" 转义）
+  var re = /self\.__next_f\.push\(\[1,"([\s\S]*?)"\]\)/g;
+  var m;
+  while ((m = re.exec(text)) !== null) full += m[1];
+  if (!full) full = text; // 测试桩可直接喂拼好的数据串
+
+  var out = [];
+  var marker = '{\\"id\\":\\"';
+  var noCodeKey = '\\"noCode\\":';
+  var pos = 0;
+  var guard = 0;
+  while (guard++ < 500) {
+    var s = full.indexOf(marker, pos);
+    if (s < 0) break;
+    var e = full.indexOf(noCodeKey, s);
+    if (e < 0) break;
+    // noCode:true|false 后的第一个 } 即对象结尾
+    var end = full.indexOf("}", e);
+    if (end < 0) break;
+    var raw = full.substring(s, end + 1).replace(/\\"/g, '"');
+    try {
+      var o = JSON.parse(raw);
+      if (o && o.id && o.appName) out.push(o);
+    } catch (err) {}
+    pos = end + 1;
+  }
+  return out;
+}
+
+/** ISO 时间串 → 友好日期（失败原样返回），如 2026-11-16T20:51:23.274Z → 2026/11/17 04:51 */
+function promoDate(iso) {
+  if (!iso) return "-";
+  try {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return String(iso);
+    return formatDate(d, "yyyy/MM/dd HH:mm");
+  } catch (e) {
+    return String(iso);
+  }
+}
+
+/**
+ * /app [数量] [Y|N]
+ *   数量：默认 5，范围 1..maxCount(20)。传 0/all 也按上限取。
+ *   第二参：Y（默认）= 仅 isHot 热门；N / ALL / A = 全部（不过滤）。
+ */
+function apiApp(args) {
+  var raw = String(args || "").trim();
+  var toks = raw ? raw.split(/\s+/) : [];
+  var cfgApp = CONFIG.promo || {};
+  var defCount = Number(cfgApp.defaultCount) || 5;
+  var maxCount = Number(cfgApp.maxCount) || 20;
+
+  // ---- 解析数量 ----
+  var count = defCount;
+  if (toks.length) {
+    var t0 = toks[0].toLowerCase();
+    if (t0 === "all" || t0 === "a" || t0 === "n") {
+      count = maxCount;
+    } else {
+      var n = parseInt(t0, 10);
+      if (!isNaN(n) && n > 0) count = Math.min(n, maxCount);
+      // 非法数量回落默认，不报错（更宽容）
+    }
+  }
+
+  // ---- 解析 hot 开关：默认仅热门；第二参 N/ALL/A → 全部 ----
+  var onlyHot = true;
+  var flag = (toks.length > 1 ? toks[1] : (toks.length === 1 ? toks[0] : "")).toLowerCase();
+  if (flag === "n" || flag === "no" || flag === "all" || flag === "a" || flag === "0") {
+    onlyHot = false;
+  }
+
+  var base = String(cfgApp.base || "https://promo.app").replace(/\/$/, "");
+  var listPath = cfgApp.listPath || "/zh-hans";
+  var revealPath = cfgApp.revealPath || "/api/promos/reveal";
+  var pageHeader = cfgApp.pageHeader || "install;d2.off";
+  var timeout = Number(cfgApp.timeoutSeconds) || 12;
+  var ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+           "(KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36";
+
+  // ---- ① 拉列表页并解析 ----
+  var html = httpText(base + listPath, {
+    headers: { "User-Agent": ua, "Accept-Language": "zh-CN,zh;q=0.9" },
+    timeoutSeconds: timeout,
+  });
+  if (!html) {
+    return uiFail("App 获取失败", ["<i>列表页暂时无法访问，请稍后重试。</i>"]);
+  }
+  var all = promoParsePromos(html);
+  if (!all.length) {
+    return uiFail("App 解析失败", [
+      "<i>页面结构可能已变更（未找到兑换码数据）。</i>",
+      "<i>可用 /apicheck 排查接口状态。</i>",
+    ]);
+  }
+
+  // ---- ② 过滤 + 限量（按 id 去重）----
+  var seen = {};
+  var picks = [];
+  for (var i = 0; i < all.length && picks.length < count; i++) {
+    var a = all[i];
+    if (!a || !a.id || seen[a.id]) continue;
+    if (onlyHot && a.isHot !== true) continue;
+    seen[a.id] = true;
+    picks.push(a);
+  }
+  if (!picks.length) {
+    return uiFail("没有可用兑换码", ["<i>当前无" + (onlyHot ? "热门" : "") + " App，请稍后再试。</i>"]);
+  }
+
+  // ---- ③ 逐条 reveal（访客态）----
+  var headers = {
+    "accept": "*/*",
+    "content-type": "application/json",
+    "origin": base,
+    "x-promo-page": pageHeader,
+    "user-agent": ua,
+  };
+  var lines = [];
+  var okCount = 0;
+  for (var k = 0; k < picks.length; k++) {
+    var app = picks[k];
+    var h = {};
+    for (var hk in headers) h[hk] = headers[hk];
+    h["referer"] = base + "/app/" + (app.slug || "");
+
+    var r = httpPostJsonEx(base + revealPath, { offerId: app.id }, { headers: h, timeoutSeconds: timeout });
+    var code = (r && r.json && r.json.code) ? String(r.json.code) : "";
+    var redeem = (r && r.json && r.json.redeemUrl) ? String(r.json.redeemUrl) : "";
+    if (code) okCount++;
+
+    // 标题：App 名称（带 App Store 链接）
+    var appLink = app.redeemUrl || "";
+    var title = appLink ? aLink(appLink, esc(clip(app.appName || "未命名", 60))) : esc(clip(app.appName || "未命名", 60));
+    lines.push("📱 <b>[" + (k + 1) + "] " + title + "</b>");
+    // 兑换码（可一键跳转兑换）
+    if (code) {
+      lines.push("🎟️ " + (redeem ? aLink(redeem, "<code>" + esc(code) + "</code>") : "<code>" + esc(code) + "</code>"));
+    } else {
+      lines.push("🎟️ <i>暂未获取到兑换码</i>");
+    }
+    // 用户要求补充的 5 个字段
+    lines.push(
+      "📊 剩余/总数：<code>" + (app.codesLeft != null ? app.codesLeft : "-") + "/" +
+      (app.total != null ? app.total : "-") + "</code>"
+    );
+    lines.push("🗓️ 上架：" + esc(promoDate(app.createdAt)));
+    lines.push(
+      "📌 " + esc(String(app.platform || "-").toUpperCase()) +
+      " · " + esc(String(app.duration || "-")) +
+      " · " + esc(String(app.offerType || "-"))
+    );
+    if (k < picks.length - 1) lines.push(""); // 条目间空行
+  }
+
+  return uiCard({
+    icon: "🎁",
+    title: "App 免费兑换码",
+    subtitle: "已取 " + okCount + "/" + picks.length + " 个 · " +
+              (onlyHot ? "仅热门" : "全部") + (raw ? " · " + raw : ""),
+    body: lines,
+    footer: "访客态获取 · 码先到先得，失效请以页面为准",
+  });
 }
 
 /* ----------------------------------------------------------------------------

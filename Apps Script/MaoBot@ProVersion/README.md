@@ -9,7 +9,7 @@
 >
 > 原版目录**完整保留、未做任何改动**，两个版本可并存、可随时回滚。
 
-**当前规模**：15 个模块（含 Secrets.gs）· 约 12888 行 · 432 项冒烟测试全绿 · 539 处顶层声明 0 重复
+**当前规模**：15 个模块（含 Secrets.gs）· 约 13099 行 · 458 项冒烟测试全绿 · 542 处顶层声明 0 重复
 
 ---
 
@@ -579,7 +579,7 @@ uiCard({
 | 分类 | 指令 |
 |:-----|:-----|
 | 基础 | `/start` `/help` `/menu` `/id` `/ping` `/lang` |
-| 查询 | `/weather` `/hot` `/ai` `/ip` `/phone` |
+| 查询 | `/weather` `/hot` `/app`（App 兑换码）`/ai` `/ip` `/phone` |
 | 娱乐 | `/hitokoto` `/dujitang` `/qinghua` `/fortune` `/dice` `/coin` `/roll` |
 | 工具 | `/calc` `/tr` `/short` `/qr` `/img` `/t` `/file` |
 | 群组 | `/info` `/stat` `/top` `/rules` `/report` |

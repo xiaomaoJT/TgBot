@@ -5,6 +5,27 @@
 
 ---
 
+## 2026-11-18 · 新增 `/app`（App 免费兑换码，访客态）
+
+> 规模：15 个模块（含 Secrets.gs）· 约 13099 行 · 458 项冒烟测试全绿 · 542 处顶层声明 0 重复。
+
+### ✨ 新增：`/app [数量] [Y|N]`
+
+- **能力**：获取 App（promo.app）限时免费 App 的兑换码，**纯访客态、无需登录**。
+- **链路**：`GET /zh-hans` 从 Next.js RSC 数据里解析 promo 对象 → 按条件筛选 → 逐个 `POST /api/promos/reveal {offerId}` 拿 `{code, redeemUrl}`。
+  - 实测匿名（不带任何 cookie）即返回 `{"code":…,"guest":true}`，故 bot 端不维护任何登录/访客 cookie，不会因 cookie 过期失效。
+- **参数**：
+  - 数量：默认 **5**，上限 **20**；`0/all` 按上限取，非法值回落默认。
+  - 第二参：`Y`（默认）= 仅 `isHot` 热门；`N`/`ALL` = 全部（含非热门）。
+  - 例：`/app`、`/app 10 Y`、`/app 20 N`。
+- **每条展示**：App 名称（带 App Store 链接）、兑换码（可点击一键兑换）、**剩余 codesLeft/总数 total**、**上架时间 createdAt**、**平台 platform**、**权益时长 duration**、**优惠类型 offerType**。
+- **健壮性**：reveal 无码降级显示「暂未获取到」不崩；列表页不可用返回友好失败；按 id 去重。
+- **配置**：`CONFIG.promo`（base / listPath / revealPath / pageHeader / defaultCount / maxCount / timeoutSeconds），接口迁移无需改业务代码。
+- **别名**：`/promo`、`/freecode`；已登记 `/help`「查询」分类与英文描述。
+- **测试**：新增 22 项冒烟测试（解析 / 数量 / hot 过滤 / 上限 / 展示字段 / reveal 参数 / 无码降级 / 502 降级 / 注册与 help）。
+
+---
+
 ## 2026-11-06（续二）· 功能面板「返回主菜单」修复
 
 > 规模同步更新为：15 个模块（含 Secrets.gs）· 约 12888 行 · 432 项冒烟测试全绿 · 539 处顶层声明 0 重复。
