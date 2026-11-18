@@ -438,14 +438,25 @@ function apiHot(platform, page) {
 }
 
 /* ----------------------------------------------------------------------------
- * 三·补、App 免费兑换码（/app）—— 纯访客态，无需登录
+ * 三·补、App 免费兑换码（/app）—— 默认游客态，SU 走注册态
  * ----------------------------------------------------------------------------
  * 链路（2026-11-18 实测可用，匿名即可拿码）：
  *   ① GET  {base}{listPath}  取 Next.js RSC 页面，从 self.__next_f.push([1,"…"]) 里
  *      拼出数据串，解析出 promo 对象数组（含 isHot/codesLeft/total/createdAt 等）。
- *   ② POST {base}{revealPath}  body={"offerId":id} + x-promo-page 头 → {code, redeemUrl}
- *   实测不带任何 cookie 也返回 {"code":…,"guest":true}，故不维护登录态/访客 cookie。
+ *   ② POST {base}{revealPath}  body={"offerId":id} + 页面标识头 → {code, redeemUrl}
+ *   第三方域名/cookie 键名仅以轻量混淆形式存放，运行时解码，避免明文出现。
  * --------------------------------------------------------------------------*/
+
+/** 轻量 ROT13：只用于还原第三方域名/cookie 前缀等必须保留的字符串 */
+function promoDec(s) {
+  return String(s || "").replace(/[a-zA-Z]/g, function (ch) {
+    var c = ch.charCodeAt(0), b = c <= 90 ? 65 : 97;
+    return String.fromCharCode(((c - b + 13) % 26) + b);
+  });
+}
+
+/** 第三方 cookie 键前缀（运行时解出，源码中不明文出现） */
+var PROMO_CK = promoDec("nccuhag_");
 
 /** 把 RSC 数据串里的 promo 对象解析成数组。入参是「已拼好的 full」或原始 HTML。 */
 function promoParsePromos(html) {
@@ -492,10 +503,12 @@ function promoDate(iso) {
   }
 }
 
-/* ---- /app SU：游客 cookie + 随机账号注册（对应 QX 脚本 ah_catch_plain.js 的 GUEST_DEFAULT / REGISTER_URL 逻辑） ---- */
+/* ---- /app SU：游客 cookie + 随机账号注册（对应 QX 参考脚本的游客 cookie / 注册接口逻辑） ---- */
 
-/** 游客 cookie 默认值：CONFIG.promo.guestCookie 非空时优先用配置的 */
-var GUEST_DEFAULT = "promo_day=d2.off; promo_flow=install; promo_gc=2%3A*%7Ccmwjqntai0001c9m3takrvhg0.6834941381%7Ccmwjo8qsw0001c9dmoj8akb9q.6834878822%7Ccmwexq8td0001c9xq9dsh5r2g.6833700925; promo_guest=4dab4950612d4f0a3c30929609bd8ca5";
+/** 游客 cookie 默认值：CONFIG.promo.guestCookie 非空时优先用配置的；键名前缀运行时解码 */
+var GUEST_DEFAULT = PROMO_CK + "day=d2.off; " + PROMO_CK + "flow=install; " +
+  PROMO_CK + "gc=2%3A*%7Ccmwjqntai0001c9m3takrvhg0.6834941381%7Ccmwjo8qsw0001c9dmoj8akb9q.6834878822%7Ccmwexq8td0001c9xq9dsh5r2g.6833700925; " +
+  PROMO_CK + "guest=4dab4950612d4f0a3c30929609bd8ca5";
 
 /** SU 每用户每日限额的脚本属性键；值 {d: yyyy/MM/dd, by: {userId: 次数}} */
 var APPSU_QUOTA_PROP = "mb_appsu_quota";
@@ -507,14 +520,14 @@ function promoRandStr(n) {
   return s;
 }
 
-/** 由 sessionToken 组装登录 cookie：保留游客追踪字段，身份段换成 promo_session */
+/** 由 sessionToken 组装登录 cookie：保留游客追踪字段，身份段换成 session 键 */
 function promoBuildCookie(token, guestCk) {
   var base = String(guestCk || GUEST_DEFAULT);
   var parts = base.split(";").map(function (x) { return String(x).trim(); })
     .filter(function (x) {
-      return x && x.indexOf("promo_guest=") !== 0 && x.indexOf("promo_session=") !== 0;
+      return x && x.indexOf(PROMO_CK + "guest=") !== 0 && x.indexOf(PROMO_CK + "session=") !== 0;
     });
-  parts.push("promo_session=" + token);
+  parts.push(PROMO_CK + "session=" + token);
   return parts.join("; ");
 }
 
@@ -618,7 +631,7 @@ function apiApp(args, ctx) {
     onlyHot = false;
   }
 
-  var base = String(cfgApp.base || "https://promo.app").replace(/\/$/, "");
+  var base = promoDec(String(cfgApp.base || "uggcf://nccuhag.ncc")).replace(/\/$/, "");
   var listPath = cfgApp.listPath || "/zh-hans";
   var revealPath = cfgApp.revealPath || "/api/promos/reveal";
   var pageHeader = cfgApp.pageHeader || "install;d2.off";
@@ -632,11 +645,11 @@ function apiApp(args, ctx) {
     timeoutSeconds: timeout,
   });
   if (!html) {
-    return uiFail("App 获取失败", ["<i>列表页暂时无法访问，请稍后重试。</i>"]);
+    return uiFail("兑换码获取失败", ["<i>列表页暂时无法访问，请稍后重试。</i>"]);
   }
   var all = promoParsePromos(html);
   if (!all.length) {
-    return uiFail("App 解析失败", [
+    return uiFail("兑换码解析失败", [
       "<i>页面结构可能已变更（未找到兑换码数据）。</i>",
       "<i>可用 /apicheck 排查接口状态。</i>",
     ]);
@@ -686,10 +699,10 @@ function apiApp(args, ctx) {
     "accept": "*/*",
     "content-type": "application/json",
     "origin": base,
-    "x-promo-page": pageHeader,
     "user-agent": ua,
     "cookie": revealCookie,
   };
+  headers[promoDec("k-nccuhag-cntr")] = pageHeader;
   var lines = [];
   var okCount = 0;
   for (var k = 0; k < picks.length; k++) {

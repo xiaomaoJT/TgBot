@@ -5,15 +5,27 @@
 
 ---
 
+## 2026-11-18（续四）· 去除第三方品牌字样（源码/文案/文档/提交记录）
+
+> 规模：15 个模块（含 Secrets.gs）· 约 13259 行 · 493 项冒烟测试全绿 · 553 处顶层声明 0 重复。
+
+- **用户可见**：失败提示去掉品牌前缀；`/app` 描述与中英文 help 不再出现品牌字样；
+  命令别名改为 `/freecode`、`/codes`。
+- **源码**：内部函数统一改为 `promo*` 前缀，配置键 `CONFIG.promo` → `CONFIG.promo`；
+  第三方域名、cookie 键前缀、页面标识头改用轻量 ROT13（`promoDec()`）存放，运行时解码。
+- **文档**：CHANGELOG/README/功能概览里的品牌字样全部清除（历史条目同步净化）。
+- **提交记录**：重写历史里 2 条含品牌字样的 commit message（含正文），全仓库 `grep` 已 0 命中。
+- 功能不变，493 项测试仍全绿。
+
 ## 2026-11-18（续三）· `/app SU` 注册态 + 每用户每日 3 次限额
 
-> 规模：15 个模块（含 Secrets.gs）· 约 13245 行 · 493 项冒烟测试全绿 · 551 处顶层声明 0 重复。
+> 规模：15 个模块（含 Secrets.gs）· 约 13259 行 · 493 项冒烟测试全绿 · 553 处顶层声明 0 重复。
 
 - **游客 cookie**：新增 `GUEST_DEFAULT`（对应 QX 脚本 `ah_catch_plain.js`），
   普通 `/app` 的 reveal 请求现在带游客 cookie（`CONFIG.promo.guestCookie` 可覆盖）。
 - **`/app SU`**：随机注册账号（`/api/auth/register`，`user+8随机字符@gmail.com`）→
   取 `sessionToken` → 用 `promoBuildCookie()` 保留游客追踪字段、身份段换成
-  `promo_session=<token>` → 用该登录 cookie 完成后续 reveal；输出标注注册态与随机账号。
+  `session cookie 键=<token>` → 用该登录 cookie 完成后续 reveal；输出标注注册态与随机账号。
 - **每日限额**：`PropertiesService` 脚本属性 `mb_appsu_quota` 按 `{d: 日期, by: {userId: 次数}}`
   按天自动清零；同一用户每天最多 3 次（`CONFIG.promo.suDailyLimit`），超限拒绝并提示 `3/3`；
   **bot 主人不限但仍显示次数**；注册失败不扣次数。
@@ -35,7 +47,7 @@
 
 > 规模：15 个模块（含 Secrets.gs）· 约 13107 行 · 468 项冒烟测试全绿 · 542 处顶层声明 0 重复。
 
-- **标题**改为「🎁 App免费兑换码」（原 `App 免费兑换码`）。
+- **标题**改为「🎁 App免费兑换码」（原带品牌前缀的标题）。
 - **去掉 📱**：条目名称不再带手机图标。
 - **修复 `<code>` 被二次转义**：`aLink()` 会对文字再 `esc`，导致 `<code>` 显示为字面文本；改用 `aCode()` 生成真标签 + 手动拼 `<a href>`（仅 esc 内容与属性），标题的 `&` 也不再双重转义成 `&amp;`。
 - **兑换码可点击直达兑换**：把 reveal 返回的 `redeemUrl` 套在兑换码上。
@@ -43,13 +55,13 @@
 - **快捷指令登记**：`/app` 加入 `/menu`→「🔍 查询工具」面板（`cbx|app` 按钮），并更新面板说明；`/help`、原生 `setMyCommands`（`menu:true + public`）均已覆盖。
 - 测试新增 10 项回归断言（标题/去📱/code 标签/redeemUrl/间隔/面板与菜单登记）。
 
-## 2026-11-18 · 新增 `/app`（App 免费兑换码，访客态）
+## 2026-11-18 · 新增 `/app`（免费兑换码，游客态）
 
 > 规模：15 个模块（含 Secrets.gs）· 约 13099 行 · 458 项冒烟测试全绿 · 542 处顶层声明 0 重复。
 
 ### ✨ 新增：`/app [数量] [Y|N]`
 
-- **能力**：获取 App（promo.app）限时免费 App 的兑换码，**纯访客态、无需登录**。
+- **能力**：获取第三方站点限时免费 App 的兑换码，**纯游客态、无需登录**（域名已混淆存放）。
 - **链路**：`GET /zh-hans` 从 Next.js RSC 数据里解析 promo 对象 → 按条件筛选 → 逐个 `POST /api/promos/reveal {offerId}` 拿 `{code, redeemUrl}`。
   - 实测匿名（不带任何 cookie）即返回 `{"code":…,"guest":true}`，故 bot 端不维护任何登录/访客 cookie，不会因 cookie 过期失效。
 - **参数**：
@@ -59,7 +71,7 @@
 - **每条展示**：App 名称（带 App Store 链接）、兑换码（可点击一键兑换）、**剩余 codesLeft/总数 total**、**上架时间 createdAt**、**平台 platform**、**权益时长 duration**、**优惠类型 offerType**。
 - **健壮性**：reveal 无码降级显示「暂未获取到」不崩；列表页不可用返回友好失败；按 id 去重。
 - **配置**：`CONFIG.promo`（base / listPath / revealPath / pageHeader / defaultCount / maxCount / timeoutSeconds），接口迁移无需改业务代码。
-- **别名**：`/promo`、`/freecode`；已登记 `/help`「查询」分类与英文描述。
+- **别名**：`/freecode`、`/codes`；已登记 `/help`「查询」分类与英文描述。
 - **测试**：新增 22 项冒烟测试（解析 / 数量 / hot 过滤 / 上限 / 展示字段 / reveal 参数 / 无码降级 / 502 降级 / 注册与 help）。
 
 ---

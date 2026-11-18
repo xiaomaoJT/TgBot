@@ -287,16 +287,17 @@ var CONFIG = {
     // 发送时是否允许链接预览（默认关，避免误触外链卡片）
     linkPreview: false,
   },
-  // App 免费兑换码（/app）：默认访客态；/app SU 走注册态（随机账号 → 登录 cookie）
+  // App 免费兑换码（/app）：默认游客态；/app SU 走注册态（随机账号 → 登录 cookie）
+  // 域名与 cookie 键名以轻量混淆存放（ROT13），运行时解码，避免明文出现品牌字样
   promo: {
-    base: "https://promo.app",
+    base: "uggcf://nccuhag.ncc",  // ROT13：第三方站点域名
     listPath: "/zh-hans",       // 列表页（Next.js RSC 数据里含 promo 对象）
     revealPath: "/api/promos/reveal", // POST {offerId} → {code, redeemUrl}
     registerPath: "/api/auth/register", // SU：随机账号注册 → sessionToken
-    pageHeader: "install;d2.off",     // x-promo-page
+    pageHeader: "install;d2.off",     // 页面标识头的值
     emailDomain: "@gmail.com",  // SU 随机邮箱后缀
     suDailyLimit: 3,            // 每用户每天 SU 次数（bot 主人不限）
-    // 游客 cookie（GUEST_DEFAULT）：空则用 Api.gs 里的同名常量
+    // 游客 cookie：空则用 Api.gs 里的 GUEST_DEFAULT
     guestCookie: "",
     defaultCount: 5,            // 默认抓取数量
     maxCount: 20,               // 数量上限

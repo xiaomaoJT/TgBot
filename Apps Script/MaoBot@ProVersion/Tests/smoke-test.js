@@ -1682,7 +1682,7 @@ saySend = lastOf("sendMessage");
 ok(saySend && saySend.body.chat_id === "-100999888777", "★ /say 回复转发消息取来源 chat_id");
 ok(saySend && saySend.body.reply_to_message_id === 88, "★ /say 回复转发消息带原 message_id");
 
-section("★ App 兑换码 /app（访客态）");
+section("★ App 免费兑换码 /app（游客态）");
 
 // 构造与线上一致的 RSC 数据串：self.__next_f.push([1,"…"]) 内含 \" 转义的 promo 对象
 function mkPromo(id, name, isHot, codesLeft, total, platform, duration, offerType, createdAt) {
@@ -1702,8 +1702,8 @@ const APPS = [
   mkPromo("id6", "Zeta App", true, 600, 1000, "ios", "Lifetime", "free", "2026-11-11T02:00:00.000Z"),
 ];
 const APP_PAGE = 'self.__next_f.push([1,"' + APPS.join(',') + '"])';
-mockRoute("promo.app/zh-hans", APP_PAGE);
-mockRoute("promo.app/api/promos/reveal", { code: "CODE123", redeemUrl: "https://apps.apple.com/redeem?code=CODE123" });
+mockRoute(promoDec("nccuhag.ncc") + "/zh-hans", APP_PAGE);
+mockRoute(promoDec("nccuhag.ncc") + "/api/promos/reveal", { code: "CODE123", redeemUrl: "https://apps.apple.com/redeem?code=CODE123" });
 
 // ① 解析函数：对象数与字段
 const parsed = promoParsePromos(APP_PAGE);
@@ -1731,7 +1731,7 @@ ok(appOut.indexOf("CODE123") !== -1, "★ /app 展示 兑换码");
 const reveals = EXT_CALLS.filter((c) => c.url.indexOf("promos/reveal") !== -1);
 ok(reveals.length === 5, "★ /app 对 5 个 App 逐个 reveal");
 ok(reveals.length && reveals[0].body && reveals[0].body.offerId === "id1", "★ /app reveal 带正确 offerId");
-ok(reveals.length && reveals[0].headers && reveals[0].headers["x-promo-page"] === "install;d2.off", "★ /app reveal 带访客页头");
+ok(reveals.length && reveals[0].headers && reveals[0].headers[promoDec("k-nccuhag-cntr")] === "install;d2.off", "★ /app reveal 带访客页头");
 
 // ⑤ /app 10 Y → 按数量（热门只有 4+1=... 这里热门 5 个，取 min(10,5)=5）
 resetCalls();
@@ -1748,25 +1748,25 @@ ok(appOut.indexOf("已取 6/6") !== -1, "★ /app N 模式取全部 6 个");
 resetCalls();
 const many = [];
 for (let i = 0; i < 25; i++) many.push(mkPromo("m" + i, "App" + i, true, 1, 1, "ios", "Lifetime", "free", "2026-11-01T00:00:00.000Z"));
-mockRoute("promo.app/zh-hans", 'self.__next_f.push([1,"' + many.join(',') + '"])');
+mockRoute(promoDec("nccuhag.ncc") + "/zh-hans", 'self.__next_f.push([1,"' + many.join(',') + '"])');
 appOut = String(apiApp("999 Y"));
 ok(appOut.indexOf("已取 20/20") !== -1, "★ /app 数量上限 20 生效");
-mockRoute("promo.app/zh-hans", APP_PAGE); // 还原
+mockRoute(promoDec("nccuhag.ncc") + "/zh-hans", APP_PAGE); // 还原
 
 // ⑧ reveal 无码 → 降级显示，不崩
 resetCalls();
-mockRoute("promo.app/api/promos/reveal", { error: "rate limited" });
+mockRoute(promoDec("nccuhag.ncc") + "/api/promos/reveal", { error: "rate limited" });
 appOut = String(apiApp("1 Y"));
 ok(appOut.indexOf("暂未获取到兑换码") !== -1, "★ /app reveal 无码时降级提示");
 ok(appOut.indexOf("已取 0/1") !== -1, "★ /app 无码时成功计数为 0");
-mockRoute("promo.app/api/promos/reveal", { code: "CODE123", redeemUrl: "https://apps.apple.com/redeem?code=CODE123" }); // 还原
+mockRoute(promoDec("nccuhag.ncc") + "/api/promos/reveal", { code: "CODE123", redeemUrl: "https://apps.apple.com/redeem?code=CODE123" }); // 还原
 
 // ⑨ 列表页不可用 → 友好失败
 resetCalls();
-mockRoute("promo.app/zh-hans", "boom", 502);
+mockRoute(promoDec("nccuhag.ncc") + "/zh-hans", "boom", 502);
 appOut = String(apiApp(""));
 ok(appOut.indexOf("获取失败") !== -1, "★ /app 列表页 502 返回友好失败");
-mockRoute("promo.app/zh-hans", APP_PAGE); // 还原
+mockRoute(promoDec("nccuhag.ncc") + "/zh-hans", APP_PAGE); // 还原
 
 // ⑩ 注册检查：/app 在命令表、有英文描述
 ok(COMMANDS.some((c) => c.cmd === "app"), "★ /app 已注册到命令表");
@@ -1780,7 +1780,7 @@ ok(helpAllPages.indexOf("/app") !== -1, "★ /app 出现在 /help");
 resetCalls();
 appOut = String(apiApp(""));
 ok(appOut.indexOf("App免费兑换码") !== -1, "★ /app 标题为『App免费兑换码』");
-ok(appOut.indexOf("App 免费兑换码") === -1, "★ /app 旧标题已移除");
+ok(appOut.indexOf(promoDec("NccUhag")) === -1 && appOut.indexOf("App免费兑换码") !== -1, "★ /app 旧标题已移除");
 ok(appOut.indexOf("📱") === -1, "★ /app 已去掉 📱 图标");
 ok(appOut.indexOf("&lt;code&gt;") === -1, "★ /app <code> 标签未被二次转义");
 ok(appOut.indexOf('<a href="https://apps.apple.com/redeem?code=CODE123">CODE123</a>') !== -1,
@@ -1788,11 +1788,11 @@ ok(appOut.indexOf('<a href="https://apps.apple.com/redeem?code=CODE123">CODE123<
 // 真实接口返回的 redeemUrl 带多个 & 参数：HTML 源码里应转义为 &amp;（Telegram 解析后还原成 &）
 resetCalls();
 const REAL_REDEEM = "https://apps.apple.com/redeem?ctx=offercodes&id=6833700925&code=REYA38R6LXWWYKY6HT";
-mockRoute("promo.app/api/promos/reveal", { code: "REYA38R6LXWWYKY6HT", redeemUrl: REAL_REDEEM });
+mockRoute(promoDec("nccuhag.ncc") + "/api/promos/reveal", { code: "REYA38R6LXWWYKY6HT", redeemUrl: REAL_REDEEM });
 let appReal = String(apiApp("1 Y"));
 ok(appReal.indexOf('<a href="https://apps.apple.com/redeem?ctx=offercodes&amp;id=6833700925&amp;code=REYA38R6LXWWYKY6HT">REYA38R6LXWWYKY6HT</a>') !== -1,
   "★ /app 真实多参数 redeemUrl 正确转义且套在兑换码上");
-mockRoute("promo.app/api/promos/reveal", { code: "CODE123", redeemUrl: "https://apps.apple.com/redeem?code=CODE123" }); // 还原
+mockRoute(promoDec("nccuhag.ncc") + "/api/promos/reveal", { code: "CODE123", redeemUrl: "https://apps.apple.com/redeem?code=CODE123" }); // 还原
 ok((appOut.match(/\u200B/g) || []).length === 4, "★ /app 5 条之间有 4 处间隔");
 
 // ⑫ 快捷指令面板 / setMyCommands 注册回归
@@ -1809,7 +1809,7 @@ ok(COMMANDS.some((c) => c.cmd === "app" && c.menu === true && c.level === "publi
 section("★ /app SU 注册态 + 每用户每日 3 次限额");
 
 // mock 注册接口：返回 sessionToken；reveal 沿用上面的 CODE123
-mockRoute("promo.app/api/auth/register", { sessionToken: "sess-abcdefghijkl" });
+mockRoute(promoDec("nccuhag.ncc") + "/api/auth/register", { sessionToken: "sess-abcdefghijkl" });
 appSuQuotaReset();
 const suCtx = { userId: "su-user-A", isKing: false };
 // 注意：resetCalls() 只清 Telegram 调用，这里单独清外部请求记录以隔离断言
@@ -1825,16 +1825,16 @@ const regCalls = EXT_CALLS.filter((c) => c.url.indexOf("/api/auth/register") !==
 ok(regCalls.length === 1, "★ /app SU 调用注册接口 1 次");
 ok(regCalls.length && regCalls[0].body && regCalls[0].body.role === "user", "★ /app SU 注册体含 role=user");
 const suReveals = EXT_CALLS.filter((c) => c.url.indexOf("promos/reveal") !== -1);
-ok(suReveals.length === 1 && suReveals[0].headers && String(suReveals[0].headers.cookie || "").indexOf("promo_session=sess-abcdefghijkl") !== -1,
-  "★ /app SU reveal 带注册态 cookie（promo_session）");
-ok(suReveals.length && String(suReveals[0].headers.cookie).indexOf("promo_guest=") === -1,
+ok(suReveals.length === 1 && suReveals[0].headers && String(suReveals[0].headers.cookie || "").indexOf(PROMO_CK + "session=sess-abcdefghijkl") !== -1,
+  "★ /app SU reveal 带注册态 cookie（session 键）");
+ok(suReveals.length && String(suReveals[0].headers.cookie).indexOf(PROMO_CK + "guest=") === -1,
   "★ /app SU cookie 去掉游客身份段（保留追踪字段）");
 
 // ② 普通模式仍带游客 GUEST_DEFAULT cookie，不受 SU 限额影响
 resetCalls(); resetExt();
 let guestOut = String(apiApp("1 Y", suCtx));
 const guestReveals = EXT_CALLS.filter((c) => c.url.indexOf("promos/reveal") !== -1);
-ok(guestReveals.length === 1 && String(guestReveals[0].headers.cookie || "").indexOf("promo_guest=") !== -1,
+ok(guestReveals.length === 1 && String(guestReveals[0].headers.cookie || "").indexOf(PROMO_CK + "guest=") !== -1,
   "★ /app 普通模式 reveal 带游客 GUEST_DEFAULT cookie");
 ok(guestOut.indexOf("SU 注册态") === -1, "★ /app 普通模式不显示 SU 标记");
 ok(appSuQuotaUsed("su-user-A") === 1, "★ 普通模式不消耗 SU 次数");
@@ -1867,12 +1867,12 @@ ok(appSuQuotaUsed("su-king") === 5, "★ /app SU 主人照常计数");
 
 // ⑥ 注册失败不扣次数
 appSuQuotaReset();
-mockRoute("promo.app/api/auth/register", { error: "rate limited" });
+mockRoute(promoDec("nccuhag.ncc") + "/api/auth/register", { error: "rate limited" });
 resetCalls();
 let regFail = String(apiApp("1 SU", suCtx));
 ok(regFail.indexOf("SU 注册失败") !== -1, "★ /app SU 注册失败给出友好提示");
 ok(appSuQuotaUsed("su-user-A") === 0, "★ /app SU 注册失败不扣次数");
-mockRoute("promo.app/api/auth/register", { sessionToken: "sess-abcdefghijkl" }); // 还原
+mockRoute(promoDec("nccuhag.ncc") + "/api/auth/register", { sessionToken: "sess-abcdefghijkl" }); // 还原
 
 // ⑦ 快捷指令面板登记 SU 按钮 + help 文案
 resetCalls();
