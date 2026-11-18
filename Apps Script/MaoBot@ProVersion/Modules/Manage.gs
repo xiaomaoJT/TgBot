@@ -1078,10 +1078,10 @@ function handleMenuCallback(ctx, cat) {
       rows: [
         [btn("🌦 天气", ["hcat", "查询"]), btn("🔥 热榜", ["hot", "weibo", "p", "0"])],
         [btn("🤖 AI 对话", ["hcat", "查询"]), btn("🌐 IP 查询", ["hcat", "查询"])],
-        [btn("🎁 免费兑换码", ["cbx", "app"])],
+        [btn("🎁 免费兑换码", ["cbx", "app"]), btn("♻️ SU 兑换码", ["cbx", "app SU"])],
       ],
       hint:
-        "直接发送指令即可，例如 <code>/weather 北京</code>、<code>/ai 你好</code>、<code>/hot zhihu</code>、<code>/app 5 Y</code>（免费兑换码）",
+        "直接发送指令即可，例如 <code>/weather 北京</code>、<code>/ai 你好</code>、<code>/hot zhihu</code>、<code>/app 5 Y</code>（访客码）、<code>/app SU</code>（注册态，每人每天 3 次）",
     },
     fun: {
       title: "🎮 娱乐互动",
@@ -1241,7 +1241,10 @@ function handleWxCallback(ctx) {
  * 这样面板按钮和文本指令走的是同一套实现，不会出现两套逻辑不一致。
  */
 function handleQuickCommand(ctx, cmdName) {
-  var def = findCommand(String(cmdName || "").toLowerCase());
+  // 支持按钮带参数，如 "app SU"：首段为指令名，其余为 args（旧按钮无参数，行为不变）
+  var qp = String(cmdName || "").trim().split(/\s+/);
+  var def = findCommand(String(qp[0] || "").toLowerCase());
+  var qargs = qp.length > 1 ? qp.slice(1).join(" ") : "";
   if (!def) {
     tgAnswerCallback(ctx.callbackId, "未知指令");
     return;
@@ -1254,7 +1257,7 @@ function handleQuickCommand(ctx, cmdName) {
   tgAnswerCallback(ctx.callbackId, "");
   var result;
   try {
-    result = def.handler(ctx, "");
+    result = def.handler(ctx, qargs);
   } catch (e) {
     logError("quickcmd:" + cmdName, e);
     tgAnswerCallback(ctx.callbackId, "执行出错", true);

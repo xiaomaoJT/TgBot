@@ -492,17 +492,111 @@ function promoDate(iso) {
   }
 }
 
+/* ---- /app SU：游客 cookie + 随机账号注册（对应 QX 脚本 ah_catch_plain.js 的 GUEST_DEFAULT / REGISTER_URL 逻辑） ---- */
+
+/** 游客 cookie 默认值：CONFIG.promo.guestCookie 非空时优先用配置的 */
+var GUEST_DEFAULT = "promo_day=d2.off; promo_flow=install; promo_gc=2%3A*%7Ccmwjqntai0001c9m3takrvhg0.6834941381%7Ccmwjo8qsw0001c9dmoj8akb9q.6834878822%7Ccmwexq8td0001c9xq9dsh5r2g.6833700925; promo_guest=4dab4950612d4f0a3c30929609bd8ca5";
+
+/** SU 每用户每日限额的脚本属性键；值 {d: yyyy/MM/dd, by: {userId: 次数}} */
+var APPSU_QUOTA_PROP = "mb_appsu_quota";
+
+function promoRandStr(n) {
+  var chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  var s = "";
+  for (var i = 0; i < n; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+  return s;
+}
+
+/** 由 sessionToken 组装登录 cookie：保留游客追踪字段，身份段换成 promo_session */
+function promoBuildCookie(token, guestCk) {
+  var base = String(guestCk || GUEST_DEFAULT);
+  var parts = base.split(";").map(function (x) { return String(x).trim(); })
+    .filter(function (x) {
+      return x && x.indexOf("promo_guest=") !== 0 && x.indexOf("promo_session=") !== 0;
+    });
+  parts.push("promo_session=" + token);
+  return parts.join("; ");
+}
+
+/** 随机账号注册 → {ok, token, email, err}；token 取 sessionToken / session.token */
+function promoRegister(base, registerPath, emailDomain, ua, timeout) {
+  var email = "user" + promoRandStr(8) + String(emailDomain || "@gmail.com");
+  var password = "pw" + promoRandStr(10);
+  var name = promoRandStr(6);
+  var body = { email: email, password: password, name: name, role: "user" };
+  var h = { "content-type": "application/json", "accept": "application/json", "user-agent": ua };
+  var r = httpPostJsonEx(base + registerPath, body, { headers: h, timeoutSeconds: timeout });
+  var j = (r && r.json) || {};
+  var token = j.sessionToken || (j.session && j.session.token) || "";
+  return {
+    ok: !!token && typeof token === "string",
+    token: token,
+    email: email,
+    err: j.error || j.message || null,
+  };
+}
+
+/** SU 配额：读当日状态 { d, by }，跨天自动清零 */
+function appSuQuotaState() {
+  try {
+    var raw = PropertiesService.getScriptProperties().getProperty(APPSU_QUOTA_PROP);
+    var o = raw ? JSON.parse(raw) : null;
+    if (o && o.d === todayStr() && o.by && typeof o.by === "object") return o;
+  } catch (e) {}
+  return { d: todayStr(), by: {} };
+}
+
+function appSuQuotaUsed(uid) {
+  var by = appSuQuotaState().by || {};
+  return Number(by[String(uid)] || 0);
+}
+
+/** 消耗一次并返回最新次数 */
+function appSuQuotaUse(uid) {
+  var st = appSuQuotaState();
+  st.by = st.by || {};
+  st.d = todayStr();
+  var k = String(uid);
+  st.by[k] = Number(st.by[k] || 0) + 1;
+  try {
+    PropertiesService.getScriptProperties().setProperty(APPSU_QUOTA_PROP, JSON.stringify(st));
+  } catch (e) {}
+  return st.by[k];
+}
+
+/** 测试/手动重置用 */
+function appSuQuotaReset() {
+  try {
+    PropertiesService.getScriptProperties().setProperty(APPSU_QUOTA_PROP, JSON.stringify({ d: todayStr(), by: {} }));
+  } catch (e) {}
+}
+
 /**
- * /app [数量] [Y|N]
+ * /app [数量] [Y|N] [SU]
  *   数量：默认 5，范围 1..maxCount(20)。传 0/all 也按上限取。
  *   第二参：Y（默认）= 仅 isHot 热门；N / ALL / A = 全部（不过滤）。
+ *   SU（大小写不限，任意位置）：随机注册一个账号换取登录 cookie 后再 reveal；
+ *      同一用户每天最多 suDailyLimit(3) 次，bot 主人不限但仍显示次数。
  */
-function apiApp(args) {
+function apiApp(args, ctx) {
   var raw = String(args || "").trim();
   var toks = raw ? raw.split(/\s+/) : [];
   var cfgApp = CONFIG.promo || {};
   var defCount = Number(cfgApp.defaultCount) || 5;
   var maxCount = Number(cfgApp.maxCount) || 20;
+
+  // ---- SU 开关：从参数里摘掉 su/signup，剩余部分仍按 [数量] [Y|N] 解析 ----
+  var suMode = false;
+  toks = toks.filter(function (t) {
+    var v = String(t).toLowerCase();
+    if (v === "su" || v === "signup") { suMode = true; return false; }
+    return true;
+  });
+  var c = ctx || {};
+  var suUid = String(c.userId || "anon");
+  var suIsKing = !!c.isKing;
+  var suLimit = Number(cfgApp.suDailyLimit) || 3;
+  var suUsed = suMode ? appSuQuotaUsed(suUid) : 0;
 
   // ---- 解析数量 ----
   var count = defCount;
@@ -562,13 +656,39 @@ function apiApp(args) {
     return uiFail("没有可用兑换码", ["<i>当前无" + (onlyHot ? "热门" : "") + " App，请稍后再试。</i>"]);
   }
 
-  // ---- ③ 逐条 reveal（访客态）----
+  // ---- SU：确认有 App 可抓后再查限额 → 随机注册换登录 cookie → 扣次数（注册失败不扣）----
+  var suCookie = "";
+  var suEmail = "";
+  var revealCookie = String(cfgApp.guestCookie || GUEST_DEFAULT);
+  if (suMode) {
+    if (!suIsKing && suUsed >= suLimit) {
+      return uiFail("今日 SU 次数已用完", [
+        "今日已用 <code>" + suUsed + "/" + suLimit + "</code> 次，每天 00:00 重置。",
+        "<i>Bot 主人不受限制；你也可改用普通访客态 <code>/app " + esc(raw.replace(/\bsu\b/i, "").trim()) + "</code>。</i>",
+      ]);
+    }
+    var reg = promoRegister(base, cfgApp.registerPath || "/api/auth/register",
+      cfgApp.emailDomain || "@gmail.com", ua, timeout);
+    if (!reg.ok) {
+      return uiFail("SU 注册失败", [
+        "<i>未能从注册接口拿到 sessionToken" + (reg.err ? "：" + esc(reg.err) : "") + "。</i>",
+        "<i>次数未扣除，可稍后重试或改用普通访客态。</i>",
+      ]);
+    }
+    suEmail = reg.email;
+    suCookie = promoBuildCookie(reg.token, revealCookie);
+    revealCookie = suCookie;
+    suUsed = appSuQuotaUse(suUid); // 注册成功才扣
+  }
+
+  // ---- ③ 逐条 reveal（SU=注册态 cookie；普通=游客 GUEST_DEFAULT）----
   var headers = {
     "accept": "*/*",
     "content-type": "application/json",
     "origin": base,
     "x-promo-page": pageHeader,
     "user-agent": ua,
+    "cookie": revealCookie,
   };
   var lines = [];
   var okCount = 0;
@@ -613,13 +733,24 @@ function apiApp(args) {
     if (k < picks.length - 1) lines.push("\u200B");
   }
 
+  // SU 头部提示：显示注册账号与今日用量（主人标注「不限」但仍显示次数）
+  var suHead = "";
+  if (suMode) {
+    var quotaTail = suIsKing
+      ? "<code>" + suUsed + "</code> 次 · <i>主人不限</i>"
+      : "<code>" + suUsed + "/" + suLimit + "</code> 次";
+    suHead = "♻️ SU 注册态 · 账号 <code>" + esc(suEmail) + "</code> · 今日 " + quotaTail;
+  }
+  var allLines = suHead ? [suHead, "\u200B"].concat(lines) : lines;
+
   return uiCard({
     icon: "🎁",
     title: "App免费兑换码",
     subtitle: "已取 " + okCount + "/" + picks.length + " 个 · " +
-              (onlyHot ? "仅热门" : "全部") + (raw ? " · " + raw : ""),
-    body: lines,
-    footer: "访客态获取 · 码先到先得，失效请以页面为准",
+              (suMode ? "SU 注册态" : (onlyHot ? "仅热门" : "全部")) +
+              (raw ? " · " + raw : ""),
+    body: allLines,
+    footer: (suMode ? "SU 注册态获取" : "访客态获取") + " · 码先到先得，失效请以页面为准",
   });
 }
 

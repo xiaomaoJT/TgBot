@@ -1805,6 +1805,93 @@ ok(editQ.length && editQ[0].body.text.indexOf("/app") !== -1, "★ 查询工具�
 ok(COMMANDS.some((c) => c.cmd === "app" && c.menu === true && c.level === "public"),
   "★ /app menu:true + public（会同步到原生命令菜单）");
 
+/* ------------------------------------------------------------ */
+section("★ /app SU 注册态 + 每用户每日 3 次限额");
+
+// mock 注册接口：返回 sessionToken；reveal 沿用上面的 CODE123
+mockRoute("promo.app/api/auth/register", { sessionToken: "sess-abcdefghijkl" });
+appSuQuotaReset();
+const suCtx = { userId: "su-user-A", isKing: false };
+// 注意：resetCalls() 只清 Telegram 调用，这里单独清外部请求记录以隔离断言
+function resetExt() { EXT_CALLS.length = 0; }
+
+// ① SU：先注册拿 token，再拼登录 cookie 用于 reveal
+resetCalls(); resetExt();
+let suOut = String(apiApp("1 SU", suCtx));
+ok(suOut.indexOf("SU 注册态") !== -1, "★ /app SU 输出标注注册态");
+ok(suOut.indexOf("今日 <code>1/3</code> 次") !== -1, "★ /app SU 显示今日已用 1/3 次");
+ok(/user[a-z0-9]{8}@gmail\.com/.test(suOut), "★ /app SU 显示随机注册账号");
+const regCalls = EXT_CALLS.filter((c) => c.url.indexOf("/api/auth/register") !== -1);
+ok(regCalls.length === 1, "★ /app SU 调用注册接口 1 次");
+ok(regCalls.length && regCalls[0].body && regCalls[0].body.role === "user", "★ /app SU 注册体含 role=user");
+const suReveals = EXT_CALLS.filter((c) => c.url.indexOf("promos/reveal") !== -1);
+ok(suReveals.length === 1 && suReveals[0].headers && String(suReveals[0].headers.cookie || "").indexOf("promo_session=sess-abcdefghijkl") !== -1,
+  "★ /app SU reveal 带注册态 cookie（promo_session）");
+ok(suReveals.length && String(suReveals[0].headers.cookie).indexOf("promo_guest=") === -1,
+  "★ /app SU cookie 去掉游客身份段（保留追踪字段）");
+
+// ② 普通模式仍带游客 GUEST_DEFAULT cookie，不受 SU 限额影响
+resetCalls(); resetExt();
+let guestOut = String(apiApp("1 Y", suCtx));
+const guestReveals = EXT_CALLS.filter((c) => c.url.indexOf("promos/reveal") !== -1);
+ok(guestReveals.length === 1 && String(guestReveals[0].headers.cookie || "").indexOf("promo_guest=") !== -1,
+  "★ /app 普通模式 reveal 带游客 GUEST_DEFAULT cookie");
+ok(guestOut.indexOf("SU 注册态") === -1, "★ /app 普通模式不显示 SU 标记");
+ok(appSuQuotaUsed("su-user-A") === 1, "★ 普通模式不消耗 SU 次数");
+
+// ③ 同一用户第 2、3 次可用，第 4 次被拒并提示次数
+apiApp("1 SU", suCtx);
+apiApp("1 SU", suCtx);
+ok(appSuQuotaUsed("su-user-A") === 3, "★ /app SU 同一用户累计到 3 次");
+resetCalls(); resetExt();
+let blocked = String(apiApp("1 SU", suCtx));
+ok(blocked.indexOf("今日 SU 次数已用完") !== -1, "★ /app SU 第 4 次被拒");
+ok(blocked.indexOf("3/3") !== -1, "★ /app SU 超额时提示已用 3/3 次");
+ok(EXT_CALLS.filter((c) => c.url.indexOf("/api/auth/register") !== -1).length === 0,
+  "★ /app SU 超额时不再调用注册接口");
+
+// ④ 不同用户计数独立
+const suCtxB = { userId: "su-user-B", isKing: false };
+resetCalls();
+let suB = String(apiApp("1 SU", suCtxB));
+ok(suB.indexOf("今日 <code>1/3</code> 次") !== -1, "★ /app SU 不同用户计数独立");
+
+// ⑤ bot 主人不受限，但仍显示次数
+const suKing = { userId: "su-king", isKing: true };
+for (let i = 0; i < 4; i++) apiApp("1 SU", suKing);
+resetCalls();
+let kingOut = String(apiApp("1 SU", suKing));
+ok(kingOut.indexOf("主人不限") !== -1, "★ /app SU 主人不受 3 次限制");
+ok(kingOut.indexOf("今日 <code>5</code> 次") !== -1, "★ /app SU 主人也会提示已用次数");
+ok(appSuQuotaUsed("su-king") === 5, "★ /app SU 主人照常计数");
+
+// ⑥ 注册失败不扣次数
+appSuQuotaReset();
+mockRoute("promo.app/api/auth/register", { error: "rate limited" });
+resetCalls();
+let regFail = String(apiApp("1 SU", suCtx));
+ok(regFail.indexOf("SU 注册失败") !== -1, "★ /app SU 注册失败给出友好提示");
+ok(appSuQuotaUsed("su-user-A") === 0, "★ /app SU 注册失败不扣次数");
+mockRoute("promo.app/api/auth/register", { sessionToken: "sess-abcdefghijkl" }); // 还原
+
+// ⑦ 快捷指令面板登记 SU 按钮 + help 文案
+resetCalls();
+handleCallback({ chatId: "111222", userId: "111222", isGroup: false, userName: "u", chatType: "private", messageId: 10, callbackId: "CBSU", callbackData: cbPack(["menu", "query"]) });
+var editSU = callsOf("editMessageText");
+ok(editSU.length && JSON.stringify(editSU[0].markup || editSU[0].body.reply_markup || {}).indexOf("app SU") !== -1,
+  "★ /app SU 登记在『查询工具』快捷指令面板");
+// 实际点 SU 按钮：cbx|app SU → handleQuickCommand 解析出 args=SU 并执行注册态
+resetCalls(); resetExt();
+handleCallback({ chatId: "111222", userId: "111222", isGroup: false, userName: "u", chatType: "private", messageId: 11, callbackId: "CBSUCLICK", callbackData: cbPack(["cbx", "app SU"]) });
+const suCard = lastOf("sendMessage");
+ok(suCard && JSON.stringify(suCard.body || {}).indexOf("SU 注册态") !== -1,
+  "★ 点击『SU 兑换码』按钮实际执行注册态 /app SU");
+ok(EXT_CALLS.filter((c) => c.url.indexOf("/api/auth/register") !== -1).length === 1,
+  "★ 点击 SU 按钮触发 1 次注册");
+ok(COMMANDS.some((c) => c.cmd === "app" && c.usage.indexOf("SU") !== -1),
+  "★ /app usage 含 SU 参数");
+ok(!!(I18N_CMD_EN.app && I18N_CMD_EN.app.usage.indexOf("SU") !== -1), "★ /app 英文 usage 含 SU 参数");
+
 /* ============================================================ */
 console.log("\n" + "=".repeat(46));
 console.log("通过 " + PASS + " 项，失败 " + FAIL + " 项");

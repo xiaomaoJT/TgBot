@@ -5,6 +5,22 @@
 
 ---
 
+## 2026-11-18（续三）· `/app SU` 注册态 + 每用户每日 3 次限额
+
+> 规模：15 个模块（含 Secrets.gs）· 约 13245 行 · 493 项冒烟测试全绿 · 551 处顶层声明 0 重复。
+
+- **游客 cookie**：新增 `GUEST_DEFAULT`（对应 QX 脚本 `ah_catch_plain.js`），
+  普通 `/app` 的 reveal 请求现在带游客 cookie（`CONFIG.promo.guestCookie` 可覆盖）。
+- **`/app SU`**：随机注册账号（`/api/auth/register`，`user+8随机字符@gmail.com`）→
+  取 `sessionToken` → 用 `promoBuildCookie()` 保留游客追踪字段、身份段换成
+  `promo_session=<token>` → 用该登录 cookie 完成后续 reveal；输出标注注册态与随机账号。
+- **每日限额**：`PropertiesService` 脚本属性 `mb_appsu_quota` 按 `{d: 日期, by: {userId: 次数}}`
+  按天自动清零；同一用户每天最多 3 次（`CONFIG.promo.suDailyLimit`），超限拒绝并提示 `3/3`；
+  **bot 主人不限但仍显示次数**；注册失败不扣次数。
+- **注册面**：`/app` usage /examples 补 SU、中英文 help 描述更新；
+  `/menu`→查询工具新增「♻️ SU 兑换码」按钮；`handleQuickCommand` 支持按钮带参数（如 `cbx|app SU`）。
+- 测试：新增 25 项 SU 回归（注册链路、cookie 拼接、限额、主人豁免、失败不扣次数、按钮点击）。
+
 ## 2026-11-18（续二）· 修复兑换码链接不生效
 
 > 规模：15 个模块（含 Secrets.gs）· 约 13106 行 · 468 项冒烟测试全绿 · 542 处顶层声明 0 重复。
