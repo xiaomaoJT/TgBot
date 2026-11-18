@@ -1717,7 +1717,7 @@ let appOut = String(apiApp(""));
 ok(appOut.indexOf("Alpha App") !== -1, "★ /app 默认输出第 1 个热门 App");
 ok(appOut.indexOf("Gamma App") === -1, "★ /app Y 模式过滤非热门 App");
 ok(appOut.indexOf("已取 5/5") !== -1, "★ /app 默认取 5 个热门");
-ok((appOut.match(/📱 <b>/g) || []).length === 5, "★ /app 默认只渲染 5 条");
+ok((appOut.match(/<b>\[\d+\]/g) || []).length === 5, "★ /app 默认只渲染 5 条");
 
 // ③ 用户要求的展示字段
 ok(appOut.indexOf("100/1000") !== -1, "★ /app 展示 剩余/总数");
@@ -1775,6 +1775,28 @@ ok(!!(I18N_CMD_EN.app && I18N_CMD_EN.app.desc), "★ /app 有英文描述");
 let helpAllPages = "";
 for (let p = 0; p < helpTotalPages(""); p++) helpAllPages += buildHelpText("", p);
 ok(helpAllPages.indexOf("/app") !== -1, "★ /app 出现在 /help");
+
+// ⑪ 2026-11-18 展示修复回归
+resetCalls();
+appOut = String(apiApp(""));
+ok(appOut.indexOf("App免费兑换码") !== -1, "★ /app 标题为『App免费兑换码』");
+ok(appOut.indexOf("App 免费兑换码") === -1, "★ /app 旧标题已移除");
+ok(appOut.indexOf("📱") === -1, "★ /app 已去掉 📱 图标");
+ok(appOut.indexOf("&lt;code&gt;") === -1, "★ /app <code> 标签未被二次转义");
+ok(appOut.indexOf("<code>CODE123</code>") !== -1, "★ /app 兑换码用真 <code> 标签渲染");
+ok(appOut.indexOf('<a href="https://apps.apple.com/redeem?code=CODE123"><code>CODE123</code></a>') !== -1,
+  "★ /app redeemUrl 套在兑换码上（点击直达兑换）");
+ok((appOut.match(/\u200B/g) || []).length === 4, "★ /app 5 条之间有 4 处间隔");
+
+// ⑫ 快捷指令面板 / setMyCommands 注册回归
+resetCalls();
+handleCallback({ chatId: "111222", userId: "111222", isGroup: false, userName: "u", chatType: "private", messageId: 10, callbackId: "CBAPP", callbackData: cbPack(["menu", "query"]) });
+var editQ = callsOf("editMessageText");
+ok(editQ.length && JSON.stringify(editQ[0].markup || editQ[0].body.reply_markup || {}).indexOf("cbx|app") !== -1,
+  "★ /app 登记在『查询工具』快捷指令面板");
+ok(editQ.length && editQ[0].body.text.indexOf("/app") !== -1, "★ 查询工具面板提示含 /app 用法");
+ok(COMMANDS.some((c) => c.cmd === "app" && c.menu === true && c.level === "public"),
+  "★ /app menu:true + public（会同步到原生命令菜单）");
 
 /* ============================================================ */
 console.log("\n" + "=".repeat(46));

@@ -584,19 +584,25 @@ function apiApp(args) {
     if (code) okCount++;
 
     // 标题：App 名称（带 App Store 链接）
+    // ⚠️ aLink() 内部已对文字 esc，切勿在传入前再 esc，否则 "&" 会双重转义成 "&amp;"
     var appLink = app.redeemUrl || "";
-    var title = appLink ? aLink(appLink, esc(clip(app.appName || "未命名", 60))) : esc(clip(app.appName || "未命名", 60));
-    lines.push("📱 <b>[" + (k + 1) + "] " + title + "</b>");
-    // 兑换码（可一键跳转兑换）
+    var appName = clip(app.appName || "未命名", 60);
+    var title = appLink ? aLink(appLink, appName) : esc(appName);
+    lines.push("<b>[" + (k + 1) + "] " + title + "</b>");
+    // 兑换码：把 reveal 返回的 redeemUrl 直接套在兑换码上（点击直达兑换页）。
+    // ⚠️ 不能用 aLink(url, "<code>…</code>")：aLink 会把 <code> 一起 esc 成字面文本。
+    //    改用 aCode() 生成真 <code> 标签，再手动拼 <a href>，只 esc 内容与属性。
     if (code) {
-      lines.push("🎟️ " + (redeem ? aLink(redeem, "<code>" + esc(code) + "</code>") : "<code>" + esc(code) + "</code>"));
+      var codeHtml = aCode(code);
+      if (redeem) codeHtml = '<a href="' + escAttr(redeem) + '">' + codeHtml + "</a>";
+      lines.push("🎟️ " + codeHtml);
     } else {
       lines.push("🎟️ <i>暂未获取到兑换码</i>");
     }
     // 用户要求补充的 5 个字段
     lines.push(
-      "📊 剩余/总数：<code>" + (app.codesLeft != null ? app.codesLeft : "-") + "/" +
-      (app.total != null ? app.total : "-") + "</code>"
+      "📊 剩余/总数：" + aCode((app.codesLeft != null ? app.codesLeft : "-") + "/" +
+      (app.total != null ? app.total : "-"))
     );
     lines.push("🗓️ 上架：" + esc(promoDate(app.createdAt)));
     lines.push(
@@ -604,12 +610,13 @@ function apiApp(args) {
       " · " + esc(String(app.duration || "-")) +
       " · " + esc(String(app.offerType || "-"))
     );
-    if (k < picks.length - 1) lines.push(""); // 条目间空行
+    // 条目间空行：uiCard 的 body.filter 会丢掉严格 ""，用零宽空格代替（Telegram 渲染为空行）
+    if (k < picks.length - 1) lines.push("\u200B");
   }
 
   return uiCard({
     icon: "🎁",
-    title: "App 免费兑换码",
+    title: "App免费兑换码",
     subtitle: "已取 " + okCount + "/" + picks.length + " 个 · " +
               (onlyHot ? "仅热门" : "全部") + (raw ? " · " + raw : ""),
     body: lines,

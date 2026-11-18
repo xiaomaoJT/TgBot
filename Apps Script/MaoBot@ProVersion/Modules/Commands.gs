@@ -590,8 +590,8 @@ function helpKeyboard(cat, page) {
 function cmdMenu(ctx) {
   var body = [
     uiSection(L("我能做什么", "What I can do"), "🧭"),
-    uiItem(L("查询：天气 / 热榜 / IP / 翻译 / AI 对话",
-      "Lookup: weather / trends / IP / translate / AI chat")),
+    uiItem(L("查询：天气 / 热榜 / IP / 翻译 / AI 对话 / 免费兑换码",
+      "Lookup: weather / trends / IP / translate / AI chat / free codes")),
     uiItem(L("娱乐：一言 / 毒鸡汤 / 今日一签 / 骰子",
       "Fun: one-liners / chicken soup / fortune / dice")),
     uiItem(L("工具：计算器 / 短链 / 二维码 / 随机图片 / 时间戳",
