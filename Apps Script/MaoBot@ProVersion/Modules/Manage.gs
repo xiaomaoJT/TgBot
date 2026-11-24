@@ -1079,9 +1079,10 @@ function handleMenuCallback(ctx, cat) {
         [btn("🌦 天气", ["hcat", "查询"]), btn("🔥 热榜", ["hot", "weibo", "p", "0"])],
         [btn("🤖 AI 对话", ["hcat", "查询"]), btn("🌐 IP 查询", ["hcat", "查询"])],
         [btn("🎁 免费兑换码", ["cbx", "app"]), btn("♻️ SU 兑换码", ["cbx", "app SU"])],
+        [btn("🔥 趋势兑换码", ["cbx", "free"])],
       ],
       hint:
-        "直接发送指令即可，例如 <code>/weather 北京</code>、<code>/ai 你好</code>、<code>/hot zhihu</code>、<code>/app 5 Y</code>（访客码）、<code>/app SU</code>（注册态，每人每天 3 次）",
+        "直接发送指令即可，例如 <code>/weather 北京</code>、<code>/ai 你好</code>、<code>/hot zhihu</code>、<code>/free</code>（不限次数）、<code>/free 10 H</code>（热门）、<code>/app SU</code>（注册态，每人每天 3 次）",
     },
     fun: {
       title: "🎮 娱乐互动",

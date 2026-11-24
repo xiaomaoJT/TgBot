@@ -110,6 +110,7 @@ var I18N_CMD_EN = {
   weather:   { desc: "Query city weather", usage: "/weather <city>", examples: ["/weather Beijing", "/weather Tokyo"] },
   hot:       { desc: "Trending boards across platforms", usage: "/hot <platform>", examples: ["/hot weibo", "/hot zhihu"] },
   app:       { desc: "Fetch free promo codes (SU sign-up mode: 3/day per user)", usage: "/app [count] [Y|N] [SU]", examples: ["/app", "/app 10 Y", "/app SU", "/app 5 SU N"] },
+  free:      { desc: "Fetch free promo codes (trending/hot/featured/all, unlimited)", usage: "/free [count] [T|H|F|A] [R]", examples: ["/free", "/free 10 H", "/free 20 A", "/free 10 T R"] },
   ai:        { desc: "Chat with AI", usage: "/ai <question> | /ai clear to reset context" },
   ip:        { desc: "Lookup IP geolocation", usage: "/ip [IP]", examples: ["/ip", "/ip 8.8.8.8"] },
   phone:     { desc: "Detect mobile carrier by number", usage: "/phone <number>", examples: ["/phone 13800138000"] },

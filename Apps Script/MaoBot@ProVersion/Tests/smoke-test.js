@@ -326,6 +326,9 @@ callsOf("setMyCommands").forEach(function (c) {
 });
 ok(menuCmds.indexOf("say") === -1 && menuCmds.indexOf("broadcast") === -1,
   "★ 主人指令(/say,/broadcast)不进原生斜杠菜单（避免暴露给普通用户）", "菜单共 " + menuCmds.length + " 条");
+// ★ 输入框联想来自 setMyCommands：/app 与 /free 必须在原生命令列表里
+ok(menuCmds.indexOf("app") !== -1, "★ /app 进入原生命令菜单（输入框联想可见）");
+ok(menuCmds.indexOf("free") !== -1, "★ /free 进入原生命令菜单（输入框联想可见）");
 
 section("⑯① 中英文切换（i18n）");
 setCurrentLang("zh");
@@ -1891,6 +1894,116 @@ ok(EXT_CALLS.filter((c) => c.url.indexOf("/api/auth/register") !== -1).length ==
 ok(COMMANDS.some((c) => c.cmd === "app" && c.usage.indexOf("SU") !== -1),
   "★ /app usage 含 SU 参数");
 ok(!!(I18N_CMD_EN.app && I18N_CMD_EN.app.usage.indexOf("SU") !== -1), "★ /app 英文 usage 含 SU 参数");
+
+/* ------------------------------------------------------------ */
+section("★ 免费兑换码 /free（公开接口 + 缓存，不限次数）");
+
+// 清缓存，隔离前面 /app 的测试
+function freeClearCache() {
+  ["t", "h", "f", "a"].forEach((v) =>
+    PropertiesService.getScriptProperties().deleteProperty("mb_free_cache_" + v));
+}
+freeClearCache(); resetExt();
+
+// 构造一条数据源记录：含夹带兑换链接的整句
+const GF_APP = {
+  name: "DualTake Cam", category: "photo-video", platforms: ["ios"],
+  rating: 4.9, tagline: "Dual Format Video Recorder",
+  codesRemaining: 392, codesTotal: 1500,
+  singleCodeValue: "Use Code: GETFREEAPP or use this link https://apps.apple.com/redeem?ctx=offercodes&id=6761738035&code=GETFREEAPP",
+  appStoreUrl: "https://apps.apple.com/us/app/dualtake-cam/id6761738035",
+};
+const GF_API = promoDec(CONFIG.free.endpoint);
+// 四个视图共用同一 endpoint；mock 返回数组（getApps 返回分页对象，单独在下面测）
+mockRoute(GF_API, { status: "success", value: [GF_APP, {
+  name: "What2WatchAI", category: "entertainment", platforms: ["ios", "android"],
+  codesRemaining: 10, codesTotal: 100, singleCodeValue: "ILOVEMOVIES",
+  appStoreUrl: "https://apps.apple.com/us/app/x/id123",
+}] });
+
+// ① 默认趋势 + 数量上限 + 码解析（链接码 + 纯码两种形态）
+let fOut = String(apiFree(""));
+ok(fOut.indexOf("免费兑换码") !== -1, "★ /free 输出卡片标题");
+ok(fOut.indexOf("趋势") !== -1, "★ /free 默认视图是趋势 T");
+ok(fOut.indexOf("已取 2/2") !== -1, "★ /free 渲染全部返回条目");
+ok(fOut.indexOf("GETFREEAPP") !== -1, "★ /free 从含链接整句里拆出码");
+ok(fOut.indexOf("https://apps.apple.com/redeem?ctx=offercodes&amp;id=6761738035&amp;code=GETFREEAPP") !== -1,
+  "★ /free redeemUrl 里的 & 正确转义为 &amp;");
+ok(fOut.indexOf("<code>ILOVEMOVIES</code>") !== -1, "★ /free 纯码用等宽样式（无链接时不编造 URL）");
+ok(fOut.indexOf("⭐4.9") !== -1 && fOut.indexOf("photo-video") !== -1 && fOut.indexOf("IOS") !== -1,
+  "★ /free 展示分类/平台/评分");
+ok(fOut.indexOf("剩余/总数：<code>392/1500</code>") !== -1, "★ /free 展示码余量");
+ok(fOut.indexOf("\u200B") !== -1, "★ /free 条目间有间隔（零宽空格）");
+const fPath0 = EXT_CALLS.length && EXT_CALLS[EXT_CALLS.length - 1].body.path;
+ok(fPath0 === "apps:getTrendingApps", "★ /free 默认请求 getTrendingApps");
+ok(fOut.indexOf("实时") !== -1, "★ /free 首次请求标注实时");
+
+// ② 缓存命中：第二次不请求外部接口
+resetExt();
+let fCached = String(apiFree(""));
+ok(fCached.indexOf("缓存") !== -1, "★ /free 第二次调用命中缓存并标注");
+ok(EXT_CALLS.length === 0, "★ /free 缓存命中不再请求外部接口");
+
+// ③ R 强制刷新：跳过缓存重新请求
+resetExt();
+let fForced = String(apiFree("1 T R"));
+ok(fForced.indexOf("实时") !== -1, "★ /free R 强制刷新标注实时");
+ok(EXT_CALLS.length === 1, "★ /free R 强制刷新触发 1 次外部请求");
+ok(EXT_CALLS[0].body.path === "apps:getTrendingApps", "★ /free R 仍按视图请求正确接口");
+
+// ④ 视图路由 T/H/F/A
+[["H", "apps:getHotApps"], ["F", "apps:getFeaturedApps"], ["A", "apps:getApps"]].forEach((pair) => {
+  freeClearCache(); resetExt();
+  apiFree("1 " + pair[0]);
+  const call = EXT_CALLS[EXT_CALLS.length - 1];
+  ok(call && call.body.path === pair[1], "★ /free 视图 " + pair[0] + " 请求 " + pair[1]);
+});
+
+// ⑤ getApps 分页对象解析（A 视图返回 {page, isDone, continueCursor}）
+freeClearCache(); resetExt();
+mockRoute(GF_API, { status: "success", value: { page: [GF_APP], isDone: true, continueCursor: "" } });
+let aOut = String(apiFree("1 A"));
+ok(aOut.indexOf("DualTake Cam") !== -1, "★ /free A 视图解析分页对象的 page 字段");
+ok(EXT_CALLS.length === 1, "★ /free A 视图 isDone=true 时只拉 1 页");
+mockRoute(GF_API, { status: "success", value: [GF_APP, {
+  name: "What2WatchAI", singleCodeValue: "ILOVEMOVIES", codesRemaining: 10, codesTotal: 100,
+}] }); // 还原
+
+// ⑥ 数量上限 20 + 非法 token 宽容
+freeClearCache(); resetExt();
+let fMax = String(apiFree("999 T"));
+ok(fMax.indexOf("已取 2/2") !== -1, "★ /free 数量 999 被限制到 maxCount（mock 仅 2 条）");
+const maxVal = EXT_CALLS[0] && EXT_CALLS[0].body.args.limit;
+ok(maxVal === 20, "★ /free 数量上限 20 传入 limit");
+
+// ⑦ 接口失败友好提示
+freeClearCache(); resetExt();
+mockRoute(GF_API, { status: "error", errorMessage: "boom" });
+let fFail = String(apiFree(""));
+ok(fFail.indexOf("免费兑换码获取失败") !== -1, "★ /free 接口失败给出友好提示");
+ok(fFail.indexOf("/free") !== -1, "★ /free 失败提示带重试用法");
+mockRoute(GF_API, { status: "success", value: [GF_APP, {
+  name: "What2WatchAI", singleCodeValue: "ILOVEMOVIES", codesRemaining: 10, codesTotal: 100,
+}] }); // 还原
+
+// ⑧ 注册/help/快捷指令面板（不设限额）
+freeClearCache(); resetCalls();
+ok(COMMANDS.some((c) => c.cmd === "free" && c.menu === true && c.level === "public"),
+  "★ /free menu:true + public（同步原生命令菜单）");
+ok(COMMANDS.some((c) => c.cmd === "free" && c.usage.indexOf("T|H|F|A") !== -1),
+  "★ /free usage 含视图与刷新参数");
+ok(!!(I18N_CMD_EN.free && I18N_CMD_EN.free.usage.indexOf("/free") !== -1),
+  "★ /free 英文描述已登记");
+handleCallback({ chatId: "111222", userId: "111222", isGroup: false, userName: "u", chatType: "private", messageId: 10, callbackId: "CBFREE", callbackData: cbPack(["menu", "query"]) });
+var editFree = callsOf("editMessageText");
+ok(editFree.length && JSON.stringify(editFree[0].markup || editFree[0].body.reply_markup || {}).indexOf("cbx|free") !== -1,
+  "★ /free 登记在『查询工具』快捷指令面板");
+// 实际点按钮
+resetCalls(); resetExt();
+handleCallback({ chatId: "111222", userId: "111222", isGroup: false, userName: "u", chatType: "private", messageId: 11, callbackId: "CBFREECLICK", callbackData: cbPack(["cbx", "free"]) });
+var freeCard = lastOf("sendMessage");
+ok(freeCard && JSON.stringify(freeCard.body || {}).indexOf("免费兑换码") !== -1,
+  "★ 点击『趋势兑换码』按钮实际执行 /free");
 
 /* ============================================================ */
 console.log("\n" + "=".repeat(46));

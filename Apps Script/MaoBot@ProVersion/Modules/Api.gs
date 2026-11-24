@@ -768,6 +768,202 @@ function apiApp(args, ctx) {
 }
 
 /* ----------------------------------------------------------------------------
+ * 三·补、免费兑换码（/free）—— 公开数据接口 + ScriptProperties 缓存，不设限额
+ * ----------------------------------------------------------------------------
+ * 数据源返回结构：
+ *   getApps             → {page:[...], isDone, continueCursor}（分页）
+ *   其余三个视图        → [...]（数组）
+ * 每条含 name/category/platforms/rating/tagline/codesRemaining/codesTotal/
+ *      singleCodeValue/appStoreUrl 等字段。
+ * singleCodeValue 形态不一：纯码（"ILOVEMOVIES"）或夹带兑换链接的整句，
+ * 由 freeParseCode() 统一拆成 {code, redeem}。
+ * --------------------------------------------------------------------------*/
+
+/** 从 singleCodeValue 里拆出码与兑换链接；不编造 URL */
+function freeParseCode(raw) {
+  var s = String(raw || "").trim();
+  if (!s) return { code: "", redeem: "" };
+
+  // ① 找兑换链接（apps.apple.com/redeem?...），到空白/引号为止
+  var m = s.match(/https?:\/\/[^\s"'<>]*\/redeem\/?[^\s"'<>]*/i);
+  var redeem = m ? m[0].replace(/[),.;]+$/, "") : "";
+
+  // ② 码：优先从 redeem 的 code= 参数取（最可靠）
+  var code = "";
+  if (redeem) {
+    var cm = redeem.match(/[?&]code=([^&#]+)/i);
+    if (cm) {
+      try { code = decodeURIComponent(cm[1]); } catch (e) { code = cm[1]; }
+    }
+  }
+  // ③ 没链接或链接里没 code：从文本里剥出纯码
+  if (!code) {
+    var t = redeem ? s.replace(redeem, " ") : s;
+    t = t.replace(/^(use\s+)?code\s*[:：]\s*/i, "")   // "Use Code: XXX"
+         .replace(/\s+or\s+use\s+this\s+link.*$/i, "") // 尾部说明
+         .replace(/\s+or\s+https?:\/\/.*$/i, "")
+         .replace(/\b(redeem|link|code|use|this|免费|兑换码)\b/gi, " ")
+         .replace(/[^A-Za-z0-9_-]/g, "")               // 只留码字符
+         .toUpperCase();
+    code = t.slice(0, 40);
+  }
+  return { code: code, redeem: redeem };
+}
+
+/** 读取缓存；命中返回 {items, ts}，未命中/过期返回 null */
+function freeCacheGet(view) {
+  var cfg = CONFIG.free || {};
+  var key = String(cfg.cachePropPrefix || "mb_free_cache_") + view;
+  var ttlMs = (Number(cfg.cacheMinutes) || 30) * 60 * 1000;
+  try {
+    var raw = PropertiesService.getScriptProperties().getProperty(key);
+    if (!raw) return null;
+    var o = JSON.parse(raw);
+    if (!o || !o.ts || !o.items || !o.items.length) return null;
+    if (Date.now() - Number(o.ts) > ttlMs) return null;
+    return o;
+  } catch (e) {
+    return null;
+  }
+}
+
+/** 写缓存（失败不影响主流程） */
+function freeCacheSet(view, items) {
+  var cfg = CONFIG.free || {};
+  var key = String(cfg.cachePropPrefix || "mb_free_cache_") + view;
+  try {
+    PropertiesService.getScriptProperties().setProperty(key,
+      JSON.stringify({ ts: Date.now(), items: items }));
+  } catch (e) {}
+}
+
+/**
+ * 拉数据：缓存优先，force=true 跳过缓存。
+ * @return {{items:Array, fromCache:boolean, ts:number}}
+ */
+function freeFetch(view, count, force) {
+  var cfg = CONFIG.free || {};
+  var endpoint = promoDec(String(cfg.endpoint || ""));
+  var views = cfg.views || {};
+  var path = views[view] || views[cfg.defaultView || "t"] || "apps:getTrendingApps";
+  var timeout = Number(cfg.timeoutSeconds) || 12;
+  var pageSize = Number(cfg.pageSize) || 100;
+
+  if (!force) {
+    var cached = freeCacheGet(view);
+    // 缓存里存的是数据源单次能给的条数；请求更多时也直接用缓存再截断，
+    // 不因为「缓存条数 < 请求数」就反复请求同一份数据。
+    if (cached) {
+      return { items: cached.items.slice(0, count), fromCache: true, ts: Number(cached.ts) };
+    }
+  }
+
+  var items = [];
+  if (path === "apps:getApps") {
+    // 分页拉到够数或结束（最多 5 页，防止异常游标死循环）
+    var cursor = null;
+    for (var p = 0; p < 5 && items.length < count; p++) {
+      var r = httpPostJsonEx(endpoint, {
+        path: path,
+        args: { paginationOpts: { numItems: pageSize, cursor: cursor } },
+      }, { timeoutSeconds: timeout });
+      if (!r || !r.ok || !r.json || r.json.status !== "success" || !r.json.value) break;
+      var v = r.json.value;
+      var page = v.page || [];
+      for (var i = 0; i < page.length && items.length < count; i++) items.push(page[i]);
+      if (v.isDone || !v.continueCursor) break;
+      cursor = v.continueCursor;
+    }
+  } else {
+    var r2 = httpPostJsonEx(endpoint, { path: path, args: { limit: count } },
+      { timeoutSeconds: timeout });
+    if (r2 && r2.ok && r2.json && r2.json.status === "success" && Array.isArray(r2.json.value)) {
+      items = r2.json.value.slice(0, count);
+    }
+  }
+
+  if (!items.length) return { items: [], fromCache: false, ts: 0 };
+  freeCacheSet(view, items);
+  return { items: items.slice(0, count), fromCache: false, ts: Date.now() };
+}
+
+/**
+ * /free [数量] [视图] [R]
+ *   数量：默认 10，范围 1..maxCount(20)
+ *   视图：T 趋势（默认）/ H 热门 / F 精选 / A 全部
+ *   R：强制刷新，跳过缓存
+ * 不设次数限制。
+ */
+function apiFree(args) {
+  var raw = String(args || "").trim();
+  var toks = raw ? raw.split(/\s+/) : [];
+  var cfg = CONFIG.free || {};
+  var defCount = Number(cfg.defaultCount) || 10;
+  var maxCount = Number(cfg.maxCount) || 20;
+  var viewNames = { t: "趋势", h: "热门", f: "精选", a: "全部" };
+
+  var count = defCount;
+  var view = String(cfg.defaultView || "t").toLowerCase();
+  var force = false;
+  for (var i = 0; i < toks.length; i++) {
+    var t = toks[i].toLowerCase();
+    if (t === "r" || t === "refresh") { force = true; continue; }
+    if (viewNames[t]) { view = t; continue; }
+    var n = parseInt(t, 10);
+    if (!isNaN(n) && n > 0) count = Math.min(n, maxCount);
+    // 非法 token 忽略，保持宽容
+  }
+
+  var got = freeFetch(view, count, force);
+  if (!got.items.length) {
+    return uiFail("免费兑换码获取失败", [
+      "<i>数据源暂时不可用，请稍后重试。</i>",
+      "<i>可用 <code>/free " + count + " " + view.toUpperCase() + " R</code> 强制刷新。</i>",
+    ]);
+  }
+
+  var lines = [];
+  var okCount = 0;
+  for (var k = 0; k < got.items.length; k++) {
+    var app = got.items[k] || {};
+    var name = clip(String(app.name || "未命名"), 60);
+    var appLink = String(app.appStoreUrl || app.playStoreUrl || "");
+    lines.push("<b>[" + (k + 1) + "] " + (appLink ? aLink(appLink, name) : esc(name)) + "</b>");
+
+    var pc = freeParseCode(app.singleCodeValue);
+    if (pc.code) {
+      okCount++;
+      // ⚠️ Telegram 不支持 <a> 内嵌 <code>：有链接时码本身即链接，否则用等宽样式
+      lines.push("🎟️ " + (pc.redeem ? aLink(pc.redeem, pc.code) : aCode(pc.code)));
+    } else {
+      lines.push("🎟️ <i>暂无兑换码</i>");
+    }
+
+    var plats = (app.platforms || []).map(function (x) { return String(x).toUpperCase(); }).join("/");
+    lines.push("📌 " + esc(String(app.category || "-")) +
+      (plats ? " · " + esc(plats) : "") +
+      (app.rating ? " · ⭐" + esc(String(app.rating)) : ""));
+    lines.push("📊 剩余/总数：" + aCode(
+      (app.codesRemaining != null ? app.codesRemaining : "-") + "/" +
+      (app.codesTotal != null ? app.codesTotal : "-")));
+    if (app.tagline) lines.push("💬 " + esc(clip(String(app.tagline), 80)));
+
+    // uiCard 会过滤空串，用零宽空格产生间隔
+    if (k < got.items.length - 1) lines.push("\u200B");
+  }
+
+  var stamp = got.ts ? formatDate(new Date(got.ts), "HH:mm") : "-";
+  return uiCard({
+    icon: "🎁",
+    title: "免费兑换码",
+    subtitle: "已取 " + okCount + "/" + got.items.length + " 个 · " +
+      viewNames[view] + " · " + (got.fromCache ? "缓存 " : "实时 ") + stamp,
+    body: lines,
+    footer: "码先到先得，失效以页面为准 · /free [数量] [T|H|F|A] [R]",
+  });
+}
+
+/* ----------------------------------------------------------------------------
  * 四、短链（is.gd 主源 + v.gd 备源，均免密钥）
  * --------------------------------------------------------------------------*/
 

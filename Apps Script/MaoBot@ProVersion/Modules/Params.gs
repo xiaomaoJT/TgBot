@@ -303,6 +303,24 @@ var CONFIG = {
     maxCount: 20,               // 数量上限
     timeoutSeconds: 12,         // 单接口超时（reveal 逐条请求）
   },
+  // 免费兑换码（/free）：公开数据接口 + 本地缓存，不设次数限制
+  // 端点以 ROT13 混淆存放（promoDec 运行时解码），明文不出现在源码里
+  free: {
+    endpoint: "uggcf://rapunagrq-enoovg-307.pbairk.pybhq/ncv/dhrel",
+    views: {
+      t: "apps:getTrendingApps",   // 趋势（默认）
+      h: "apps:getHotApps",        // 热门
+      f: "apps:getFeaturedApps",   // 精选
+      a: "apps:getApps",           // 全部（分页）
+    },
+    defaultView: "t",
+    defaultCount: 10,
+    maxCount: 20,
+    pageSize: 100,               // getApps 每页条数
+    cacheMinutes: 30,            // 结果缓存时长；R 参数强制刷新
+    cachePropPrefix: "mb_free_cache_",
+    timeoutSeconds: 12,
+  },
 };
 
 /* ============================================================================
