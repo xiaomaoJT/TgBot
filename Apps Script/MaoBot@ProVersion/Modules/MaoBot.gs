@@ -477,6 +477,64 @@ function userNameOf(user) {
   return [user.first_name || "", user.last_name || ""].join("") || user.username || String(user.id);
 }
 
+/**
+ * 解析消息里的 @ 提及（entities），用于精确判断「群里 @ 的是不是本 bot」。
+ *
+ * Telegram 的 mention entity 只给 offset/length，用户名要从原文切片取；
+ * text_mention（无 username 的用户）则带 user.id，用数字 ID 比对。
+ *
+ * @return {object}
+ *   mentionsBot —— 是否 @ 了本 bot（mention 比 username，text_mention 比数字 ID）
+ *   mentionsAny —— 是否 @ 了任何人
+ *   cleanText   —— 去掉所有 @ 片段并 trim 后的正文（关键词匹配 / AI prompt 用）
+ *   mentionOnly —— 裸 @（@ 完没其它内容）
+ */
+function parseMentions(msg) {
+  var text = String((msg && (msg.text || msg.caption)) || "");
+  var entities = (msg && (msg.entities || msg.caption_entities)) || [];
+  var botName = String(botUsername || "").replace(/^@/, "").toLowerCase();
+  var botNumericId = String(botIdAlone || "");
+
+  var mentionsBot = false;
+  var mentionsAny = false;
+  var spans = [];
+
+  for (var i = 0; i < entities.length; i++) {
+    var en = entities[i] || {};
+    var type = String(en.type || "");
+    if (type !== "mention" && type !== "text_mention") continue;
+    var off = Number(en.offset);
+    var len = Number(en.length);
+    if (isNaN(off) || isNaN(len) || off < 0 || len <= 0) continue;
+
+    mentionsAny = true;
+    var isBot = false;
+    if (type === "text_mention") {
+      isBot = !!botNumericId && String(get(en, "user.id", "")) === botNumericId;
+    } else {
+      var uname = text.substr(off, len).replace(/^@/, "").toLowerCase();
+      isBot = !!botName ? uname === botName : true; // username 未配置时宽松降级（兼容旧行为）
+    }
+    if (isBot) mentionsBot = true;
+    spans.push({ offset: off, length: len });
+  }
+
+  var clean = text;
+  // 从后往前切，避免前面的移除让后面的 offset 漂移
+  spans.sort(function (a, b) { return b.offset - a.offset; });
+  for (var j = 0; j < spans.length; j++) {
+    clean = clean.slice(0, spans[j].offset) + clean.slice(spans[j].offset + spans[j].length);
+  }
+  clean = clean.replace(/^[\s,，:：]+/, "").trim();
+
+  return {
+    mentionsBot: mentionsBot,
+    mentionsAny: mentionsAny,
+    cleanText: clean,
+    mentionOnly: mentionsBot && !clean,
+  };
+}
+
 function buildCtx(msg, kind, update) {
   var chat = (msg && msg.chat) || {};
   var from = (msg && msg.from) || {};
@@ -484,6 +542,7 @@ function buildCtx(msg, kind, update) {
   var chatId = String(chat.id || "");
   var userId =
     chat.type === "private" ? String(from.id || "") : String(from.id || chatId);
+  var mentions = parseMentions(msg);
 
   return {
     update: update,
@@ -502,8 +561,12 @@ function buildCtx(msg, kind, update) {
     userName: userNameOf(from),
     userNameKey: from.username ? "@" + from.username : "",
     text: msg ? msg.text || "" : "",
+    cleanText: mentions.cleanText,
+    mentionsBot: mentions.mentionsBot,
+    mentionsAny: mentions.mentionsAny,
+    mentionOnly: mentions.mentionOnly,
     reply: msg ? msg.reply_to_message || null : null,
-    isKing: String(userId) === String(KingId) && !!KingId,
+    isKing: isKingId(userId),
     isBotOwner: null, // 惰性求值
   };
 }
@@ -594,22 +657,84 @@ function defaultInlineKeyboard(ctx) {
  * 三、兜底回复
  * ==========================================================================*/
 
-function fallbackReply(ctx) {
-  // 只在"私聊"或"回复机器人"或"被 @ 提及"时才回应，避免群里刷屏
-  var mentioned = false;
-  try {
-    mentioned = (ctx.message.entities || []).some(function (en) {
-      return en.type === "mention";
+/**
+ * 检测「用户输入了指令名但漏了斜杠」——如 app / free / weather 北京。
+ * 只在第一个词精确等于某条 public 指令名或别名时命中，避免误伤正常聊天。
+ * @return {object|null} { cmd, args, def }
+ */
+function guessCommandHint(text) {
+  var s = String(text || "").trim();
+  if (!s || s.charAt(0) === "/" || s.charAt(0) === "!") return null; // 已有前缀，不该走这
+  var parts = s.split(/\s+/);
+  var name = parts[0].toLowerCase();
+  var def = findCommand(name);
+  if (!def || def.level !== "public") return null; // 管理/主人指令不提示，避免暴露
+  return { cmd: "/" + def.cmd, args: parts.slice(1).join(" "), def: def };
+}
+
+/** 漏斜杠指令的友好提示卡片 */
+function commandHintCard(ctx, hint) {
+  var usage = cmdUsageI18n(hint.def);
+  var body = [
+    L("你输入的是指令名，前面加 <code>/</code> 才会执行。正确写法：",
+      "That looks like a command — add <code>/</code> in front to run it:"),
+    "",
+    uiItem(uiMono(usage)),
+  ];
+  var examples = cmdExamplesI18n(hint.def);
+  if (examples.length) {
+    body.push("");
+    body.push(L("例如：", "e.g."));
+    examples.slice(0, 4).forEach(function (ex) {
+      body.push(uiItem(uiMono(ex)));
     });
-  } catch (e) {}
+  }
+  body.push("");
+  body.push(uiItem(L(uiCmd("/help") + " 查看全部功能", "Send " + uiCmd("/help") + " for all features")));
+  return uiCard({ icon: "💡", title: L("指令写法提示", "Command tip"), body: body });
+}
+
+function fallbackReply(ctx) {
+  // 只在"私聊"或"回复机器人"或"@ 了【本 bot】"时才回应，避免群里刷屏。
+  // ⚠️ 旧版只看 entity.type==="mention"，群里 @ 任何人都会误触发「未匹配到内容」。
+  //    现在用 ctx.mentionsBot（按 username / 数字 ID 精确比对）。
+  var mentioned = !!ctx.mentionsBot;
   var replyingBot =
     ctx.reply && String(get(ctx.reply, "from.id", "")) === String(botIdAlone);
 
   if (!ctx.isPrivate && !replyingBot && !mentioned) return;
 
-  // 回复机器人消息 → 走 AI 续聊
-  if (replyingBot) {
-    var prompt = ctx.text || readableContent(ctx.message);
+  // 群里只 @ 了一下 bot（没带问题）→ 友好引导，不再弹"未匹配到内容"
+  if (ctx.mentionOnly && !ctx.isPrivate) {
+    sendCard(
+      ctx,
+      uiCard({
+        icon: "🤖",
+        title: L("我在，请直接说需求", "I'm here — tell me what you need"),
+        body: [
+          uiItem(L("回复本机器人消息即可 AI 对话，或 " + uiCmd("/ai 你的问题") + " 直接问",
+            "Reply to my message for AI chat, or use " + uiCmd("/ai your question"))),
+          uiItem(L(uiCmd("/help") + " 查看全部功能 · " + uiCmd("/menu") + " 打开功能面板",
+            uiCmd("/help") + " for all features · " + uiCmd("/menu") + " for the panel")),
+        ],
+      }),
+      { reply_markup: defaultInlineKeyboard(ctx) }
+    );
+    return;
+  }
+
+  // ⭐ 漏斜杠的指令名（如 "app" / "@bot app"）→ 先提示正确写法，
+  //    放在 AI 分支之前，避免被 AI 吞掉（AI 未配置时原分支会直接 return）。
+  var showText = ctx.cleanText || ctx.text || "";
+  var hint = guessCommandHint(showText);
+  if (hint) {
+    sendCard(ctx, commandHintCard(ctx, hint), { reply_markup: defaultInlineKeyboard(ctx) });
+    return;
+  }
+
+  // 回复机器人消息 / @ 本 bot 带问题 → 走 AI 续聊
+  if (replyingBot || (mentioned && ctx.cleanText)) {
+    var prompt = showText || readableContent(ctx.message);
     if (!aiStatus().ok) return;
     withTyping(ctx, "typing", function () {});
     var r = apiAIText(prompt, ctx);
@@ -625,10 +750,10 @@ function fallbackReply(ctx) {
     return;
   }
 
-  // 普通兜底
+  // 普通兜底（用 showText：@ 前缀已剥离，不会再把 "@bot 关键词" 当整句展示）
   var body = [
-    L("我没有找到与 <b>" + esc(clip(ctx.text, 40)) + "</b> 匹配的内容。",
-      "I couldn't find anything matching <b>" + esc(clip(ctx.text, 40)) + "</b>."),
+    L("我没有找到与 <b>" + esc(clip(showText, 40)) + "</b> 匹配的内容。",
+      "I couldn't find anything matching <b>" + esc(clip(showText, 40)) + "</b>."),
     "",
     uiItem(L("发送 " + uiCmd("/help") + " 查看全部功能",
       "Send " + uiCmd("/help") + " to see all features")),
@@ -757,7 +882,9 @@ function loadKeywords() {
  *   null 表示已命中，且回复已由本函数直接发出。
  */
 function matchKeyword(ctx) {
-  var text = ctx.text;
+  // ⭐ 用 cleanText：群里 "@bot 关键词" 要按「关键词」去匹配，
+  //    否则 @ 前缀会让短词全等、长词子串都失准。
+  var text = ctx.cleanText || ctx.text;
   if (!text) return undefined;
 
   var list = loadKeywords();

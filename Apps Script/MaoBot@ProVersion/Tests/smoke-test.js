@@ -18,6 +18,7 @@ EXECID = "MOCK_SHEET_ID";
 BOTID = "123456:MOCK_TOKEN";
 KingId = "777777";
 botIdAlone = "123456";
+botUsername = "test_monitor_bot";
 CONFIG.cache.enabled = false; // 关闭缓存便于逐条验证
 
 let UID = 5000;
@@ -48,6 +49,7 @@ function mkUpdate(text, opts) {
     text,
   };
   if (o.replyTo) msg.reply_to_message = o.replyTo;
+  if (o.entities) msg.entities = o.entities;
   if (o.caption !== undefined) { delete msg.text; msg.caption = o.caption; }
   if (o.photo) { delete msg.text; msg.photo = [{ file_id: "FID_SMALL" }, { file_id: "FID_BIG" }]; }
   return { update_id: nextUpdateId(), message: msg };
@@ -2004,6 +2006,112 @@ handleCallback({ chatId: "111222", userId: "111222", isGroup: false, userName: "
 var freeCard = lastOf("sendMessage");
 ok(freeCard && JSON.stringify(freeCard.body || {}).indexOf("免费兑换码") !== -1,
   "★ 点击『趋势兑换码』按钮实际执行 /free");
+
+/* ============================================================ */
+section("★★ 群聊 @ 精确识别 + 漏斜杠提示 + 主人消息保护");
+
+const BOT_MENTION = "@test_monitor_bot";
+const OTHER_MENTION = "@someone_else";
+
+/* ---- ① parseMentions：精确判断 @ 的是谁 ---- */
+const BOT_ENT = [{ type: "mention", offset: 0, length: BOT_MENTION.length }];
+let pm = parseMentions({ text: BOT_MENTION + " 你好", entities: BOT_ENT });
+ok(pm.mentionsBot === true, "★ parseMentions 精确识别 @ 本 bot");
+ok(pm.cleanText === "你好", "★ parseMentions 剥离 @bot 前缀得到正文");
+pm = parseMentions({ text: OTHER_MENTION + " 你好", entities: [
+  { type: "mention", offset: 0, length: OTHER_MENTION.length },
+] });
+ok(pm.mentionsBot === false && pm.mentionsAny === true, "★ @ 别人不算 @ 本 bot");
+ok(pm.cleanText === "你好", "★ @ 别人的前缀也剥离，不当关键词");
+pm = parseMentions({ text: BOT_MENTION, entities: [
+  { type: "mention", offset: 0, length: BOT_MENTION.length },
+] });
+ok(pm.mentionOnly === true, "★ 裸 @（只有 @ 没正文）被识别");
+pm = parseMentions({ text: "你好", entities: [
+  { type: "text_mention", offset: 0, length: 2, user: { id: Number(botIdAlone) } },
+] });
+ok(pm.mentionsBot === true, "★ text_mention 用数字 ID 也能识别本 bot");
+
+/* ---- ② 群聊 @ 别人不误触发兜底 ---- */
+resetCalls();
+post(mkUpdate(OTHER_MENTION + " 随便聊聊", {
+  fromId: 6101,
+  entities: [{ type: "mention", offset: 0, length: OTHER_MENTION.length }],
+}));
+let groupMsgs = callsOf("sendMessage").filter((c) => String(c.body.chat_id) !== String(KingId));
+ok(groupMsgs.length === 0, "★ 群里 @ 别人，bot 不再回「未匹配到内容」");
+
+/* ---- ③ 裸 @ 本 bot → 友好引导，不是「未匹配到内容」 ---- */
+resetCalls();
+post(mkUpdate(BOT_MENTION, {
+  fromId: 6102,
+  entities: [{ type: "mention", offset: 0, length: BOT_MENTION.length }],
+}));
+let bareMention = lastOf("sendMessage");
+ok(bareMention && bareMention.body.text.indexOf("未匹配到内容") === -1,
+  "★ 裸 @ 本 bot 不再弹「未匹配到内容」");
+ok(bareMention && bareMention.body.text.indexOf("我在") !== -1,
+  "★ 裸 @ 本 bot 给友好引导");
+
+/* ---- ④ @bot + 指令名 → 漏斜杠提示（群聊；先关 AI 避免走 AI 续聊）---- */
+CONFIG.ai.geminiKey = "";
+resetCalls();
+post(mkUpdate(BOT_MENTION + " app", {
+  fromId: 6103,
+  entities: [{ type: "mention", offset: 0, length: BOT_MENTION.length }],
+}));
+let atCmd = lastOf("sendMessage");
+ok(atCmd && atCmd.body.text.indexOf("指令写法提示") !== -1,
+  "★ @bot + 指令名给出写法提示（AI 未配置时走提示）");
+
+/* ---- ⑤ 私聊漏斜杠 "app" → 提示正确写法 + 示例 ---- */
+resetCalls();
+post(mkUpdate("app", { chatType: "private" }));
+let hintCard = lastOf("sendMessage");
+ok(hintCard && hintCard.body.text.indexOf("指令写法提示") !== -1,
+  "★ 私聊输入 app（无斜杠）给写法提示");
+ok(hintCard && hintCard.body.text.indexOf("/app") !== -1,
+  "★ 提示里含正确写法 /app");
+ok(hintCard && hintCard.body.text.indexOf("/app SU") !== -1,
+  "★ 提示里含示例 /app SU");
+resetCalls();
+post(mkUpdate("free 10 H", { chatType: "private" }));
+let hintFree = lastOf("sendMessage");
+ok(hintFree && hintFree.body.text.indexOf("/free") !== -1,
+  "★ 私聊输入 free 10 H（无斜杠）也提示 /free");
+
+/* ---- ⑥ help 排版：示例 + 参数注解 + 条目间隔 ---- */
+let helpQuery = String(buildHelpText("查询", 0));
+ok(helpQuery.indexOf("例：") !== -1 || helpQuery.indexOf("e.g.") !== -1,
+  "★ /help 查询类展示示例");
+ok(helpQuery.indexOf("Y=仅热门") !== -1, "★ /help 对 [Y|N] 给中文注解");
+ok(helpQuery.indexOf("T=趋势") !== -1, "★ /help 对 [T|H|F|A] 给中文注解");
+ok(helpQuery.indexOf("\u200B") !== -1, "★ /help 指令条目间有间隔");
+
+/* ---- ⑦ 主人消息绝对不被删除 ---- */
+// 主人发敏感词：不删、不警告、不计数
+addSensitiveWord("主人测试词", "sensitive");
+cacheDrop(["sensitiveWords", "sensitiveWordsMap"]);
+resetCalls();
+post(mkUpdate("这里有主人测试词", { chatType: "supergroup", fromId: 777777 }));
+ok(callsOf("deleteMessage").length === 0, "★ 主人发敏感词，消息不被删除");
+ok(callsOf("sendMessage").every((c) => String(c.body.chat_id) !== "-1001234567890"),
+  "★ 主人发敏感词，群里不弹警告卡片");
+
+// 主人命中关键词（触发关键字）：不删消息
+const kp2 = getSS().getSheetByName("key_params");
+kp2._set(6, 1, "主人关键词");
+kp2._set(6, 2, "HTML");
+kp2._set(6, 3, "关键词回复内容");
+cacheDrop(["keyParamsList"]);
+resetCalls();
+post(mkUpdate("主人关键词", { chatType: "supergroup", fromId: 777777 }));
+ok(callsOf("deleteMessage").length === 0, "★ 主人触发关键字，消息不被删除");
+
+// 批量清理函数直接拒绝主人
+getSS().getSheetByName("db_telegram")._set(2, 2, "777777");
+ok(deleteRecentMessages("-1001234567890", "777777", 24) === 0,
+  "★ deleteRecentMessages 对主人直接返回 0");
 
 /* ============================================================ */
 console.log("\n" + "=".repeat(46));

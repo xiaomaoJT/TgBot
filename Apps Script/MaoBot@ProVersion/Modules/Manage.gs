@@ -242,6 +242,7 @@ function detectWords(text) {
 function securityFilter(ctx) {
   if (!ctx.isGroup) return false;
   if (!isChatFeatureOn(ctx.chatId, "filter")) return false;
+  if (isKingId(ctx.userId)) return false; // 🛡️ 主人绝对不拦：不删消息、不警告、不计数（无论是否命中关键字）
   if (isChatAdmin(ctx)) return false; // 管理员不拦
 
   var text = ctx.text || "";
@@ -323,6 +324,9 @@ function securityFilter(ctx) {
 
 /** 删除某用户近 N 小时的消息（批量 API，一次最多 100 条） */
 function deleteRecentMessages(chatId, userId, hours) {
+  // 🛡️ 主人消息绝对不删：这是所有「按用户批量清理」的公共出口
+  //    （敏感词绝杀、/purge、封禁清理都走这里），在此统一拦截最稳。
+  if (isKingId(userId)) return 0;
   var ids = recentMessageIds(userId, chatId, hours);
   if (!ids.length) return 0;
   // 分批，避免单次请求过大
@@ -572,6 +576,7 @@ function cmdBanAction(ctx, args) {
     return uiUsage("/ban", "/ban [时长]（回复目标用户的消息）", ["/ban", "/ban 30m", "/ban 3d"]);
   }
   if (String(target.id) === String(botIdAlone)) return uiFail("不能对自己下手 🙂");
+  if (isKingId(target.id)) return uiFail("不能对主人下手 🙂"); // 🛡️
   if (isChatAdmin({ chatId: ctx.chatId, userId: target.id, isGroup: true, isKing: false })) {
     return uiFail("对方是管理员，无法封禁");
   }
@@ -619,6 +624,7 @@ function cmdMuteAction(ctx, args) {
   if (!ctx.isGroup) return uiWarn("该指令仅在群聊中可用");
   var target = resolveTarget(ctx, args);
   if (!target) return uiUsage("/mute", "/mute [时长]（回复目标用户）", ["/mute 10m", "/mute 1h"]);
+  if (isKingId(target.id)) return uiFail("不能禁言主人 🙂"); // 🛡️
 
   var durMatch = String(args || "").match(/(\d+\s*[smhdw])/i);
   var seconds = durMatch ? Math.max(30, parseDuration(durMatch[1].replace(/\s/g, "")) - unixNow()) : 3600;
@@ -638,6 +644,7 @@ function cmdKickAction(ctx, args) {
   var target = resolveTarget(ctx, args);
   if (!target) return uiUsage("/kick", "/kick（回复目标用户）");
   if (String(target.id) === String(botIdAlone)) return uiFail("不能踢我自己 🙂");
+  if (isKingId(target.id)) return uiFail("不能踢主人 🙂"); // 🛡️
 
   var r = tgKickMember(ctx.chatId, target.id);
   if (!r) return uiFail("移出失败", ["请确认我已拥有「封禁用户」管理员权限。"]);
@@ -700,6 +707,7 @@ function cmdWarnAction(ctx, args) {
   var target = resolveTarget(ctx, args);
   if (!target) return uiUsage("/warn", "/warn [原因]（回复目标用户）", ["/warn 广告刷屏"]);
   if (String(target.id) === String(botIdAlone)) return uiFail("不能警告我自己 🙂");
+  if (isKingId(target.id)) return uiFail("不能警告主人 🙂"); // 🛡️
 
   var reason = String(args || "").replace(/\d{5,}/, "").trim() || "未说明";
   addWarn(ctx.chatId, target.id, target.name, ctx.userId, reason);
@@ -819,13 +827,15 @@ function cmdPurgeAction(ctx, args) {
   // 没有指定目标时，至少把当前指令和它回复的那条删掉
   if (!target) {
     if (ctx.reply) {
-      tgDeleteMessage(ctx.chatId, ctx.reply.message_id);
+      // 🛡️ 回复的是主人消息时保留，绝不删除
+      if (!isKingId(get(ctx.reply, "from.id", ""))) tgDeleteMessage(ctx.chatId, ctx.reply.message_id);
       tgDeleteMessage(ctx.chatId, ctx.messageId);
       return null;
     }
     return uiUsage("/purge", "/purge（回复目标用户的消息，清理其近 24 小时发言）");
   }
 
+  if (isKingId(target.id)) return uiFail("不能清理主人的消息 🙂"); // 🛡️
   var n = deleteRecentMessages(ctx.chatId, target.id, 24);
   tgDeleteMessage(ctx.chatId, ctx.messageId);
 
@@ -1283,6 +1293,10 @@ function handleKingCallback(ctx, parts) {
   if (action === "ban") {
     var chatId = parts[2];
     var userId = parts[3];
+    if (isKingId(userId)) { // 🛡️ 主人永不封禁、永不清理消息
+      tgAnswerCallback(ctx.callbackId, "不能对主人操作 🙂", true);
+      return;
+    }
     var r = tgBanMember(chatId, userId, 0);
     tgAnswerCallback(ctx.callbackId, r ? "已封禁" : "封禁失败", !r);
     if (r) {

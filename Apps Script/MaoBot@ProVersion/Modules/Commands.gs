@@ -512,29 +512,87 @@ function helpCategories() {
   return cats;
 }
 
-/** 构造某分类下的帮助条目（每项可能占 2 行） */
+/** usage 里特殊标记的中文注解（帮用户看懂 [Y|N] / SU 这类简写） */
+var HELP_ARG_NOTES = {
+  "数量": "1–20 的数字，省略则取默认",
+  "Y|N": "Y=仅热门，N=全部",
+  "SU": "注册态取码（每人每天 3 次）",
+  "T|H|F|A": "T=趋势 H=热门 F=精选 A=全部",
+  "R": "加 R 强制刷新，跳过缓存",
+  "分类": "如 查询 / 娱乐 / 工具",
+  "城市": "城市名，如 北京",
+  "平台": "平台名，如 weibo / zhihu",
+  "IP": "IP 地址，留空查自己的",
+  "号码": "手机号",
+  "问题": "你想问的内容",
+  "时长": "如 30m / 2h / 3d",
+  "条数": "数字，省略取默认",
+};
+
+/** 从 usage 中抽出 [...] <...> 标记，配上可读注解 */
+function helpArgNote(usage) {
+  var s = String(usage || "");
+  var tokens = s.match(/[\[<]([^\]>]+)[\]>]/g) || [];
+  var notes = [];
+  for (var i = 0; i < tokens.length; i++) {
+    var inner = tokens[i].slice(1, -1).split(/[\s,，]/)[0];
+    var text = HELP_ARG_NOTES[inner];
+    if (text && notes.indexOf(inner) === -1) notes.push(inner + "：" + text);
+  }
+  return notes;
+}
+
+/** 取指令示例（英文环境下优先英文示例，回落原表） */
+function cmdExamplesI18n(c) {
+  var list = c.examples || [];
+  if (__CUR_LANG__ === "en") {
+    var en = I18N_CMD_EN[c.cmd];
+    if (en && en.examples && en.examples.length) return en.examples;
+  }
+  return list;
+}
+
+/**
+ * 构造某分类下的帮助条目。
+ * ⭐ 每条＝描述 + 用法 + 示例（若有）+ 参数注解（若有），条目之间用零宽空格留白，
+ *    解决「指令挤在一起、[Y|N] 看不懂」的反馈。
+ */
 function helpLines(cat) {
-  return helpVisibleCommands()
-    .filter(function (c) {
-      return !cat || c.cat === cat;
-    })
-    .map(function (c) {
-      var usage = cmdUsageI18n(c);
-      return (
-        uiItem("<b>" + esc(cmdDescI18n(c)) + "</b>\n   " + uiMono(usage)) +
-        (c.alias && c.alias.length ? " <i>(" + esc(c.alias.join(", ")) + ")</i>" : "")
-      );
-    });
+  var out = [];
+  var visible = helpVisibleCommands().filter(function (c) {
+    return !cat || c.cat === cat;
+  });
+  visible.forEach(function (c, idx) {
+    var usage = cmdUsageI18n(c);
+    var block = [
+      uiItem("<b>" + esc(cmdDescI18n(c)) + "</b>"),
+      "   " + uiMono(usage) +
+        (c.alias && c.alias.length ? "  <i>(" + esc(c.alias.join(", ")) + ")</i>" : ""),
+    ];
+    var examples = cmdExamplesI18n(c);
+    if (examples.length) {
+      block.push("   " + L("例：", "e.g. ") + examples.map(uiMono).join("  "));
+    }
+    var notes = helpArgNote(usage);
+    if (notes.length) {
+      block.push("   <i>" + esc(notes.join("；")) + "</i>");
+    }
+    out.push(block.join("\n"));
+    // 条目间留白：uiCard 的 body.filter 会丢掉严格 ""，用零宽空格代替
+    if (idx < visible.length - 1) out.push("\u200B");
+  });
+  return out;
 }
 
 function helpTotalPages(cat) {
-  return Math.max(1, Math.ceil(helpLines(cat).length / 8));
+  // 每条现在还带 1 个间隔行，按 5 条/页计算，避免单页过长
+  return Math.max(1, Math.ceil(helpLines(cat).length / 10));
 }
 
 /** 帮助菜单正文 */
 function buildHelpText(cat, page) {
   var lines = helpLines(cat);
-  var pg = paginate(lines, page, 8);
+  var pg = paginate(lines, page, 10); // 5 条指令 + 间隔行
   var cats = helpCategories();
 
   return uiCard({
